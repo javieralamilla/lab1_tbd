@@ -5,14 +5,14 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.5</version>
+		<version>3.5.7</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>Lab1_tbd</artifactId>
+	<groupId>cl.usach.tbd.grupo4</groupId>
+	<artifactId>plataforma-urbanismo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Lab1_tbd</name>
-	<description>Demo project for Spring Boot</description>
+	<name>plataforma-urbanismo</name>
+	<description>API RESTful para la Plataforma de Urbanismo y Planificación</description>
 	<url/>
 	<licenses>
 		<license/>
