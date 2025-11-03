@@ -1,0 +1,36 @@
+/* src/assets/css/theme.css */
+:root {
+  --bg-primary: #0F172A;
+  --bg-secondary: #1E293B;
+  --border-color: #334155;
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --accent-primary: #6366F1;
+  --accent-primary-hover: #4F46E5;
+  --accent-danger: #F43F5E;
+  --accent-danger-bg: #450a0a;
+  --accent-danger-bg-hover: #7f1d1d;
+
+  /* Variables para iconos de estadísticas */
+  --icon-zonas-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --icon-proyectos-bg: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --icon-puntos-bg: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  --icon-poblacion-bg: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+
+  /* Variables para estados de proyectos */
+  --status-en-curso-bg: #dbeafe;
+  --status-en-curso-border: #3b82f6;
+  --status-completado-bg: #d1fae5;
+  --status-completado-border: #10b981;
+  --status-planeado-bg: #fef3c7;
+  --status-planeado-border: #f59e0b;
+  --status-retrasado-bg: #fee2e2;
+  --status-retrasado-border: #ef4444;
+}
+
+/* === AÑADE ESTO === */
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+/* =================== */

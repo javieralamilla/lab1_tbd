@@ -1,0 +1,38 @@
+@import './base.css';
+
+#app {
+  /* Eliminamos max-width para que el layout pueda ocupar 100% del ancho */
+  max-width: none;
+  width: 100%;
+  margin: 0; /* No centrar globalmente, el layout maneja el espaciado */
+  padding: 0; /* Dejar padding a AppLayout y vistas */
+  font-weight: normal;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  /* Quitamos estilos que forzaban grid/centrado global: el layout debe controlarlo */
+  /* body {
+    display: flex;
+    place-items: center;
+  } */
+
+  #app {
+    /* Para pantallas grandes mantenemos padding, pero no forcemos grid */
+    padding: 0 2rem;
+    width: 100%;
+  }
+}
