@@ -104,9 +104,20 @@ const parseGeoJSON = (geojson) => {
     const geo = typeof geojson === 'string' ? JSON.parse(geojson) : geojson;
 
     // GeoJSON Point tiene formato: { "type": "Point", "coordinates": [lng, lat] }
+    // PostGIS ST_AsGeoJSON devuelve: {"type":"Point","coordinates":[-70.6408,-33.4245]}
+    // Donde el primer valor es LONGITUD (lng) y el segundo es LATITUD (lat)
     if (geo.type === 'Point' && geo.coordinates) {
       const [lng, lat] = geo.coordinates;
-      return [lat, lng]; // Leaflet usa [lat, lng]
+      
+      // Validación: Santiago está en lng≈-70.6, lat≈-33.4
+      // lng debe estar entre -71 y -70 (negativo, oeste)
+      // lat debe estar entre -34 y -33 (negativo, sur)
+      if (lng < -71 || lng > -70 || lat < -34 || lat > -33) {
+        console.warn(`⚠️ Coordenadas fuera de rango para Santiago: [lng=${lng}, lat=${lat}]`);
+      }
+      
+      // Convertir a formato Leaflet: [lat, lng]
+      return [lat, lng];
     }
 
     return null;
@@ -247,11 +258,31 @@ const addPuntosToMap = () => {
   puntosToShow.forEach(punto => {
     const tipoString = getTipoString(punto.tipo);
     // El backend puede devolver diferentes nombres de campo
-    const coords = parseGeoJSON(punto.coordenadas_geojson || punto.coordenadasPunto || punto.geometria);
+    const geojsonData = punto.coordenadas_geojson || punto.coordenadasPunto || punto.geometria;
+    
+    // DEBUG: Mostrar datos originales del primer punto
+    if (bounds.length === 0) {
+      console.log('📍 Ejemplo de punto original del backend:', {
+        nombre: punto.nombre,
+        geojson_original: geojsonData,
+        geojson_tipo: typeof geojsonData
+      });
+    }
+    
+    const coords = parseGeoJSON(geojsonData);
 
     if (!coords) {
-      console.warn('No se pudieron parsear coordenadas para:', punto.nombre);
+      console.warn('❌ No se pudieron parsear coordenadas para:', punto.nombre);
       return;
+    }
+    
+    // DEBUG: Mostrar conversión del primer punto
+    if (bounds.length === 0) {
+      console.log('✅ Coordenadas después de parsear:', {
+        nombre: punto.nombre,
+        leaflet_coords: coords,
+        formato: '[lat, lng]'
+      });
     }
 
     // Validar coordenadas
