@@ -74,7 +74,7 @@ CREATE TABLE zonas_urbanas (
 CREATE TABLE puntos_interes (
                                 punto_interes_id SERIAL PRIMARY KEY,
                                 nombre VARCHAR(150) NOT NULL,
-                                tipo VARCHAR(50) NOT NULL CHECK (tipo IN ('Hospital', 'Escuela', 'Parque', 'Centro Comercial', 'Transporte')),
+                                tipo VARCHAR(50) NOT NULL CHECK (tipo IN ('Hospital', 'Escuela', 'Parque', 'Centro Comercial', 'Transporte', 'Centro Cultural')),
                                 coordenadas_punto GEOMETRY(POINT, 4326) NOT NULL,
                                 direccion VARCHAR(255),
                                 zona_urbana_id INTEGER NOT NULL,

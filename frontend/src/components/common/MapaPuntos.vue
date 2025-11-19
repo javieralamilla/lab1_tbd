@@ -25,7 +25,8 @@ const props = defineProps({
       escuela: true,
       parque: true,
       centro_comercial: true,
-      transporte: true
+      transporte: true,
+      centro_cultural: true
     })
   }
 });
@@ -76,6 +77,16 @@ const tipoConfig = {
       <circle cx="7" cy="18" r="2"/>
       <circle cx="17" cy="18" r="2"/>
     </svg>`
+  },
+  'Centro Cultural': {
+    color: '#ec4899',
+    iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+      <rect x="3" y="3" width="7" height="9"/>
+      <rect x="14" y="3" width="7" height="5"/>
+      <rect x="14" y="12" width="7" height="9"/>
+      <rect x="3" y="16" width="7" height="5"/>
+      <path d="M3 3L21 3M3 21h18"/>
+    </svg>`
   }
 };
 
@@ -108,14 +119,14 @@ const parseGeoJSON = (geojson) => {
     // Donde el primer valor es LONGITUD (lng) y el segundo es LATITUD (lat)
     if (geo.type === 'Point' && geo.coordinates) {
       const [lng, lat] = geo.coordinates;
-      
+
       // Validación: Santiago está en lng≈-70.6, lat≈-33.4
       // lng debe estar entre -71 y -70 (negativo, oeste)
       // lat debe estar entre -34 y -33 (negativo, sur)
       if (lng < -71 || lng > -70 || lat < -34 || lat > -33) {
         console.warn(`⚠️ Coordenadas fuera de rango para Santiago: [lng=${lng}, lat=${lat}]`);
       }
-      
+
       // Convertir a formato Leaflet: [lat, lng]
       return [lat, lng];
     }
@@ -138,7 +149,8 @@ const getTipoString = (tipo) => {
       'ESCUELA': 'Escuela',
       'PARQUE': 'Parque',
       'CENTRO_COMERCIAL': 'Centro Comercial',
-      'TRANSPORTE': 'Transporte'
+      'TRANSPORTE': 'Transporte',
+      'CENTRO_CULTURAL': 'Centro Cultural'
     };
 
     // Si es un valor del enum (mayúsculas), convertirlo
@@ -155,7 +167,6 @@ const getTipoString = (tipo) => {
     // Puede tener propiedad 'valor' o 'name'
     if (tipo.valor) return tipo.valor;
     if (tipo.name) return tipo.name;
-
 
     if (tipo.toString && tipo.toString() !== '[object Object]') {
       return tipo.toString();
@@ -237,13 +248,13 @@ const addPuntosToMap = () => {
   // Filtrar puntos según tipo seleccionado
   let puntosToShow = props.selectedTipo
     ? props.puntos.filter(p => {
-        const tipoNormalizado = getTipoString(p.tipo);
-        const match = tipoNormalizado === props.selectedTipo;
-        if (!match && props.selectedTipo) {
-          console.log(`  FILTRADO: "${p.nombre}" tipo="${tipoNormalizado}" NO coincide con filtro="${props.selectedTipo}"`);
-        }
-        return match;
-      })
+      const tipoNormalizado = getTipoString(p.tipo);
+      const match = tipoNormalizado === props.selectedTipo;
+      if (!match && props.selectedTipo) {
+        console.log(`  FILTRADO: "${p.nombre}" tipo="${tipoNormalizado}" NO coincide con filtro="${props.selectedTipo}"`);
+      }
+      return match;
+    })
     : props.puntos;
 
   console.log('Puntos después del filtro:', puntosToShow.length);
@@ -259,7 +270,7 @@ const addPuntosToMap = () => {
     const tipoString = getTipoString(punto.tipo);
     // El backend puede devolver diferentes nombres de campo
     const geojsonData = punto.coordenadas_geojson || punto.coordenadasPunto || punto.geometria;
-    
+
     // DEBUG: Mostrar datos originales del primer punto
     if (bounds.length === 0) {
       console.log('📍 Ejemplo de punto original del backend:', {
@@ -268,14 +279,14 @@ const addPuntosToMap = () => {
         geojson_tipo: typeof geojsonData
       });
     }
-    
+
     const coords = parseGeoJSON(geojsonData);
 
     if (!coords) {
       console.warn('❌ No se pudieron parsear coordenadas para:', punto.nombre);
       return;
     }
-    
+
     // DEBUG: Mostrar conversión del primer punto
     if (bounds.length === 0) {
       console.log('✅ Coordenadas después de parsear:', {
@@ -287,7 +298,7 @@ const addPuntosToMap = () => {
 
     // Validar coordenadas
     if (!Array.isArray(coords) || coords.length !== 2 ||
-        isNaN(coords[0]) || isNaN(coords[1])) {
+      isNaN(coords[0]) || isNaN(coords[1])) {
       console.warn('Coordenadas inválidas para:', punto.nombre, coords);
       return;
     }
@@ -440,4 +451,3 @@ watch(() => props.activeLayers, () => {
   margin: 12px;
 }
 </style>
-

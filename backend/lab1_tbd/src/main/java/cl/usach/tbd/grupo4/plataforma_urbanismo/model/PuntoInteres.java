@@ -27,7 +27,8 @@ public class PuntoInteres {
         ESCUELA("Escuela"),
         PARQUE("Parque"),
         CENTRO_COMERCIAL("Centro Comercial"),
-        TRANSPORTE("Transporte");
+        TRANSPORTE("Transporte"),
+        CENTRO_CULTURAL("Centro Cultural");
 
         private final String valor;
 

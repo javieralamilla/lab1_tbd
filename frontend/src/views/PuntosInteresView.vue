@@ -36,6 +36,7 @@
         <option value="Parque">Parque</option>
         <option value="Centro Comercial">Centro Comercial</option>
         <option value="Transporte">Transporte</option>
+        <option value="Centro Cultural">Centro Cultural</option>
       </select>
     </div>
 
@@ -66,6 +67,10 @@
         <div class="leyenda-item transporte">
           <span class="leyenda-color"></span>
           <label>Transporte</label>
+        </div>
+        <div class="leyenda-item centro-cultural">
+          <span class="leyenda-color"></span>
+          <label>Centros Culturales</label>
         </div>
 
         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color);">
@@ -125,7 +130,6 @@ import ErrorAlert from '@/components/common/ErrorAlert.vue';
 import MapaPuntos from '@/components/common/MapaPuntos.vue';
 import puntosInteresService from '@/services/puntosInteresService';
 
-// ... (El resto de tu <script setup> es idéntico y correcto) ...
 const authStore = useAuthStore();
 const loading = ref(true);
 const error = ref(null);
@@ -134,43 +138,35 @@ const searchQuery = ref('');
 const filterTipo = ref('');
 
 // Función helper para obtener el string del tipo
-// Maneja tanto objetos como strings y diferentes formatos
 const getTipoString = (tipo) => {
   if (!tipo) return 'Desconocido';
 
-  // Si ya es string, puede ser el enum o el valor
   if (typeof tipo === 'string') {
-    // Mapeo de valores del enum a valores legibles
     const enumMap = {
       'HOSPITAL': 'Hospital',
       'ESCUELA': 'Escuela',
       'PARQUE': 'Parque',
       'CENTRO_COMERCIAL': 'Centro Comercial',
-      'TRANSPORTE': 'Transporte'
+      'TRANSPORTE': 'Transporte',
+      'CENTRO_CULTURAL': 'Centro Cultural'
     };
 
-    // Si es un valor del enum (mayúsculas), convertirlo
     if (enumMap[tipo]) {
       return enumMap[tipo];
     }
 
-    // Si ya es el valor legible, devolverlo
     return tipo;
   }
 
-  // Si es un objeto, intentar extraer el valor
   if (typeof tipo === 'object') {
-    // Puede tener propiedad 'valor' o 'name'
     if (tipo.valor) return tipo.valor;
     if (tipo.name) return tipo.name;
 
-    // Si tiene método toString personalizado
     if (tipo.toString && tipo.toString() !== '[object Object]') {
       return tipo.toString();
     }
   }
 
-  // Último recurso: convertir a string
   return String(tipo);
 };
 
@@ -179,11 +175,6 @@ const filteredPuntos = computed(() => {
     const nombreMatch = punto.nombre.toLowerCase().includes(searchQuery.value.toLowerCase());
     const tipoString = getTipoString(punto.tipo);
     const tipoMatch = !filterTipo.value || tipoString === filterTipo.value;
-
-    // Debug: descomentar para depuración
-    // if (filterTipo.value) {
-    //   console.log('Filtro:', filterTipo.value, 'Tipo punto:', tipoString, 'Match:', tipoMatch);
-    // }
 
     return nombreMatch && tipoMatch;
   });
@@ -267,6 +258,23 @@ const getIconForType = (tipo) => {
       h('path', { d: 'M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H6c-1.1 0-2.1.8-2.4 1.8l-1.4 5c-.1.4-.2.8-.2 1.2 0 .4.1.8.2 1.2.3 1.1.8 2.8.8 2.8h3' }),
       h('circle', { cx: '7', cy: '18', r: '2' }),
       h('circle', { cx: '17', cy: '18', r: '2' })
+    ]),
+    'Centro Cultural': () => h('svg', {
+      xmlns: 'http://www.w3.org/2000/svg',
+      width: '28',
+      height: '28',
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': '2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round'
+    }, [
+      h('rect', { x: '3', y: '3', width: '7', height: '9' }),
+      h('rect', { x: '14', y: '3', width: '7', height: '5' }),
+      h('rect', { x: '14', y: '12', width: '7', height: '9' }),
+      h('rect', { x: '3', y: '16', width: '7', height: '5' }),
+      h('path', { d: 'M3 3L21 3M3 21h18' })
     ])
   };
   return icons[tipo] || icons['Parque'];
@@ -274,8 +282,6 @@ const getIconForType = (tipo) => {
 
 const handlePuntoSelected = (punto) => {
   console.log('Punto seleccionado:', punto);
-  // Aquí puedes mostrar un mensaje o realizar otra acción
-  // Por ejemplo, podrías usar un sistema de notificaciones en lugar de alert
 };
 
 const loadPuntos = async () => {
@@ -291,17 +297,15 @@ const loadPuntos = async () => {
     loading.value = false;
   }
 };
+
 onMounted(() => {
   loadPuntos();
 });
 </script>
 
 <style scoped>
-/* .puntos-page { ... } <-- ELIMINADO */
-
 .page-container {
   max-width: 1400px;
-  /* margin y padding eliminados, los maneja AppLayout */
 }
 
 .page-header {
@@ -311,13 +315,13 @@ onMounted(() => {
 .page-header h1 {
   font-size: 32px;
   font-weight: 700;
-  color: var(--text-primary); /* CAMBIADO */
+  color: var(--text-primary);
   margin: 0 0 8px 0;
 }
 
 .page-header p {
   font-size: 16px;
-  color: var(--text-secondary); /* CAMBIADO */
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -333,13 +337,13 @@ onMounted(() => {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: var(--bg-secondary); /* CAMBIADO */
-  border: 1px solid var(--border-color); /* CAMBIADO */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
 }
 
 .search-box svg {
-  color: var(--text-secondary); /* CAMBIADO */
+  color: var(--text-secondary);
 }
 
 .search-box input {
@@ -347,8 +351,8 @@ onMounted(() => {
   border: none;
   outline: none;
   font-size: 14px;
-  background: transparent; /* CAMBIADO */
-  color: var(--text-primary); /* CAMBIADO */
+  background: transparent;
+  color: var(--text-primary);
 }
 
 .search-box input::placeholder {
@@ -357,9 +361,9 @@ onMounted(() => {
 
 .filter-select {
   padding: 12px 16px;
-  background: var(--bg-secondary); /* CAMBIADO */
-  border: 1px solid var(--border-color); /* CAMBIADO */
-  color: var(--text-primary); /* CAMBIADO */
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
@@ -370,51 +374,11 @@ onMounted(() => {
   color: var(--text-primary);
 }
 
-/* Contenedor del Mapa */
 .mapa-container {
   display: grid;
   grid-template-columns: 1fr 280px;
   gap: 20px;
   margin-bottom: 24px;
-}
-
-.mapa-placeholder {
-  background: var(--bg-secondary);
-  border: 2px dashed var(--border-color);
-  border-radius: 12px;
-  padding: 60px 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-height: 400px;
-}
-
-.mapa-placeholder svg {
-  color: var(--text-secondary);
-  margin-bottom: 20px;
-  opacity: 0.5;
-}
-
-.mapa-placeholder h3 {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0 0 8px 0;
-}
-
-.mapa-placeholder p {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin: 0 0 8px 0;
-}
-
-.mapa-placeholder .nota-futura {
-  font-size: 12px;
-  font-style: italic;
-  color: var(--accent-primary);
-  margin-top: 16px;
 }
 
 .mapa-leyenda {
@@ -451,6 +415,7 @@ onMounted(() => {
 .leyenda-item.parque .leyenda-color { background-color: #10b981; }
 .leyenda-item.centro-comercial .leyenda-color { background-color: #f59e0b; }
 .leyenda-item.transporte .leyenda-color { background-color: #8b5cf6; }
+.leyenda-item.centro-cultural .leyenda-color { background-color: #ec4899; }
 
 .leyenda-item label {
   font-size: 14px;
@@ -465,18 +430,17 @@ onMounted(() => {
 }
 
 .point-card {
-  background: var(--bg-secondary); /* CAMBIADO */
+  background: var(--bg-secondary);
   border-radius: 12px;
   padding: 20px;
   display: flex;
   gap: 16px;
-  box-shadow: none; /* CAMBIADO */
-  border: 1px solid var(--border-color); /* CAMBIADO */
+  box-shadow: none;
+  border: 1px solid var(--border-color);
   transition: transform 0.2s, box-shadow 0.2s;
   border-left: 4px solid;
 }
 
-/* Mapeo a colores de estado */
 .point-card.hospital {
   border-color: var(--status-retrasado-border);
 }
@@ -491,6 +455,9 @@ onMounted(() => {
 }
 .point-card.transporte {
   border-color: var(--accent-primary);
+}
+.point-card.centro-cultural {
+  border-color: #ec4899;
 }
 
 .point-card:hover {
@@ -509,12 +476,12 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-/* Colores de ícono (ya estaban bien) */
 .hospital .point-icon { background-color: #dc2626; }
 .escuela .point-icon { background-color: #3b82f6; }
 .parque .point-icon { background-color: #059669; }
 .centro-comercial .point-icon { background-color: #f59e0b; }
 .transporte .point-icon { background-color: #8b5cf6; }
+.centro-cultural .point-icon { background-color: #ec4899; }
 
 .point-info {
   flex: 1;
@@ -524,7 +491,7 @@ onMounted(() => {
 .point-info h3 {
   font-size: 16px;
   font-weight: 600;
-  color: var(--text-primary); /* CAMBIADO */
+  color: var(--text-primary);
   margin: 0 0 8px 0;
 }
 
@@ -540,7 +507,6 @@ onMounted(() => {
   font-weight: 600;
 }
 
-/* Mapeo a colores de estado */
 .type-badge.hospital {
   background-color: var(--status-retrasado-bg);
   color: var(--status-retrasado-border);
@@ -561,13 +527,17 @@ onMounted(() => {
   background-color: var(--icon-zonas-bg);
   color: white;
 }
+.type-badge.centro-cultural {
+  background-color: #fce7f3;
+  color: #ec4899;
+}
 
 .point-address {
   display: flex;
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: var(--text-secondary); /* CAMBIADO */
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -575,7 +545,7 @@ onMounted(() => {
   grid-column: 1 / -1;
   padding: 64px 24px;
   text-align: center;
-  color: var(--text-secondary); /* CAMBIADO */
+  color: var(--text-secondary);
 }
 
 .empty-state svg {
@@ -586,15 +556,13 @@ onMounted(() => {
 .empty-state h3 {
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-primary); /* CAMBIADO */
+  color: var(--text-primary);
   margin: 0 0 8px 0;
 }
 
 .empty-state p {
   margin: 0;
 }
-
-/* ESTILOS DE STATS ELIMINADOS */
 
 @media (max-width: 1024px) {
   .mapa-container {
@@ -617,15 +585,8 @@ onMounted(() => {
     flex-direction: column;
   }
 
-  .mapa-placeholder {
-    padding: 40px 20px;
-    min-height: 300px;
-  }
-
   .points-grid {
     grid-template-columns: 1fr;
   }
-
-
 }
 </style>

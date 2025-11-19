@@ -339,392 +339,237 @@ INSERT INTO zonas_urbanas (nombre, geometria_poligono, tipo_zona, area_km2) VALU
      'Mixto', 16.9);
 
 
--- PUNTOS DE INTERÉS - HOSPITALES
--- Coordenadas GPS Reales Verificadas
--- FORMATO: ST_GeomFromText('POINT(longitud latitud)', 4326)
--- Santiago: lng=-70.6°, lat=-33.4°
+-- ==================================================
+-- 3. PUNTOS DE INTERÉS (COORDENADAS CORREGIDAS A FORMATO POSTGIS: LONGITUD LATITUD)
 -- ==================================================
 
+-- SALUD
 INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urbana_id) VALUES
--- Hospitales Principales - COORDENADAS VERIFICADAS
-('Hospital Clínico Universidad de Chile', 'Hospital', ST_GeomFromText('POINT(-70.653915 -33.420219)', 4326), 'Av. Santos Dumont 999', 1),
-('Hospital del Salvador', 'Hospital', ST_GeomFromText('POINT(-70.624980 -33.437270)', 4326), 'Av. Salvador 364', 2),
-('Clínica Las Condes', 'Hospital', ST_GeomFromText('POINT(-70.530760 -33.384637)', 4326), 'Estoril 450', 3),
-('Clínica Alemana', 'Hospital', ST_GeomFromText('POINT(-70.573221 -33.391697)', 4326), 'Av. Vitacura 5951', 4),
-('Hospital Barros Luco', 'Hospital', ST_GeomFromText('POINT(-70.649128 -33.483869)', 4326), 'Av. José Miguel Carrera 3204', 10),
-('Hospital Sótero del Río', 'Hospital', ST_GeomFromText('POINT(-70.581781 -33.577251)', 4326), 'Av. Concha y Toro 3459', 5),
-('Hospital Félix Bulnes', 'Hospital', ST_GeomFromText('POINT(-70.741700 -33.423951)', 4326), 'Av. Pajaritos 3201', 6),
-
--- Centros de Salud Primaria (CESFAM)
-('CESFAM San Joaquín', 'Hospital', ST_GeomFromText('POINT(-70.630710 -33.495060)', 4326), 'Av. Vicuña Mackenna 6630', 10),
-('CESFAM Providencia', 'Hospital', ST_GeomFromText('POINT(-70.612940 -33.431960)', 4326), 'Av. Tobalaba 1623', 2),
-('CESFAM Padre Orellana', 'Hospital', ST_GeomFromText('POINT(-70.752900 -33.503100)', 4326), 'Av. Pajaritos 2551', 6),
-('CESFAM Recreo', 'Hospital', ST_GeomFromText('POINT(-70.663300 -33.468300)', 4326), 'Av. Departamental 879', 10);
+                                                                                            ('Hospital Clínico U. de Chile', 'Hospital', ST_GeomFromText('POINT(-70.653940 -33.420350)', 4326), 'Av. Santos Dumont 999', 1),
+                                                                                            ('Hospital del Salvador', 'Hospital', ST_GeomFromText('POINT(-70.62382 -33.43691)', 4326), 'Av. Salvador 364', 2),
+                                                                                            ('Clínica Las Condes', 'Hospital', ST_GeomFromText('POINT(-70.530800 -33.384700)', 4326), 'Estoril 450', 3),
+                                                                                            ('Clínica Alemana', 'Hospital', ST_GeomFromText('POINT(-70.57268 -33.39299)', 4326), 'Av. Vitacura 5951', 4),
+                                                                                            ('Hospital Barros Luco', 'Hospital', ST_GeomFromText('POINT(-70.64579 -33.48441)', 4326), 'Av. José Miguel Carrera 3204', 10),
+                                                                                            ('Hospital Sótero del Río', 'Hospital', ST_GeomFromText('POINT(-70.58124 -33.57679)', 4326), 'Av. Concha y Toro 3459', 5),
+                                                                                            ('Hospital Félix Bulnes (Nuevo)', 'Hospital', ST_GeomFromText('POINT(-70.74182 -33.42297)', 4326), 'Av. Mapocho 7432', 6),
+                                                                                            ('Hospital Militar', 'Hospital', ST_GeomFromText('POINT(-70.53818 -33.45052)', 4326), 'Av. Fernando Castillo Velasco 9100', 8),
+                                                                                            ('Clínica Santa María', 'Hospital', ST_GeomFromText('POINT(-70.62906 -33.43223)', 4326), 'Av. Santa María 0500', 2),
+                                                                                            ('Hospital De Urgencia Asistencia Pública', 'Hospital', ST_GeomFromText('POINT(-70.63852 -33.44441)', 4326), 'Av. Portugal 125', 1),
+                                                                                            ('Clínica Indisa', 'Hospital', ST_GeomFromText('POINT(-70.61845 -33.42109)', 4326), 'Av. Santa María 1810', 2),
+                                                                                            ('Hospital San José', 'Hospital', ST_GeomFromText('POINT(-70.65336 -33.41632)', 4326), 'Av. Independencia 1792', 12),
+                                                                                            ('CESFAM San Joaquín', 'Hospital', ST_GeomFromText('POINT(-70.62363 -33.48673)', 4326), 'Av. Vicuña Mackenna 6630', 10),
+                                                                                            ('CESFAM Dr. Hernán Alessandri', 'Hospital', ST_GeomFromText('POINT(-70.62047 -33.44415)', 4326), 'Los Jesuitas 857', 2),
+                                                                                            ('CESFAM Padre Orellana', 'Hospital', ST_GeomFromText('POINT(-70.62967 -33.46644)', 4326), 'Av. Pajaritos 2551', 6),
+                                                                                            ('CESFAM Recreo', 'Hospital', ST_GeomFromText('POINT(-70.64336 -33.50402)', 4326), 'Av. Departamental 879', 10);
 
 -- ==================================================
 -- PUNTOS DE INTERÉS - EDUCACIÓN
 -- ==================================================
+-- CORRECCIÓN: ORDEN INVERTIDO (LONGITUD, LATITUD)
+-- X = -70... (Oeste/West)
+-- Y = -33... (Sur/South)
 
 INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urbana_id) VALUES
--- Universidades - COORDENADAS VERIFICADAS
-('Universidad de Chile - Campus Beaucheff', 'Escuela', ST_GeomFromText('POINT(-70.661930 -33.457980)', 4326), 'Av. Beaucheff 850', 1),
-('Pontificia Universidad Católica', 'Escuela', ST_GeomFromText('POINT(-70.642370 -33.441560)', 4326), 'Av. Libertador Bernardo O''Higgins 340', 1),
-('Universidad de Santiago USACH', 'Escuela', ST_GeomFromText('POINT(-70.682060 -33.449060)', 4326), 'Av. Libertador Bernardo O''Higgins 3363', 1),
+-- Universidades
+('Universidad de Chile - Campus Beaucheff', 'Escuela', ST_GeomFromText('POINT(-70.66265 -33.45772)', 4326), 'Av. Beaucheff 850', 1),
+('Pontificia Universidad Católica', 'Escuela', ST_GeomFromText('POINT(-70.64064 -33.44136)', 4326), 'Av. Libertador Bernardo O''Higgins 340', 1),
+('Universidad de Santiago USACH', 'Escuela', ST_GeomFromText('POINT(-70.68031 -33.45050)', 4326), 'Av. Libertador Bernardo O''Higgins 3363', 1),
 
--- Colegios y Liceos - COORDENADAS VERIFICADAS
-('Instituto Nacional', 'Escuela', ST_GeomFromText('POINT(-70.649210 -33.444960)', 4326), 'Arturo Prat 33', 1),
-('Liceo José Victorino Lastarria', 'Escuela', ST_GeomFromText('POINT(-70.610770 -33.437480)', 4326), 'Av. Vicuña Mackenna 820', 1),
-('Liceo 1 Javiera Carrera', 'Escuela', ST_GeomFromText('POINT(-70.642630 -33.442250)', 4326), 'Av. Libertador Bernardo O''Higgins 462', 1),
-('Liceo República de Brasil', 'Escuela', ST_GeomFromText('POINT(-70.662240 -33.456900)', 4326), 'Av. República 526', 1),
-('Liceo República Argentina', 'Escuela', ST_GeomFromText('POINT(-70.682620 -33.455520)', 4326), 'Av. Portales 3250', 1),
-('Colegio Providencia', 'Escuela', ST_GeomFromText('POINT(-70.615320 -33.428090)', 4326), 'Av. Providencia 2594', 2),
-('Liceo Carmela Carvajal', 'Escuela', ST_GeomFromText('POINT(-70.605940 -33.436830)', 4326), 'Av. Presidente Eduardo Frei Montalva 3549', 2),
-('Colegio The Grange School', 'Escuela', ST_GeomFromText('POINT(-70.548060 -33.402010)', 4326), 'Av. Príncipe de Gales 6154', 3),
-('Colegio Santiago College', 'Escuela', ST_GeomFromText('POINT(-70.496240 -33.366070)', 4326), 'Camino Las Flores 12000', 3),
-('Colegio Verbo Divino', 'Escuela', ST_GeomFromText('POINT(-70.552610 -33.410660)', 4326), 'Av. Padre Hurtado 13150', 3),
-('Liceo Industrial de Maipú', 'Escuela', ST_GeomFromText('POINT(-70.752770 -33.509970)', 4326), 'Av. Pajaritos 2755', 6),
-('Instituto Alonso de Ercilla', 'Escuela', ST_GeomFromText('POINT(-70.744640 -33.509140)', 4326), 'Av. Central 5555', 6),
-('Colegio San Ignacio El Bosque', 'Escuela', ST_GeomFromText('POINT(-70.601840 -33.424680)', 4326), 'Pocuro 2801', 9);
+-- Colegios y Liceos
+('Instituto Nacional', 'Escuela', ST_GeomFromText('POINT(-70.65034 -33.44495)', 4326), 'Arturo Prat 33', 1),
+('Liceo José Victorino Lastarria', 'Escuela', ST_GeomFromText('POINT(-70.62132 -33.43047)', 4326), 'Av. Vicuña Mackenna 820', 1),
+('Liceo 1 Javiera Carrera', 'Escuela', ST_GeomFromText('POINT(-70.65742 -33.43935)', 4326), 'Av. Libertador Bernardo O''Higgins 462', 1),
+('Liceo República de Brasil', 'Escuela', ST_GeomFromText('POINT(-70.65915 -33.47222)', 4326), 'Av. República 526', 1),
+('Liceo Carmela Carvajal', 'Escuela', ST_GeomFromText('POINT(-70.62531 -33.44353)', 4326), 'Av. Presidente Eduardo Frei Montalva 3549', 2),
+('Colegio The Grange School', 'Escuela', ST_GeomFromText('POINT(-70.56817 -33.43705)', 4326), 'Av. Príncipe de Gales 6154', 3),
+('Colegio Santiago College', 'Escuela', ST_GeomFromText('POINT(-70.54450 -33.33977)', 4326), 'Camino Las Flores 12000', 3),
+('Instituto Alonso de Ercilla', 'Escuela', ST_GeomFromText('POINT(-70.66675 -33.43763)', 4326), 'Av. Central 5555', 6),
+('Colegio San Ignacio El Bosque', 'Escuela', ST_GeomFromText('POINT(-70.59370 -33.43431)', 4326), 'Pocuro 2801', 9);
 
 -- ==================================================
 -- PUNTOS DE INTERÉS - PARQUES Y ÁREAS VERDES
--- COORDENADAS VERIFICADAS
 -- ==================================================
 
 INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urbana_id) VALUES
-                                                                                            ('Parque Metropolitano', 'Parque', ST_GeomFromText('POINT(-70.633290 -33.422820)', 4326), 'Cerro San Cristóbal', 2),
-                                                                                            ('Parque Forestal', 'Parque', ST_GeomFromText('POINT(-70.642980 -33.436210)', 4326), 'Av. Ismael Valdés Vergara', 1),
-                                                                                            ('Plaza de Armas', 'Parque', ST_GeomFromText('POINT(-70.650270 -33.437240)', 4326), 'Plaza de Armas', 1),
-                                                                                            ('Quinta Normal', 'Parque', ST_GeomFromText('POINT(-70.679870 -33.443130)', 4326), 'Av. Matucana 520', 1),
-                                                                                            ('Parque O''Higgins', 'Parque', ST_GeomFromText('POINT(-70.661120 -33.466130)', 4326), 'Av. Beaucheff con Av. Rondizzoni', 1),
-                                                                                            ('Parque Los Reyes', 'Parque', ST_GeomFromText('POINT(-70.653630 -33.437790)', 4326), 'Av. Los Reyes', 1),
-                                                                                            ('Parque Bicentenario', 'Parque', ST_GeomFromText('POINT(-70.586420 -33.404970)', 4326), 'Av. Bicentenario 3800', 4),
-                                                                                            ('Parque Araucano', 'Parque', ST_GeomFromText('POINT(-70.571270 -33.413910)', 4326), 'Av. Presidente Riesco 5330', 3),
-                                                                                            ('Parque Inés de Suárez', 'Parque', ST_GeomFromText('POINT(-70.602900 -33.452900)', 4326), 'Av. Irarrázaval 2933', 9),
-                                                                                            ('Plaza Ñuñoa', 'Parque', ST_GeomFromText('POINT(-70.604190 -33.457200)', 4326), 'Av. Irarrázaval 3300', 9),
-                                                                                            ('Parque Juan XXIII', 'Parque', ST_GeomFromText('POINT(-70.548980 -33.463320)', 4326), 'Av. José Arrieta 8989', 8),
-                                                                                            ('Parque Intercomunal', 'Parque', ST_GeomFromText('POINT(-70.555880 -33.447970)', 4326), 'Av. Las Condes 11001', 8),
-                                                                                            ('Parque André Jarlan', 'Parque', ST_GeomFromText('POINT(-70.654900 -33.496030)', 4326), 'Av. Departamental 1255', 10),
-                                                                                            ('Parque Padre Renato Poblete', 'Parque', ST_GeomFromText('POINT(-70.702820 -33.429640)', 4326), 'Av. Costanera Norte 8000', 11);
-
--- ==================================================
--- PUNTOS DE INTERÉS - CENTROS COMERCIALES
--- COORDENADAS VERIFICADAS
--- ==================================================
-
+                                                                                            ('Parque Metropolitano', 'Parque', ST_GeomFromText('POINT(-70.61909 -33.41457)', 4326), 'Cerro San Cristóbal', 2),
+                                                                                            ('Parque Forestal', 'Parque', ST_GeomFromText('POINT(-70.64124 -33.43573)', 4326), 'Av. Ismael Valdés Vergara', 1),
+                                                                                            ('Plaza de Armas', 'Parque', ST_GeomFromText('POINT(-70.65032 -33.43797)', 4326), 'Plaza de Armas', 1),
+                                                                                            ('Quinta Normal', 'Parque', ST_GeomFromText('POINT(-70.68292 -33.44133)', 4326), 'Av. Matucana 520', 1),
+                                                                                            ('Parque O''Higgins', 'Parque', ST_GeomFromText('POINT(-70.65864 -33.46268)', 4326), 'Av. Beaucheff con Av. Rondizzoni', 1),
+                                                                                            ('Parque Los Reyes', 'Parque', ST_GeomFromText('POINT(-70.66621 -33.42929)', 4326), 'Av. Los Reyes', 1),
+                                                                                            ('Parque Araucano', 'Parque', ST_GeomFromText('POINT(-70.57285 -33.40221)', 4326), 'Av. Presidente Riesco 5330', 3),
+                                                                                            ('Parque Inés de Suárez', 'Parque', ST_GeomFromText('POINT(-70.61174 -33.44063)', 4326), 'Av. Irarrázaval 2933', 9),
+                                                                                            ('Plaza Ñuñoa', 'Parque', ST_GeomFromText('POINT(-70.59369 -33.45615)', 4326), 'Av. Irarrázaval 3300', 9),
+                                                                                            ('Parque Juan XXIII', 'Parque', ST_GeomFromText('POINT(-70.58774 -33.45730)', 4326), 'Av. José Arrieta 8989', 8),
+                                                                                            ('Parque Intercomunal', 'Parque', ST_GeomFromText('POINT(-70.54391 -33.43194)', 4326), 'Av. Las Condes 11001', 8),
+                                                                                            ('Parque André Jarlan', 'Parque', ST_GeomFromText('POINT(-70.66968 -33.48532)', 4326), 'Av. Departamental 1255', 10),
+                                                                                            ('Parque Padre Renato Poblete', 'Parque', ST_GeomFromText('POINT(-70.67768 -33.42462)', 4326), 'Av. Costanera Norte 8000', 11);
+-- COMERCIO
 INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urbana_id) VALUES
-                                                                                            ('Mall Costanera Center', 'Centro Comercial', ST_GeomFromText('POINT(-70.605960 -33.417760)', 4326), 'Av. Andrés Bello 2425', 2),
-                                                                                            ('Mall Plaza Tobalaba', 'Centro Comercial', ST_GeomFromText('POINT(-70.603060 -33.436740)', 4326), 'Av. Providencia 2653', 2),
-                                                                                            ('Drugstore Providencia', 'Centro Comercial', ST_GeomFromText('POINT(-70.614410 -33.428690)', 4326), 'Av. Providencia 2124', 2),
-                                                                                            ('Parque Arauco', 'Centro Comercial', ST_GeomFromText('POINT(-70.567990 -33.413980)', 4326), 'Av. Presidente Kennedy 5413', 3),
-                                                                                            ('Alto Las Condes', 'Centro Comercial', ST_GeomFromText('POINT(-70.546470 -33.390310)', 4326), 'Av. Pdte. Kennedy 9001', 3),
-                                                                                            ('Mall Apumanque', 'Centro Comercial', ST_GeomFromText('POINT(-70.577000 -33.427280)', 4326), 'Av. Apoquindo 3990', 3),
-                                                                                            ('Plaza Los Dominicos', 'Centro Comercial', ST_GeomFromText('POINT(-70.545940 -33.405970)', 4326), 'Av. Padre Hurtado Sur 13150', 3),
-                                                                                            ('Mall Plaza Vespucio', 'Centro Comercial', ST_GeomFromText('POINT(-70.609140 -33.514690)', 4326), 'Av. Vicuña Mackenna 7110', 5),
-                                                                                            ('Mall Maipú', 'Centro Comercial', ST_GeomFromText('POINT(-70.756110 -33.510290)', 4326), 'Av. Cinco de Abril 2025', 6),
-                                                                                            ('Mall Plaza Oeste', 'Centro Comercial', ST_GeomFromText('POINT(-70.737210 -33.516760)', 4326), 'Av. Américo Vespucio 1501', 11),
-                                                                                            ('Portal La Reina', 'Centro Comercial', ST_GeomFromText('POINT(-70.539520 -33.453250)', 4326), 'Av. Inca de Oro 5851', 8);
+                                                                                            ('Mall Costanera Center', 'Centro Comercial', ST_GeomFromText('POINT(-70.606000 -33.417800)', 4326), 'Av. Andrés Bello 2425', 2),
+                                                                                            ('Mall Plaza Tobalaba', 'Centro Comercial', ST_GeomFromText('POINT(-70.55748 -33.56950)', 4326), 'Av. Camilo Henríquez 3296', 7),
+                                                                                            ('Galería Drugstore', 'Centro Comercial', ST_GeomFromText('POINT(-70.61132 -33.42230)', 4326), 'Av. Providencia 2124', 2),
+                                                                                            ('Parque Arauco', 'Centro Comercial', ST_GeomFromText('POINT(-70.57857 -33.40195)', 4326), 'Av. Presidente Kennedy 5413', 3),
+                                                                                            ('Alto Las Condes', 'Centro Comercial', ST_GeomFromText('POINT(-70.546500 -33.390300)', 4326), 'Av. Presidente Kennedy 9001', 3),
+                                                                                            ('Mall Apumanque', 'Centro Comercial', ST_GeomFromText('POINT(-70.56735 -33.40986)', 4326), 'Av. Manquehue Sur 31', 3),
+                                                                                            ('Mall Plaza Los Dominicos', 'Centro Comercial', ST_GeomFromText('POINT(-70.54061 -33.41504)', 4326), 'Av. Padre Hurtado Sur 875', 3),
+                                                                                            ('Mall Plaza Vespucio', 'Centro Comercial', ST_GeomFromText('POINT(-70.59813 -33.51762)', 4326), 'Av. Vicuña Mackenna 7110', 5),
+                                                                                            ('Mall Arauco Maipú', 'Centro Comercial', ST_GeomFromText('POINT(-70.75197 -33.48151)', 4326), 'Av. Américo Vespucio 399', 6),
+                                                                                            ('Mall Plaza Oeste', 'Centro Comercial', ST_GeomFromText('POINT(-70.71735 -33.51731)', 4326), 'Av. Américo Vespucio 1501', 11),
+                                                                                            ('Portal La Reina', 'Centro Comercial', ST_GeomFromText('POINT(-70.54023 -33.42853)', 4326), 'Av. Francisco Bilbao 8750', 8),
+                                                                                            ('Mall Plaza Egaña', 'Centro Comercial', ST_GeomFromText('POINT(-70.56948 -33.45244)', 4326), 'Av. Larraín 5862', 9),
+                                                                                            ('Cenco Ñuñoa', 'Centro Comercial', ST_GeomFromText('POINT(-70.59802 -33.46514)', 4326), 'Av. José Pedro Alessandri 1166', 9),
+                                                                                            ('Mall Plaza Norte', 'Centro Comercial', ST_GeomFromText('POINT(-70.67848 -33.36625)', 4326), 'Av. Américo Vespucio 1737', 12),
+                                                                                            ('Mall Vivo Imperio', 'Centro Comercial', ST_GeomFromText('POINT(-70.64868 -33.43953)', 4326), 'San Antonio 530', 1);
 
--- ==================================================
--- PUNTOS DE INTERÉS - TRANSPORTE (METRO)
--- COORDENADAS VERIFICADAS
--- ==================================================
-
+-- METRO
 INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urbana_id) VALUES
-                                                                                            ('Metro Baquedano', 'Transporte', ST_GeomFromText('POINT(-70.634890 -33.437420)', 4326), 'Plaza Baquedano', 1),
-                                                                                            ('Metro Universidad de Chile', 'Transporte', ST_GeomFromText('POINT(-70.650520 -33.444680)', 4326), 'Av. Libertador Bernardo O''Higgins 1058', 1),
-                                                                                            ('Metro Universidad de Santiago', 'Transporte', ST_GeomFromText('POINT(-70.680620 -33.448930)', 4326), 'Av. Libertador Bernardo O''Higgins 3349', 1),
-                                                                                            ('Metro Franklin', 'Transporte', ST_GeomFromText('POINT(-70.649360 -33.474530)', 4326), 'Av. Libertador Bernardo O''Higgins 3350', 1),
-                                                                                            ('Metro Tobalaba', 'Transporte', ST_GeomFromText('POINT(-70.603140 -33.436920)', 4326), 'Av. Providencia 2653', 2),
-                                                                                            ('Metro Los Leones', 'Transporte', ST_GeomFromText('POINT(-70.602040 -33.425810)', 4326), 'Av. Presidente Riesco 3201', 2),
-                                                                                            ('Metro Escuela Militar', 'Transporte', ST_GeomFromText('POINT(-70.565950 -33.410870)', 4326), 'Av. Apoquindo 6275', 3),
-                                                                                            ('Metro Manquehue', 'Transporte', ST_GeomFromText('POINT(-70.570170 -33.411900)', 4326), 'Av. Apoquindo 4900', 3),
-                                                                                            ('Metro Vicuña Mackenna', 'Transporte', ST_GeomFromText('POINT(-70.626480 -33.493670)', 4326), 'Av. Vicuña Mackenna 5501', 5),
-                                                                                            ('Metro Maipú', 'Transporte', ST_GeomFromText('POINT(-70.762820 -33.509970)', 4326), 'Av. Cinco de Abril 2075', 6),
-                                                                                            ('Metro Plaza de Puente Alto', 'Transporte', ST_GeomFromText('POINT(-70.578000 -33.610100)', 4326), 'Av. Concha y Toro 175', 7),
-                                                                                            ('Metro Plaza Egaña', 'Transporte', ST_GeomFromText('POINT(-70.594870 -33.452990)', 4326), 'Av. José Pedro Alessandri 1398', 9),
-                                                                                            ('Metro Los Domínicos', 'Transporte', ST_GeomFromText('POINT(-70.544900 -33.406150)', 4326), 'Av. Apoquindo 9075', 3),
-                                                                                            ('Metro Ñuñoa', 'Transporte', ST_GeomFromText('POINT(-70.607890 -33.457440)', 4326), 'Av. Irarrázaval 3440', 9),
-                                                                                            ('Metro Moneda', 'Transporte', ST_GeomFromText('POINT(-70.648520 -33.442990)', 4326), 'Av. Libertador Bernardo O''Higgins 1071', 1),
-                                                                                            ('Metro Los Libertadores', 'Transporte', ST_GeomFromText('POINT(-70.662480 -33.370540)', 4326), 'Av. Américo Vespucio Norte 980', 12),
-                                                                                            ('Metro Estación Central', 'Transporte', ST_GeomFromText('POINT(-70.684480 -33.452160)', 4326), 'Av. Libertador Bernardo O''Higgins 3760', 1);
+                                                                                            ('Metro Baquedano', 'Transporte', ST_GeomFromText('POINT(-70.63416 -33.43746)', 4326), 'Plaza Baquedano', 1),
+                                                                                            ('Metro U. de Chile', 'Transporte', ST_GeomFromText('POINT(-70.65039 -33.44381)', 4326), 'Alameda 1058', 1),
+                                                                                            ('Metro U. de Santiago', 'Transporte', ST_GeomFromText('POINT(-70.68615 -33.45289)', 4326), 'Alameda 3349', 1),
+                                                                                            ('Metro Franklin', 'Transporte', ST_GeomFromText('POINT(-70.64924 -33.47638)', 4326), 'Gran Avenida 3350', 1),
+                                                                                            ('Metro Tobalaba', 'Transporte', ST_GeomFromText('POINT(-70.60189 -33.41809)', 4326), 'Av. Providencia 2653', 2),
+                                                                                            ('Metro Los Leones', 'Transporte', ST_GeomFromText('POINT(-70.60801 -33.42051)', 4326), 'Av. Nueva Providencia 2250', 2),
+                                                                                            ('Metro Escuela Militar', 'Transporte', ST_GeomFromText('POINT(-70.58325 -33.41351)', 4326), 'Av. Apoquindo 4501', 3),
+                                                                                            ('Metro Manquehue', 'Transporte', ST_GeomFromText('POINT(-70.56733 -33.40864)', 4326), 'Av. Apoquindo 5950', 3),
+                                                                                            ('Metro Vicuña Mackenna', 'Transporte', ST_GeomFromText('POINT(-70.59607 -33.51965)', 4326), 'A. Vespucio / V. Mackenna', 5),
+                                                                                            ('Metro Plaza de Maipú', 'Transporte', ST_GeomFromText('POINT(-70.75723 -33.51051)', 4326), 'Av. Pajaritos / 5 de Abril', 6),
+                                                                                            ('Metro Plaza de Puente Alto', 'Transporte', ST_GeomFromText('POINT(-70.57592 -33.60956)', 4326), 'Av. Concha y Toro 175', 7),
+                                                                                            ('Metro Plaza Egaña', 'Transporte', ST_GeomFromText('POINT(-70.57071 -33.45348)', 4326), 'Av. Irarrázaval 5700', 9),
+                                                                                            ('Metro Los Dominicos', 'Transporte', ST_GeomFromText('POINT(-70.54520 -33.40801)', 4326), 'Av. Apoquindo 9075', 3),
+                                                                                            ('Metro Ñuñoa', 'Transporte', ST_GeomFromText('POINT(-70.60544 -33.45447)', 4326), 'Av. Irarrázaval / P. de Valdivia', 9),
+                                                                                            ('Metro La Moneda', 'Transporte', ST_GeomFromText('POINT(-70.65483 -33.44487)', 4326), 'Alameda 1071', 1),
+                                                                                            ('Metro Los Libertadores', 'Transporte', ST_GeomFromText('POINT(-70.69073 -33.36546)', 4326), 'Autopista Los Libertadores', 12),
+                                                                                            ('Metro Estación Central', 'Transporte', ST_GeomFromText('POINT(-70.67907 -33.45138)', 4326), 'Alameda 3760', 1);
+
+-- CULTURA
+INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urbana_id) VALUES
+                                                                                            ('Palacio de La Moneda', 'Centro Cultural', ST_GeomFromText('POINT(-70.653900 -33.442900)', 4326), 'Moneda s/n', 1),
+                                                                                            ('Biblioteca Nacional', 'Centro Cultural', ST_GeomFromText('POINT(-70.64565 -33.44226)', 4326), 'Alameda 651', 1),
+                                                                                            ('Museo Nacional de Bellas Artes', 'Centro Cultural', ST_GeomFromText('POINT(-70.64354 -33.43531)', 4326), 'Parque Forestal s/n', 1),
+                                                                                            ('GAM', 'Centro Cultural', ST_GeomFromText('POINT(-70.63985 -33.43920)', 4326), 'Alameda 227', 1),
+                                                                                            ('Museo de la Memoria', 'Centro Cultural', ST_GeomFromText('POINT(-70.67940 -33.43975)', 4326), 'Matucana 501', 1),
+                                                                                            ('Centro Cultural Estación Mapocho', 'Centro Cultural', ST_GeomFromText('POINT(-70.65387 -33.43233)', 4326), 'Plaza de la Cultura s/n', 1);
 -- ==================================================
--- DATOS DEMOGRÁFICOS (Históricos 2020-2025)
+-- 4. DATOS DEMOGRÁFICOS
 -- ==================================================
+-- BORRAR DATOS ANTERIORES (Opcional, si estás re-insertando)
+-- DELETE FROM datos_demograficos WHERE poblacion IS NOT NULL;
 
 -- Santiago Centro
 INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (1, 404495, 39.2, 134832, 2020),
-                                                                                                      (1, 408123, 39.4, 136041, 2021),
-                                                                                                      (1, 410856, 39.6, 136952, 2022),
-                                                                                                      (1, 412340, 39.8, 137447, 2023),
-                                                                                                      (1, 413892, 40.0, 137964, 2024),
-                                                                                                      (1, 415234, 40.1, 138411, 2025);
-
+                                                                                                      (1, 404495, 39.2, 134832, 2020), (1, 408123, 39.4, 136041, 2021), (1, 410856, 39.6, 136952, 2022),
+                                                                                                      (1, 412340, 39.8, 137447, 2023), (1, 413892, 40.0, 137964, 2024), (1, 415234, 40.1, 138411, 2025);
 -- Providencia
 INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (2, 142079, 42.3, 47360, 2020),
-                                                                                                      (2, 143891, 42.5, 47964, 2021),
-                                                                                                      (2, 145234, 42.7, 48411, 2022),
-                                                                                                      (2, 146123, 42.9, 48708, 2023),
-                                                                                                      (2, 147456, 43.1, 49152, 2024),
-                                                                                                      (2, 148678, 43.3, 49559, 2025);
-
+                                                                                                      (2, 142079, 42.3, 47360, 2020), (2, 143891, 42.5, 47964, 2021), (2, 145234, 42.7, 48411, 2022),
+                                                                                                      (2, 146123, 42.9, 48708, 2023), (2, 147456, 43.1, 49152, 2024), (2, 148678, 43.3, 49559, 2025);
 -- Las Condes
 INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (3, 330759, 40.8, 110253, 2020),
-                                                                                                      (3, 335421, 41.0, 111807, 2021),
-                                                                                                      (3, 339872, 41.2, 113291, 2022),
-                                                                                                      (3, 343891, 41.4, 114630, 2023),
-                                                                                                      (3, 348234, 41.6, 116078, 2024),
-                                                                                                      (3, 352567, 41.8, 117522, 2025);
-
+                                                                                                      (3, 330759, 40.8, 110253, 2020), (3, 335421, 41.0, 111807, 2021), (3, 339872, 41.2, 113291, 2022),
+                                                                                                      (3, 343891, 41.4, 114630, 2023), (3, 348234, 41.6, 116078, 2024), (3, 352567, 41.8, 117522, 2025);
 -- Vitacura
 INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (4, 85384, 43.5, 28461, 2020),
-                                                                                                      (4, 86712, 43.7, 28904, 2021),
-                                                                                                      (4, 87891, 43.9, 29297, 2022),
-                                                                                                      (4, 89023, 44.1, 29674, 2023),
-                                                                                                      (4, 90234, 44.3, 30078, 2024),
-                                                                                                      (4, 91456, 44.5, 30485, 2025);
-
+                                                                                                      (4, 85384, 43.5, 28461, 2020), (4, 86712, 43.7, 28904, 2021), (4, 87891, 43.9, 29297, 2022),
+                                                                                                      (4, 89023, 44.1, 29674, 2023), (4, 90234, 44.3, 30078, 2024), (4, 91456, 44.5, 30485, 2025);
 -- La Florida
 INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (5, 402433, 34.2, 134144, 2020),
-                                                                                                      (5, 411234, 34.4, 137078, 2021),
-                                                                                                      (5, 419872, 34.6, 139957, 2022),
-                                                                                                      (5, 428156, 34.8, 142719, 2023),
-                                                                                                      (5, 436891, 35.0, 145630, 2024),
-                                                                                                      (5, 445234, 35.2, 148411, 2025);
-
+                                                                                                      (5, 402433, 34.2, 134144, 2020), (5, 411234, 34.4, 137078, 2021), (5, 419872, 34.6, 139957, 2022),
+                                                                                                      (5, 428156, 34.8, 142719, 2023), (5, 436891, 35.0, 145630, 2024), (5, 445234, 35.2, 148411, 2025);
 -- Maipú
 INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (6, 578605, 32.8, 192868, 2020),
-                                                                                                      (6, 595234, 33.0, 198411, 2021),
-                                                                                                      (6, 611456, 33.2, 203819, 2022),
-                                                                                                      (6, 627891, 33.4, 209297, 2023),
-                                                                                                      (6, 644523, 33.6, 214841, 2024),
-                                                                                                      (6, 661789, 33.8, 220596, 2025);
-
+                                                                                                      (6, 578605, 32.8, 192868, 2020), (6, 595234, 33.0, 198411, 2021), (6, 611456, 33.2, 203819, 2022),
+                                                                                                      (6, 627891, 33.4, 209297, 2023), (6, 644523, 33.6, 214841, 2024), (6, 661789, 33.8, 220596, 2025);
 -- Puente Alto
 INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (7, 645909, 31.5, 215303, 2020),
-                                                                                                      (7, 663234, 31.7, 221078, 2021),
-                                                                                                      (7, 680456, 31.9, 226819, 2022),
-                                                                                                      (7, 697891, 32.1, 232630, 2023),
-                                                                                                      (7, 715234, 32.3, 238411, 2024),
-                                                                                                      (7, 732567, 32.5, 244189, 2025);
-
+                                                                                                      (7, 645909, 31.5, 215303, 2020), (7, 663234, 31.7, 221078, 2021), (7, 680456, 31.9, 226819, 2022),
+                                                                                                      (7, 697891, 32.1, 232630, 2023), (7, 715234, 32.3, 238411, 2024), (7, 732567, 32.5, 244189, 2025);
 -- La Reina
 INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (8, 100252, 38.7, 33417, 2020),
-                                                                                                      (8, 101891, 38.9, 33964, 2021),
-                                                                                                      (8, 103234, 39.1, 34411, 2022),
-                                                                                                      (8, 104567, 39.3, 34856, 2023),
-                                                                                                      (8, 105891, 39.5, 35297, 2024),
-                                                                                                      (8, 107123, 39.7, 35708, 2025);
-
+                                                                                                      (8, 100252, 38.7, 33417, 2020), (8, 101891, 38.9, 33964, 2021), (8, 103234, 39.1, 34411, 2022),
+                                                                                                      (8, 104567, 39.3, 34856, 2023), (8, 105891, 39.5, 35297, 2024), (8, 107123, 39.7, 35708, 2025);
 -- Ñuñoa
 INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (9, 208237, 37.4, 69412, 2020),
-                                                                                                      (9, 211234, 37.6, 70411, 2021),
-                                                                                                      (9, 214123, 37.8, 71374, 2022),
-                                                                                                      (9, 216891, 38.0, 72297, 2023),
-                                                                                                      (9, 219567, 38.2, 73189, 2024),
-                                                                                                      (9, 222234, 38.4, 74078, 2025);
-
+                                                                                                      (9, 208237, 37.4, 69412, 2020), (9, 211234, 37.6, 70411, 2021), (9, 214123, 37.8, 71374, 2022),
+                                                                                                      (9, 216891, 38.0, 72297, 2023), (9, 219567, 38.2, 73189, 2024), (9, 222234, 38.4, 74078, 2025);
 -- San Miguel
 INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (10, 133059, 36.8, 44353, 2020),
-                                                                                                      (10, 134891, 37.0, 44964, 2021),
-                                                                                                      (10, 136567, 37.2, 45522, 2022),
-                                                                                                      (10, 138123, 37.4, 46041, 2023),
-                                                                                                      (10, 139891, 37.6, 46630, 2024),
-                                                                                                      (10, 141567, 37.8, 47189, 2025);
-
+                                                                                                      (10, 133059, 36.8, 44353, 2020), (10, 134891, 37.0, 44964, 2021), (10, 136567, 37.2, 45522, 2022),
+                                                                                                      (10, 138123, 37.4, 46041, 2023), (10, 139891, 37.6, 46630, 2024), (10, 141567, 37.8, 47189, 2025);
 -- Cerrillos
 INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (11, 88956, 35.2, 29652, 2020),
-                                                                                                      (11, 90891, 35.4, 30297, 2021),
-                                                                                                      (11, 92734, 35.6, 30911, 2022),
-                                                                                                      (11, 94567, 35.8, 31522, 2023),
-                                                                                                      (11, 96234, 36.0, 32078, 2024),
-                                                                                                      (11, 97891, 36.2, 32630, 2025);
-
+                                                                                                      (11, 88956, 35.2, 29652, 2020), (11, 90891, 35.4, 30297, 2021), (11, 92734, 35.6, 30911, 2022),
+                                                                                                      (11, 94567, 35.8, 31522, 2023), (11, 96234, 36.0, 32078, 2024), (11, 97891, 36.2, 32630, 2025);
 -- Independencia
 INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (12, 142065, 34.9, 47355, 2020),
-                                                                                                      (12, 144234, 35.1, 48078, 2021),
-                                                                                                      (12, 146123, 35.3, 48708, 2022),
-                                                                                                      (12, 147891, 35.5, 49297, 2023),
-                                                                                                      (12, 149567, 35.7, 49856, 2024),
-                                                                                                      (12, 151234, 35.9, 50411, 2025);
+                                                                                                      (12, 142065, 34.9, 47355, 2020), (12, 144234, 35.1, 48078, 2021), (12, 146123, 35.3, 48708, 2022),
+                                                                                                      (12, 147891, 35.5, 49297, 2023), (12, 149567, 35.7, 49856, 2024), (12, 151234, 35.9, 50411, 2025);
+
 
 -- ==================================================
--- PROYECTOS URBANOS REALES
+-- 5. PROYECTOS URBANOS (GEOMETRÍAS CORREGIDAS)
 -- ==================================================
+-- BORRAR DATOS ANTERIORES (Opcional, si estás re-insertando)
+-- DELETE FROM proyectos_urbanos WHERE nombre IS NOT NULL;
 
--- Línea 7 del Metro (En Curso)
+-- Línea 7 del Metro (Trazado aproximado Renca-Vitacura)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Línea 7 del Metro',
-     'Nueva línea de metro que conectará Vitacura con Renca',
-     'Transporte Público',
-     '2024-01-15',
-     '2027-12-31',
-     'En Curso',
-     2500000000.00,
-     ST_GeomFromText('LINESTRING(-70.5858 -33.3924, -70.6372 -33.4226, -70.6806 -33.4489)', 4326),
-     2);
+    ('Línea 7 del Metro', 'Nueva línea de metro que conectará Vitacura con Renca', 'Transporte Público', '2024-01-15', '2027-12-31', 'En Curso', 2500000000.00,
+     ST_GeomFromText('LINESTRING(-70.736 -33.408, -70.685 -33.425, -70.653 -33.432, -70.634 -33.437, -70.595 -33.415, -70.545 -33.385)', 4326), 2);
 
--- Parque de la Familia (Completado)
+-- Parque de la Familia (Polígono ajustado en Quinta Normal/Cerrillos)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Parque de la Familia Cerrillos',
-     'Parque urbano de 30 hectáreas con áreas deportivas y recreativas',
-     'Área Verde',
-     '2022-03-01',
-     '2024-10-15',
-     'Completado',
-     15000000.00,
-     ST_GeomFromText('POLYGON((-70.7100 -33.4950, -70.7000 -33.4950, -70.7000 -33.4900, -70.7100 -33.4900, -70.7100 -33.4950))', 4326),
-     1);
+    ('Parque de la Familia Cerrillos', 'Parque urbano de 30 hectáreas con áreas deportivas y recreativas', 'Área Verde', '2022-03-01', '2024-10-15', 'Completado', 15000000.00,
+     ST_GeomFromText('POLYGON((-70.711 -33.433, -70.702 -33.433, -70.701 -33.428, -70.710 -33.428, -70.711 -33.433))', 4326), 1);
 
--- Mejoramiento Avenida Américo Vespucio Sur
+-- Mejoramiento Vespucio Sur (Trazado vial)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Mejoramiento Vespucio Sur',
-     'Ampliación y mejoramiento de Américo Vespucio sector sur',
-     'Vialidad',
-     '2023-06-01',
-     '2025-12-31',
-     'En Curso',
-     89000000.00,
-     ST_GeomFromText('LINESTRING(-70.6097 -33.5150, -70.5777 -33.6099)', 4326),
-     2);
+    ('Mejoramiento Vespucio Sur', 'Ampliación y mejoramiento de Américo Vespucio sector sur', 'Vialidad', '2023-06-01', '2025-12-31', 'En Curso', 89000000.00,
+     ST_GeomFromText('LINESTRING(-70.609 -33.515, -70.600 -33.530, -70.580 -33.550)', 4326), 2);
 
--- Hospital Digital de La Florida
+-- Hospital Digital de La Florida (Ubicación exacta)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Hospital Digital La Florida',
-     'Nuevo hospital con tecnología de punta, 300 camas',
-     'Salud',
-     '2024-09-01',
-     '2027-06-30',
-     'En Curso',
-     120000000.00,
-     ST_GeomFromText('POINT(-70.5950 -33.5000)', 4326),
-     1);
+    ('Hospital Digital La Florida', 'Nuevo hospital con tecnología de punta, 300 camas', 'Salud', '2024-09-01', '2027-06-30', 'En Curso', 120000000.00,
+     ST_GeomFromText('POINT(-70.5955 -33.5220)', 4326), 1);
 
--- Ciclovía Providencia-Las Condes
+-- Ciclovía Providencia (Trazado eje Andrés Bello/Providencia)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Ciclovía Av. Providencia',
-     'Red de ciclovías protegidas desde Providencia hasta Las Condes',
-     'Movilidad Sostenible',
-     '2025-01-15',
-     '2025-12-31',
-     'Planeado',
-     8500000.00,
-     ST_GeomFromText('LINESTRING(-70.6150 -33.4280, -70.5694 -33.4091)', 4326),
-     2);
+    ('Ciclovía Av. Providencia', 'Red de ciclovías protegidas desde Providencia hasta Las Condes', 'Movilidad Sostenible', '2025-01-15', '2025-12-31', 'Planeado', 8500000.00,
+     ST_GeomFromText('LINESTRING(-70.634 -33.437, -70.615 -33.428, -70.603 -33.418)', 4326), 2);
 
--- Centro Cultural Maipú
+-- Centro Cultural Maipú (Polígono ajustado)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Centro Cultural Municipal Maipú',
-     'Centro cultural con biblioteca, teatro y espacios comunitarios',
-     'Equipamiento Cultural',
-     '2024-03-01',
-     '2025-09-30',
-     'En Curso',
-     12000000.00,
-     ST_GeomFromText('POLYGON((-70.7560 -33.5100, -70.7540 -33.5100, -70.7540 -33.5085, -70.7560 -33.5085, -70.7560 -33.5100))', 4326),
-     3);
+    ('Centro Cultural Municipal Maipú', 'Centro cultural con biblioteca, teatro y espacios comunitarios', 'Equipamiento Cultural', '2024-03-01', '2025-09-30', 'En Curso', 12000000.00,
+     ST_GeomFromText('POLYGON((-70.758 -33.511, -70.756 -33.511, -70.756 -33.509, -70.758 -33.509, -70.758 -33.511))', 4326), 3);
 
--- Renovación Barrio Yungay
+-- Renovación Barrio Yungay (Polígono zona típica)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Renovación Urbana Barrio Yungay',
-     'Recuperación patrimonial y mejoramiento de espacios públicos',
-     'Renovación Urbana',
-     '2023-04-01',
-     '2024-08-31',
-     'Retrasado',
-     25000000.00,
-     ST_GeomFromText('POLYGON((-70.6800 -33.4450, -70.6700 -33.4450, -70.6700 -33.4380, -70.6800 -33.4380, -70.6800 -33.4450))', 4326),
-     4);
+    ('Renovación Urbana Barrio Yungay', 'Recuperación patrimonial y mejoramiento de espacios públicos', 'Renovación Urbana', '2023-04-01', '2024-08-31', 'Retrasado', 25000000.00,
+     ST_GeomFromText('POLYGON((-70.680 -33.445, -70.670 -33.445, -70.670 -33.438, -70.680 -33.438, -70.680 -33.445))', 4326), 4);
 
--- Parque Lineal Mapocho
+-- Parque Lineal Mapocho (Trazado río)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Parque Lineal Río Mapocho',
-     'Parque lineal a lo largo del río Mapocho, fase 1',
-     'Área Verde',
-     '2025-03-01',
-     '2026-12-31',
-     'Planeado',
-     45000000.00,
-     ST_GeomFromText('LINESTRING(-70.6806 -33.4400, -70.6372 -33.4300, -70.6000 -33.4250)', 4326),
-     1);
+    ('Parque Lineal Río Mapocho', 'Parque lineal a lo largo del río Mapocho, fase 1', 'Área Verde', '2025-03-01', '2026-12-31', 'Planeado', 45000000.00,
+     ST_GeomFromText('LINESTRING(-70.685 -33.425, -70.660 -33.430, -70.635 -33.435)', 4326), 1);
+
 
 -- ==================================================
--- RELACIÓN PROYECTOS-ZONAS
+-- 6. RELACIÓN PROYECTOS-ZONAS
 -- ==================================================
+-- BORRAR DATOS ANTERIORES (Opcional, si estás re-insertando)
+-- DELETE FROM proyectos_zonas WHERE proyecto_urbano_id IS NOT NULL;
+
 INSERT INTO proyectos_zonas (proyecto_urbano_id, zona_urbana_id) VALUES
-                                                                     (1, 4),  -- Línea 7 - Vitacura
-                                                                     (1, 2),  -- Línea 7 - Providencia
-                                                                     (1, 1),  -- Línea 7 - Santiago Centro
-                                                                     (2, 11), -- Parque Familia - Cerrillos
-                                                                     (3, 5),  -- Vespucio Sur - La Florida
-                                                                     (3, 7),  -- Vespucio Sur - Puente Alto
-                                                                     (4, 5),  -- Hospital - La Florida
-                                                                     (5, 2),  -- Ciclovía - Providencia
-                                                                     (5, 3),  -- Ciclovía - Las Condes
-                                                                     (6, 6),  -- Centro Cultural - Maipú
-                                                                     (7, 1),  -- Renovación Yungay - Santiago Centro
-                                                                     (8, 1),  -- Parque Mapocho - Santiago Centro
-                                                                     (8, 2),  -- Parque Mapocho - Providencia
-                                                                     (8, 12); -- Parque Mapocho - Independencia
+                                                                     (1, 4), (1, 2), (1, 1), -- Línea 7
+                                                                     (2, 11), -- Parque Familia
+                                                                     (3, 5), (3, 7), -- Vespucio Sur
+                                                                     (4, 5), -- Hospital
+                                                                     (5, 2), (5, 3), -- Ciclovía
+                                                                     (6, 6), -- Centro Cultural
+                                                                     (7, 1), -- Renovación Yungay
+                                                                     (8, 1), (8, 2), (8, 12); -- Parque Mapocho
 
--- ==================================================
--- PUNTOS DE INTERÉS ADICIONALES
--- ==================================================
 
--- Hospitales adicionales
-INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urbana_id) VALUES
-('Hospital Militar de Santiago', 'Hospital', ST_GeomFromText('POINT(-70.537980 -33.408960)', 4326), 'Av. Fernando Castillo Velasco 9100', 8),
-('Clínica Santa María', 'Hospital', ST_GeomFromText('POINT(-70.629320 -33.425880)', 4326), 'Av. Santa María 0500', 2),
-('Hospital de Urgencia Asistencia Pública (Posta Central)', 'Hospital', ST_GeomFromText('POINT(-70.642880 -33.446310)', 4326), 'Av. Portugal 125', 1),
-('Clínica Indisa', 'Hospital', ST_GeomFromText('POINT(-70.623950 -33.424260)', 4326), 'Av. Santa María 1810', 2),
-('Hospital San José', 'Hospital', ST_GeomFromText('POINT(-70.657710 -33.405560)', 4326), 'Av. Independencia 1792', 12);
-
--- Universidades e institutos adicionales
-INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urbana_id) VALUES
-('Universidad Diego Portales', 'Escuela', ST_GeomFromText('POINT(-70.646960 -33.456510)', 4326), 'Av. Ejército 333', 1),
-('Universidad Andrés Bello - Campus República', 'Escuela', ST_GeomFromText('POINT(-70.657630 -33.456710)', 4326), 'Av. República 275', 1),
-('Duoc UC - Sede San Joaquín', 'Escuela', ST_GeomFromText('POINT(-70.624710 -33.494750)', 4326), 'Av. Vicuña Mackenna 4917', 10),
-('INACAP - Sede Apoquindo', 'Escuela', ST_GeomFromText('POINT(-70.572960 -33.412820)', 4326), 'Av. Apoquindo 7282', 3),
-('Universidad Alberto Hurtado', 'Escuela', ST_GeomFromText('POINT(-70.649770 -33.449820)', 4326), 'Alameda 1869', 1);
-
--- Parques adicionales
-INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urbana_id) VALUES
-('Parque de la Familia', 'Parque', ST_GeomFromText('POINT(-70.706940 -33.433260)', 4326), 'Av. Portales 3250, Quinta Normal', 11),
-('Parque Mahuida', 'Parque', ST_GeomFromText('POINT(-70.526580 -33.478770)', 4326), 'Av. Alcalde Fernando Castillo Velasco 11075', 8),
-('Parque Brasil', 'Parque', ST_GeomFromText('POINT(-70.658960 -33.442770)', 4326), 'Av. Brasil 500', 1),
-('Parque Bernardo O''Higgins Norte', 'Parque', ST_GeomFromText('POINT(-70.663600 -33.460450)', 4326), 'Av. Rondizzoni 260', 1),
-('Parque La Bandera', 'Parque', ST_GeomFromText('POINT(-70.639960 -33.529670)', 4326), 'Av. La Bandera 6700, San Ramón', 10);
-
--- Centros comerciales adicionales
-INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urbana_id) VALUES
-('Mall Plaza Egaña', 'Centro Comercial', ST_GeomFromText('POINT(-70.593920 -33.453050)', 4326), 'Av. Ossa 123, Ñuñoa', 9),
-('Portal Ñuñoa', 'Centro Comercial', ST_GeomFromText('POINT(-70.598130 -33.456970)', 4326), 'Av. José Pedro Alessandri 1166', 9),
-('Mall Plaza Norte', 'Centro Comercial', ST_GeomFromText('POINT(-70.679870 -33.354880)', 4326), 'Av. Américo Vespucio 1737, Huechuraba', 12),
-('Mall Plaza Los Dominicos', 'Centro Comercial', ST_GeomFromText('POINT(-70.544690 -33.409330)', 4326), 'Av. Apoquindo 9071', 3),
-('Mall Vivo Imperio', 'Centro Comercial', ST_GeomFromText('POINT(-70.650880 -33.442480)', 4326), 'San Antonio 530', 1);
-
--- Puntos culturales e institucionales (clasificados como Parque por limitación del schema)
-INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urbana_id) VALUES
-('Palacio de La Moneda', 'Parque', ST_GeomFromText('POINT(-70.650480 -33.444250)', 4326), 'Moneda s/n', 1),
-('Biblioteca Nacional de Chile', 'Parque', ST_GeomFromText('POINT(-70.642850 -33.443880)', 4326), 'Av. Libertador Bernardo O''Higgins 651', 1),
-('Museo Nacional de Bellas Artes', 'Parque', ST_GeomFromText('POINT(-70.640430 -33.437040)', 4326), 'Parque Forestal s/n', 1),
-('Centro Cultural Gabriela Mistral (GAM)', 'Parque', ST_GeomFromText('POINT(-70.642630 -33.442700)', 4326), 'Av. Libertador Bernardo O''Higgins 227', 1),
-('Museo de la Memoria y los Derechos Humanos', 'Parque', ST_GeomFromText('POINT(-70.682320 -33.441960)', 4326), 'Matucana 501', 1),
-('Estación Mapocho - Centro Cultural', 'Parque', ST_GeomFromText('POINT(-70.666890 -33.435850)', 4326), 'Pdte. Balmaceda 853', 1);
-
--- ==================================================
 -- REFRESCAR VISTAS MATERIALIZADAS
 -- ==================================================
 REFRESH MATERIALIZED VIEW cobertura_infraestructura;
