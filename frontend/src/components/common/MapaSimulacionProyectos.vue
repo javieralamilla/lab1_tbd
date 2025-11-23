@@ -207,8 +207,11 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+
+// Fix para leaflet-draw con Vite
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
+
 import api from '@/services/api';
 
 const emit = defineEmits(['error', 'success']);

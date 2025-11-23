@@ -78,8 +78,11 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+
+// Fix para leaflet-draw con Vite
 import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
+
 import api from '@/services/api';
 
 const emit = defineEmits(['error']);
@@ -117,8 +120,8 @@ const initMap = () => {
     draw: {
       polygon: {
         allowIntersection: false,
-        showArea: true,
-        metric: true,
+        showArea: false,  // Deshabilitar para evitar error "type is not defined"
+        metric: false,
         shapeOptions: {
           color: '#3b82f6',
           fillColor: '#3b82f6',
@@ -127,6 +130,8 @@ const initMap = () => {
         }
       },
       rectangle: {
+        showArea: false,  // Deshabilitar para evitar error
+        metric: false,
         shapeOptions: {
           color: '#3b82f6',
           fillColor: '#3b82f6',

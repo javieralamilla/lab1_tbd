@@ -27,6 +27,7 @@ public class ZonaUrbana {
     private LocalDateTime fechaCreacion;
 
     // Datos demográficos del año actual (opcional - viene del JOIN)
+    @JsonProperty("poblacion_estimada_2025")
     private Long poblacion;
     
     @JsonProperty("densidad_poblacion")

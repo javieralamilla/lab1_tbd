@@ -30,10 +30,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        // CORREGIDO: Usar mayúsculas para los roles
+                        // Permitir todos los GET para visualización de datos
+                        .requestMatchers("GET", "/api/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMINISTRADOR")
-                        // También puedes usar authorities si prefieres el control completo
-                        // .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMINISTRADOR")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

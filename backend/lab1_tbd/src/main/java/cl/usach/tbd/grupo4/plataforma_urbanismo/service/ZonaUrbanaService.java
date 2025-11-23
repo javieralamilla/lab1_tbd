@@ -77,4 +77,30 @@ public class ZonaUrbanaService {
             numHospitales, impactoPoblacion, areaInfluencia
         );
     }
+
+    // 3. Análisis de Proximidad a Proyectos
+    public List<Map<String, Object>> obtenerEscuelasCercaProyectos() {
+        return zonaUrbanaRepository.getEscuelasCercaProyectos();
+    }
+
+    // 9. Análisis de Superposición de Proyectos
+    public List<Map<String, Object>> obtenerProyectosSuperpuestos() {
+        return zonaUrbanaRepository.getProyectosSuperpuestos();
+    }
+
+    // 5. Análisis de Cobertura de Infraestructura
+    public List<Map<String, Object>> obtenerCoberturaInfraestructura() {
+        return zonaUrbanaRepository.getCoberturaInfraestructura();
+    }
+
+    // 10. Resumen de Proyectos por Estado y Tipo de Zona
+    public List<Map<String, Object>> obtenerResumenProyectosEstadoZona() {
+        return zonaUrbanaRepository.getResumenProyectosEstadoZona();
+    }
+
+    // Refrescar vistas materializadas
+    public void refrescarVistasMatererializadas() {
+        zonaUrbanaRepository.refrescarCoberturaInfraestructura();
+        zonaUrbanaRepository.refrescarResumenProyectos();
+    }
 }

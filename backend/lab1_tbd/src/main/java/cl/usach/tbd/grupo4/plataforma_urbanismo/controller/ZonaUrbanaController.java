@@ -89,6 +89,42 @@ public class ZonaUrbanaController {
         return ResponseEntity.ok(zonaUrbanaService.obtenerZonasSinPlanificacionReciente());
     }
 
+    // 3. Análisis de Proximidad a Proyectos
+    @GetMapping("/analisis/escuelas-cerca-proyectos")
+    public ResponseEntity<List<Map<String, Object>>> obtenerEscuelasCercaProyectos() {
+        return ResponseEntity.ok(zonaUrbanaService.obtenerEscuelasCercaProyectos());
+    }
+
+    // 5. Análisis de Cobertura de Infraestructura
+    @GetMapping("/analisis/cobertura-infraestructura")
+    public ResponseEntity<List<Map<String, Object>>> obtenerCoberturaInfraestructura() {
+        return ResponseEntity.ok(zonaUrbanaService.obtenerCoberturaInfraestructura());
+    }
+
+    // 9. Análisis de Superposición de Proyectos
+    @GetMapping("/analisis/proyectos-superpuestos")
+    public ResponseEntity<List<Map<String, Object>>> obtenerProyectosSuperpuestos() {
+        return ResponseEntity.ok(zonaUrbanaService.obtenerProyectosSuperpuestos());
+    }
+
+    // 10. Resumen de Proyectos por Estado y Tipo de Zona
+    @GetMapping("/analisis/resumen-proyectos-estado-zona")
+    public ResponseEntity<List<Map<String, Object>>> obtenerResumenProyectosEstadoZona() {
+        return ResponseEntity.ok(zonaUrbanaService.obtenerResumenProyectosEstadoZona());
+    }
+
+    // Endpoint para refrescar vistas materializadas
+    @PostMapping("/admin/refrescar-vistas")
+    public ResponseEntity<String> refrescarVistasMatererializadas() {
+        try {
+            zonaUrbanaService.refrescarVistasMatererializadas();
+            return ResponseEntity.ok("Vistas materializadas refrescadas exitosamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al refrescar vistas: " + e.getMessage());
+        }
+    }
+
     // Análisis Espacial: Obtener estadísticas de un área seleccionada
     @PostMapping("/analisis/area")
     public ResponseEntity<?> obtenerEstadisticasArea(@RequestBody Map<String, Object> request) {

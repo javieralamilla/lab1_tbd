@@ -186,9 +186,15 @@ public class ZonaUrbanaRepository {
 
     // Análisis Espacial: Obtener estadísticas dentro de un área delimitada por coordenadas
     public Map<String, Object> getEstadisticasArea(String geojsonArea) {
-        // Obtener población total en el área
+        // Obtener población total en el área (proporcional al área de intersección)
         String sqlPoblacion = """
-            SELECT COALESCE(SUM(dd.poblacion), 0) as poblacion_total
+            SELECT COALESCE(SUM(
+                ROUND(
+                    dd.poblacion * 
+                    ST_Area(ST_Transform(ST_Intersection(zu.geometria_poligono, ST_GeomFromGeoJSON(?)), 32719)) / 
+                    (ST_Area(ST_Transform(zu.geometria_poligono, 32719)) + 0.000001)
+                )
+            ), 0) as poblacion_total
             FROM zonas_urbanas zu
             INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
             WHERE dd.anio = EXTRACT(YEAR FROM CURRENT_DATE)
@@ -237,7 +243,7 @@ public class ZonaUrbanaRepository {
         """;
 
         try {
-            Long poblacion = jdbcTemplate.queryForObject(sqlPoblacion, Long.class, geojsonArea);
+            Long poblacion = jdbcTemplate.queryForObject(sqlPoblacion, Long.class, geojsonArea, geojsonArea);
             Integer escuelas = jdbcTemplate.queryForObject(sqlEscuelas, Integer.class, geojsonArea);
             Integer hospitales = jdbcTemplate.queryForObject(sqlHospitales, Integer.class, geojsonArea);
             Integer proyectos = jdbcTemplate.queryForObject(sqlProyectos, Integer.class, geojsonArea);
@@ -408,5 +414,107 @@ public class ZonaUrbanaRepository {
             e.printStackTrace();
             throw new RuntimeException("Error al calcular impacto del proyecto: " + e.getMessage());
         }
+    }
+
+    // 3. Análisis de Proximidad a Proyectos
+    public List<Map<String, Object>> getEscuelasCercaProyectos() {
+        String sql = """
+            SELECT DISTINCT
+                pi.nombre AS nombre_escuela,
+                pu.nombre AS nombre_proyecto,
+                ROUND(
+                    ST_Distance(
+                        pi.coordenadas_punto::geography,
+                        ST_Centroid(pu.geometria)::geography
+                    )::NUMERIC, 2
+                ) AS distancia_metros
+            FROM puntos_interes pi
+            INNER JOIN proyectos_urbanos pu ON ST_DWithin(
+                pi.coordenadas_punto::geography,
+                ST_Centroid(pu.geometria)::geography,
+                500
+            )
+            WHERE pi.tipo = 'Escuela'
+              AND pu.estado = 'En Curso'
+              AND pi.activo = TRUE
+            ORDER BY distancia_metros
+        """;
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    // 9. Análisis de Superposición de Proyectos
+    public List<Map<String, Object>> getProyectosSuperpuestos() {
+        String sql = """
+            SELECT 
+                p1.nombre AS proyecto_1,
+                p2.nombre AS proyecto_2,
+                ROUND(
+                    ST_Area(
+                        ST_Transform(
+                            ST_Intersection(p1.geometria, p2.geometria), 
+                            32719
+                        )
+                    )::NUMERIC, 2
+                ) AS area_superposicion_m2
+            FROM proyectos_urbanos p1
+            INNER JOIN proyectos_urbanos p2 ON p1.proyecto_urbano_id < p2.proyecto_urbano_id
+            WHERE ST_Intersects(p1.geometria, p2.geometria)
+              AND ST_GeometryType(ST_Intersection(p1.geometria, p2.geometria)) IN ('ST_Polygon', 'ST_MultiPolygon')
+              AND ST_Area(ST_Transform(ST_Intersection(p1.geometria, p2.geometria), 32719)) > 1
+            ORDER BY area_superposicion_m2 DESC
+        """;
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    // Refrescar vista materializada de cobertura
+    public void refrescarCoberturaInfraestructura() {
+        try {
+            jdbcTemplate.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY cobertura_infraestructura");
+        } catch (Exception e) {
+            // Si falla el refresco concurrente, intentar refresco normal
+            jdbcTemplate.execute("REFRESH MATERIALIZED VIEW cobertura_infraestructura");
+        }
+    }
+
+    // Refrescar vista materializada de resumen de proyectos
+    public void refrescarResumenProyectos() {
+        try {
+            jdbcTemplate.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY resumen_proyectos_estado_zona");
+        } catch (Exception e) {
+            // Si falla el refresco concurrente, intentar refresco normal
+            jdbcTemplate.execute("REFRESH MATERIALIZED VIEW resumen_proyectos_estado_zona");
+        }
+    }
+
+    // Obtener cobertura de infraestructura
+    public List<Map<String, Object>> getCoberturaInfraestructura() {
+        String sql = """
+            SELECT
+                zona_urbana_id,
+                nombre_zona,
+                total_parques,
+                total_escuelas,
+                total_hospitales,
+                total_puntos_interes
+            FROM cobertura_infraestructura
+            ORDER BY nombre_zona
+        """;
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    // Obtener resumen de proyectos por estado y zona
+    public List<Map<String, Object>> getResumenProyectosEstadoZona() {
+        String sql = """
+            SELECT
+                tipo_zona,
+                estado_proyecto,
+                SUM(cantidad_proyectos) AS cantidad_proyectos,
+                SUM(presupuesto_total) AS presupuesto_total
+            FROM resumen_proyectos_estado_zona
+            WHERE estado_proyecto IS NOT NULL
+            GROUP BY tipo_zona, estado_proyecto
+            ORDER BY tipo_zona, estado_proyecto
+        """;
+        return jdbcTemplate.queryForList(sql);
     }
 }
