@@ -22,7 +22,7 @@ DROP MATERIALIZED VIEW IF EXISTS resumen_proyectos_estado_zona;
 DROP TABLE IF EXISTS proyectos_zonas;
 
 -- 2. Borrar tablas que dependen de 'usuarios' y 'zonas_urbanas'
-DROP TABLE IF EXISTS proyectos_urbanos;
+DROP TABLE IF EXISTS proyectos_urbanos CASCADE;
 DROP TABLE IF EXISTS puntos_interes;
 DROP TABLE IF EXISTS datos_demograficos;
 
