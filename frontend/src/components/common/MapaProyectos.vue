@@ -261,9 +261,9 @@ const addProyectoInteraction = (layer, proyecto) => {
       <p style="margin: 4px 0; font-size: 13px; color: #666;">
         <strong>Estado:</strong> ${estadoStr}
       </p>
-      ${proyecto.tipo_proyecto ? `
+      ${(proyecto.tipoProyecto || proyecto.tipo_proyecto) ? `
         <p style="margin: 4px 0; font-size: 13px; color: #666;">
-          <strong>Tipo:</strong> ${proyecto.tipo_proyecto}
+          <strong>Tipo:</strong> ${proyecto.tipoProyecto || proyecto.tipo_proyecto}
         </p>
       ` : ''}
       ${proyecto.presupuesto ? `
@@ -271,9 +271,9 @@ const addProyectoInteraction = (layer, proyecto) => {
           <strong>Presupuesto:</strong> ${formatCurrency(proyecto.presupuesto)}
         </p>
       ` : ''}
-      ${proyecto.fecha_inicio ? `
+      ${(proyecto.fechaInicio || proyecto.fecha_inicio) ? `
         <p style="margin: 4px 0; font-size: 13px; color: #666;">
-          <strong>Inicio:</strong> ${formatDate(proyecto.fecha_inicio)}
+          <strong>Inicio:</strong> ${formatDate(proyecto.fechaInicio || proyecto.fecha_inicio)}
         </p>
       ` : ''}
       ${proyecto.descripcion ? `

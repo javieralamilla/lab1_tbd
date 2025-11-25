@@ -111,9 +111,9 @@
               <span class="label">Presupuesto:</span>
               <span>${{ itemSeleccionado.data.presupuesto.toLocaleString() }}</span>
             </div>
-            <div class="detail-row" v-if="itemSeleccionado.data.fecha_inicio">
+            <div class="detail-row" v-if="itemSeleccionado.data.fechaInicio || itemSeleccionado.data.fecha_inicio">
               <span class="label">Fecha Inicio:</span>
-              <span>{{ formatDate(itemSeleccionado.data.fecha_inicio) }}</span>
+              <span>{{ formatDate(itemSeleccionado.data.fechaInicio || itemSeleccionado.data.fecha_inicio) }}</span>
             </div>
           </div>
 

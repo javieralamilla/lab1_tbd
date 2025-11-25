@@ -18,6 +18,63 @@
       </button>
     </div>
 
+    <!-- Modal / Panel Nuevo Proyecto -->
+    <div v-if="showCreateModal" class="modal-overlay">
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h3>➕ Nuevo Proyecto</h3>
+          <button class="btn-cerrar" @click="cancelCreate">✖</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nombre del Proyecto</label>
+            <input v-model="newProject.nombre" type="text" placeholder="Nombre" />
+          </div>
+
+          <div class="form-group">
+            <label>Tipo de Proyecto</label>
+            <select v-model="newProject.tipo_proyecto">
+              <option value="RESIDENCIAL">Residencial</option>
+              <option value="COMERCIAL">Comercial</option>
+              <option value="INDUSTRIAL">Industrial</option>
+              <option value="EDUCATIVO">Educativo</option>
+              <option value="SALUD">Salud</option>
+              <option value="RECREATIVO">Recreativo</option>
+              <option value="TRANSPORTE">Transporte</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Inicio</label>
+            <input v-model="newProject.fecha_inicio" type="date" />
+          </div>
+
+          <div class="form-group">
+            <label>Presupuesto (CLP)</label>
+            <input v-model.number="newProject.presupuesto" type="number" min="0" />
+          </div>
+
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea v-model="newProject.descripcion" rows="3" placeholder="Descripción breve"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-guardar" @click="saveProject" :disabled="creating">Guardar Proyecto</button>
+          <button class="btn-cancel" @click="cancelCreate" :disabled="creating">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mapa de dibujo para nuevo proyecto -->
+    <div v-if="showMapDraw" class="modal-overlay">
+      <div class="modal-panel" style="width:90%; max-width:1100px; padding:0;">
+        <MapaNuevoProyecto @area-drawn="onAreaDrawn" @cancel="cancelMapDraw" />
+      </div>
+    </div>
+
     <LoadingSpinner v-if="loading" message="Cargando proyectos..." />
 
     <ErrorAlert
@@ -91,7 +148,7 @@
     <div v-if="!loading && !error" class="projects-grid">
       <div
         v-for="proyecto in filteredProyectos"
-        :key="proyecto.proyecto_urbano_id"
+        :key="proyecto.proyectoUrbanoId || proyecto.proyecto_urbano_id"
         class="project-card"
       >
         <div class="project-header">
@@ -111,7 +168,7 @@
               <line x1="8" y1="2" x2="8" y2="6"></line>
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
-            <span>{{ formatDate(proyecto.fecha_inicio) }}</span>
+            <span>{{ formatDate(proyecto.fechaInicio || proyecto.fecha_inicio) }}</span>
           </div>
 
           <div class="detail-item">
@@ -122,11 +179,11 @@
             <span>{{ formatCurrency(proyecto.presupuesto) }}</span>
           </div>
 
-          <div v-if="proyecto.tipo_proyecto" class="detail-item">
+          <div v-if="proyecto.tipoProyecto || proyecto.tipo_proyecto" class="detail-item">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
             </svg>
-            <span>{{ proyecto.tipo_proyecto }}</span>
+            <span>{{ proyecto.tipoProyecto || proyecto.tipo_proyecto }}</span>
           </div>
         </div>
 
@@ -164,6 +221,7 @@ import { useAuthStore } from '@/stores/auth';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import ErrorAlert from '@/components/common/ErrorAlert.vue';
 import MapaProyectos from '@/components/common/MapaProyectos.vue';
+import MapaNuevoProyecto from '@/components/common/MapaNuevoProyecto.vue';
 import proyectosService from '@/services/proyectosService';
 
 // ... (el resto de tu <script setup> es idéntico y correcto)
@@ -173,6 +231,18 @@ const error = ref(null);
 const proyectos = ref([]);
 const searchQuery = ref('');
 const filterEstado = ref('');
+
+// Nuevo proyecto (modal)
+const showCreateModal = ref(false);
+const creating = ref(false);
+const newProject = ref({
+  nombre: '',
+  descripcion: '',
+  tipo_proyecto: 'RESIDENCIAL',
+  fecha_inicio: '',
+  presupuesto: 0
+});
+const showMapDraw = ref(false);
 const filteredProyectos = computed(() => {
   return proyectos.value.filter(proyecto => {
     const matchesSearch = proyecto.nombre.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
@@ -228,7 +298,103 @@ const editProject = (proyecto) => {
   alert(`Editar proyecto: ${proyecto.nombre}`);
 };
 const createProject = () => {
-  alert('Crear nuevo proyecto');
+  // Abrir la interfaz de dibujo en el mapa para seleccionar el área primero
+  newProject.value = {
+    nombre: '',
+    descripcion: '',
+    tipo_proyecto: 'RESIDENCIAL',
+    fecha_inicio: '',
+    presupuesto: 0,
+    geometria: null
+  };
+  showMapDraw.value = true;
+  showCreateModal.value = false;
+};
+
+const cancelMapDraw = () => {
+  showMapDraw.value = false;
+};
+
+const onAreaDrawn = (geometry) => {
+  // geometry es la geometría GeoJSON (objeto)
+  newProject.value.geometria = geometry;
+  // cerrar el mapa y abrir el formulario
+  showMapDraw.value = false;
+  showCreateModal.value = true;
+};
+
+const cancelCreate = () => {
+  showCreateModal.value = false;
+};
+
+const saveProject = async () => {
+  if (!newProject.value.nombre || newProject.value.nombre.trim() === '') {
+    error.value = 'El nombre del proyecto es obligatorio.';
+    return;
+  }
+
+  creating.value = true;
+  error.value = null;
+
+  try {
+    // Preparar payload según backend (ajustar si es necesario)
+    // Adaptar nombres al modelo backend: `tipoProyecto`, `fechaInicio`, `geometria` como string
+    // Normalizar fecha al formato ISO (YYYY-MM-DD) que backend espera
+    let fechaIso = null;
+    if (newProject.value.fecha_inicio) {
+      try {
+        // newProject.value.fecha_inicio normalmente ya viene como 'YYYY-MM-DD'
+        const d = new Date(newProject.value.fecha_inicio);
+        if (!isNaN(d.getTime())) {
+          fechaIso = d.toISOString().slice(0, 10);
+        } else {
+          // si no es un string parseable, usar tal cual
+          fechaIso = newProject.value.fecha_inicio;
+        }
+      } catch (e) {
+        fechaIso = newProject.value.fecha_inicio;
+      }
+    }
+
+    const payload = {
+      nombre: newProject.value.nombre,
+      descripcion: newProject.value.descripcion,
+      tipoProyecto: newProject.value.tipo_proyecto,
+      fechaInicio: fechaIso,
+      presupuesto: newProject.value.presupuesto ? Number(newProject.value.presupuesto) : null,
+      estado: 'Planeado',
+      geometria: newProject.value.geometria ? JSON.stringify(newProject.value.geometria) : null,
+      // Enviar ambos nombres por compatibilidad: usuarioId y usuario_id
+      usuarioId: authStore.user?.usuario_id || authStore.user?.usuarioId || null,
+      usuario_id: authStore.user?.usuario_id || authStore.user?.usuarioId || null
+    };
+
+    console.log('Payload crear proyecto:', payload);
+
+    const created = await proyectosService.create(payload);
+    // Refrescar la lista desde el servidor para asegurar formatos (fechas, geojson)
+    await loadProyectos();
+    showCreateModal.value = false;
+    alert('Proyecto creado correctamente');
+  } catch (err) {
+    console.error('Error creando proyecto:', err);
+    // Mostrar mensaje detallado si el backend devolvió texto o un objeto con message
+    let msg = 'Error al crear proyecto';
+    if (!err) {
+      msg = 'Error desconocido';
+    } else if (typeof err === 'string') {
+      msg = err;
+    } else if (err.message) {
+      msg = err.message;
+    } else if (err.response && err.response.data) {
+      msg = err.response.data;
+    } else {
+      try { msg = JSON.stringify(err); } catch(e) { msg = String(err); }
+    }
+    error.value = msg;
+  } finally {
+    creating.value = false;
+  }
 };
 onMounted(() => {
   loadProyectos();
@@ -563,4 +729,49 @@ onMounted(() => {
 }
 
 /* ... (el resto de tus estilos es correcto) ... */
+</style>
+
+<style scoped>
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.modal-panel {
+  width: 520px;
+  background: var(--bg-primary);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  padding: 16px;
+  border: 1px solid var(--border-color);
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.modal-header h3 { margin: 0; }
+.btn-cerrar {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+.modal-body { max-height: 60vh; overflow-y: auto; }
+.modal-body .form-group { margin-bottom: 10px; }
+.modal-body label { display:block; font-weight:600; margin-bottom:6px; }
+.modal-body input, .modal-body select, .modal-body textarea {
+  width: 100%; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);
+}
+.modal-footer { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
+.btn-guardar { background: var(--accent-primary); color: white; padding: 10px 14px; border-radius: 8px; border:none; cursor:pointer; }
+.btn-cancel { background: transparent; border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 8px; cursor:pointer; }
 </style>
