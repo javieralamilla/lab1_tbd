@@ -9,7 +9,23 @@
           <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>
         </svg>
         Control de Capas
+        <button class="legend-help-btn" @click="showLegendHelp = !showLegendHelp" :aria-expanded="String(showLegendHelp)" :title="showLegendHelp ? 'Ocultar ayuda' : 'Mostrar ayuda sobre colores'">
+          ?
+        </button>
       </h3>
+
+      <div v-if="showLegendHelp" class="legend-help">
+        <h4>Leyenda y guía de colores</h4>
+        <p class="legend-intro">Los colores y emojis representan el estado de los proyectos. Esta guía explica su significado y por qué ayudan a la usabilidad (visibilidad, consistencia y reconocimiento).</p>
+        <ul class="legend-list">
+          <li><span class="legend-emoji">📋</span> <strong>Planeado</strong> — Proyecto en etapa de planificación. Color azul: sugiere neutralidad y preparación.</li>
+          <li><span class="legend-emoji">🚧</span> <strong>En Curso</strong> — Proyecto en ejecución. Naranja: visibilidad y atención inmediata.</li>
+          <li><span class="legend-emoji">✅</span> <strong>Completado</strong> — Proyecto finalizado. Verde: asociado a éxito y disponibilidad.</li>
+          <li><span class="legend-emoji">⚠️</span> <strong>Retrasado</strong> — Atención requerida. Rojo con patrón: color y patrón para usuarios daltónicos.</li>
+          <li><span class="legend-emoji">❌</span> <strong>Cancelado</strong> — Proyecto cancelado. Gris oscuro con patrón: reduce prominencia pero se identifica claramente.</li>
+        </ul>
+        <p class="legend-note"><strong>Heurísticas abordadas:</strong> Visibilidad del estado del sistema; Correspondencia con el mundo real; Prevención de errores; Reconocimiento sobre recuerdo; Consistencia y estándares.</p>
+      </div>
 
       <div class="capa-group">
         <div class="capa-header">
@@ -26,23 +42,28 @@
         <div v-if="capasActivas.proyectos" class="capa-filtros">
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosProyectos.planeado" @change="actualizarProyectos" />
-            <span class="filtro-color planeado"></span>
+            <span class="filtro-color planeado" title="Planeado — 📋 (Preparación)" aria-hidden="true"></span>
             Planeado
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosProyectos.enCurso" @change="actualizarProyectos" />
-            <span class="filtro-color en-curso"></span>
+            <span class="filtro-color en-curso" title="En Curso — 🚧 (Ejecución)" aria-hidden="true"></span>
             En Curso
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosProyectos.completado" @change="actualizarProyectos" />
-            <span class="filtro-color completado"></span>
+            <span class="filtro-color completado" title="Completado — ✅ (Finalizado)" aria-hidden="true"></span>
             Completado
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosProyectos.retrasado" @change="actualizarProyectos" />
-            <span class="filtro-color retrasado"></span>
+            <span class="filtro-color retrasado" title="Retrasado — ⚠️ (Atención)" aria-hidden="true"></span>
             Retrasado
+          </label>
+          <label class="filtro-item">
+            <input type="checkbox" v-model="filtrosProyectos.cancelado" @change="actualizarProyectos" />
+            <span class="filtro-color cancelado" title="Cancelado — ❌ (Cancelado)" aria-hidden="true"></span>
+            Cancelado
           </label>
         </div>
       </div>
@@ -62,27 +83,27 @@
         <div v-if="capasActivas.puntos" class="capa-filtros">
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosPuntos.hospital" @change="actualizarPuntos" />
-            <span class="filtro-color hospital"></span>
+            <span class="filtro-color hospital" title="Hospital — ❤️ (Salud)" aria-hidden="true"></span>
             Hospitales
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosPuntos.escuela" @change="actualizarPuntos" />
-            <span class="filtro-color escuela"></span>
+            <span class="filtro-color escuela" title="Escuela — 📚 (Educación)" aria-hidden="true"></span>
             Escuelas
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosPuntos.parque" @change="actualizarPuntos" />
-            <span class="filtro-color parque"></span>
+            <span class="filtro-color parque" title="Parque — 🌳 (Recreación)" aria-hidden="true"></span>
             Parques
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosPuntos.centroComercial" @change="actualizarPuntos" />
-            <span class="filtro-color centro-comercial"></span>
+            <span class="filtro-color centro-comercial" title="Centro Comercial — 🛍️ (Comercio)" aria-hidden="true"></span>
             Centros Comerciales
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosPuntos.transporte" @change="actualizarPuntos" />
-            <span class="filtro-color transporte"></span>
+            <span class="filtro-color transporte" title="Transporte — 🚆 (Movilidad)" aria-hidden="true"></span>
             Transporte
           </label>
         </div>
@@ -103,22 +124,22 @@
         <div v-if="capasActivas.zonas" class="capa-filtros">
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosZonas.residencial" @change="actualizarZonas" />
-            <span class="filtro-color zona-residencial"></span>
+            <span class="filtro-color zona-residencial" title="Residencial — 🏠 (Vivienda)" aria-hidden="true"></span>
             Residencial
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosZonas.comercial" @change="actualizarZonas" />
-            <span class="filtro-color zona-comercial"></span>
+            <span class="filtro-color zona-comercial" title="Comercial — 🏬 (Comercio)" aria-hidden="true"></span>
             Comercial
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosZonas.industrial" @change="actualizarZonas" />
-            <span class="filtro-color zona-industrial"></span>
+            <span class="filtro-color zona-industrial" title="Industrial — 🏭 (Industria)" aria-hidden="true"></span>
             Industrial
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosZonas.mixto" @change="actualizarZonas" />
-            <span class="filtro-color zona-mixto"></span>
+            <span class="filtro-color zona-mixto" title="Mixto — ⚖️ (Usos mixtos)" aria-hidden="true"></span>
             Mixto
           </label>
         </div>
@@ -166,6 +187,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['item-selected']);
+
+// Mostrar u ocultar la ayuda/leyenda extendida
+const showLegendHelp = ref(false);
 
 const mapContainer = ref(null);
 let map = null;
@@ -696,7 +720,6 @@ onBeforeUnmount(() => {
   padding-bottom: 16px;
   border-bottom: 1px solid var(--border-color);
 }
-
 .capa-group:last-of-type {
   border-bottom: none;
 }
@@ -794,6 +817,44 @@ onBeforeUnmount(() => {
 .filtro-color.en-curso { background-color: #f59e0b; }
 .filtro-color.completado { background-color: #10b981; }
 .filtro-color.retrasado { background-color: #ef4444; }
+
+/* Mejorar contraste y accesibilidad: añadir patrones para estados críticos */
+.filtro-color.retrasado {
+  background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.18) 0 6px, transparent 6px 12px), linear-gradient(#ef4444, #ef4444);
+  background-blend-mode: overlay;
+}
+.filtro-color.cancelado { background-color: #6b7280; background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.14) 0 6px, transparent 6px 12px); }
+
+.filtro-color { border: 2px solid rgba(255,255,255,0.06); box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+
+.legend-help-btn {
+  margin-left: 8px;
+  background: var(--icon-zonas-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.legend-help {
+  margin-top: 12px;
+  padding: 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  border-radius: 8px;
+  border: 1px dashed var(--border-color);
+}
+.legend-help h4 { margin: 0 0 8px 0; font-size: 14px; }
+.legend-list { list-style: none; padding: 0; margin: 0 0 8px 0; }
+.legend-list li { display: flex; align-items: center; gap: 8px; padding: 6px 0; color: var(--text-secondary); font-size: 13px; }
+.legend-emoji { width: 22px; display:inline-block; text-align:center; }
+.legend-intro { margin: 6px 0 8px 0; font-size: 13px; color: var(--text-secondary); }
+.legend-note { margin: 8px 0 0 0; font-size: 12px; color: var(--text-secondary); }
 
 /* Colores puntos */
 .filtro-color.hospital { background-color: #ef4444; }

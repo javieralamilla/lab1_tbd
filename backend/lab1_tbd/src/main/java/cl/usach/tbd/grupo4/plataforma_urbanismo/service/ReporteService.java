@@ -237,5 +237,261 @@ public class ReporteService {
                 return generarReporteProyectos(fechaInicio, fechaFin);
         }
     }
+
+    // Generar PDF en el backend usando PDFBox
+    public byte[] generarPdfDesdeReporte(List<ReporteDTO> datos, String titulo) {
+        try (org.apache.pdfbox.pdmodel.PDDocument doc = new org.apache.pdfbox.pdmodel.PDDocument()) {
+            org.apache.pdfbox.pdmodel.PDPage page = new org.apache.pdfbox.pdmodel.PDPage();
+            doc.addPage(page);
+
+            final float margin = 50f;
+            final float yStart = page.getMediaBox().getHeight() - margin;
+            final float tableWidth = page.getMediaBox().getWidth() - 2 * margin;
+            final float rowHeight = 18f;
+            final float headerHeight = 22f;
+
+            org.apache.pdfbox.pdmodel.font.PDFont fontBold = org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
+            org.apache.pdfbox.pdmodel.font.PDFont font = org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA;
+
+            // Column widths (sum should be <= tableWidth)
+            float colId = 40f;
+            float colNombre = 200f;
+            float colTipo = 100f;
+            float colFecha = 70f;
+            float colEstado = tableWidth - (colId + colNombre + colTipo + colFecha);
+
+            float y = yStart;
+            int pageNumber = 1;
+
+            org.apache.pdfbox.pdmodel.PDPageContentStream content = new org.apache.pdfbox.pdmodel.PDPageContentStream(doc, page);
+
+            // Title
+            content.beginText();
+            content.setFont(fontBold, 18);
+            content.newLineAtOffset(margin, y);
+            content.showText(titulo != null ? titulo : "Reporte");
+            content.endText();
+
+            // Generation date
+            content.beginText();
+            content.setFont(font, 10);
+            content.newLineAtOffset(margin, y - 20);
+            content.showText("Fecha de generación: " + java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").format(java.time.LocalDateTime.now()));
+            content.endText();
+
+            y -= 40f;
+
+            // Draw table header background
+            content.setNonStrokingColor(230, 230, 230);
+            content.addRect(margin, y - headerHeight + 4, tableWidth, headerHeight);
+            content.fill();
+            content.setNonStrokingColor(0, 0, 0);
+
+            // Header text
+            float textY = y - 14f;
+            float x = margin + 4f;
+            content.beginText();
+            content.setFont(fontBold, 11);
+            content.newLineAtOffset(x, textY);
+            content.showText("ID");
+            content.newLineAtOffset(colId, 0);
+            content.showText("Nombre");
+            content.newLineAtOffset(colNombre, 0);
+            content.showText("Tipo");
+            content.newLineAtOffset(colTipo, 0);
+            content.showText("Fecha");
+            content.newLineAtOffset(colFecha, 0);
+            content.showText("Estado");
+            content.endText();
+
+            y -= headerHeight;
+
+            boolean alternate = false;
+
+            for (int i = 0; i < datos.size(); i++) {
+                ReporteDTO r = datos.get(i);
+
+                // Start new page if needed
+                if (y < margin + 60) {
+                    // Footer with page number
+                    content.beginText();
+                    content.setFont(font, 9);
+                    content.newLineAtOffset(page.getMediaBox().getWidth() / 2 - 20, margin / 2);
+                    content.showText("Página " + pageNumber);
+                    content.endText();
+                    content.close();
+
+                    page = new org.apache.pdfbox.pdmodel.PDPage();
+                    doc.addPage(page);
+                    content = new org.apache.pdfbox.pdmodel.PDPageContentStream(doc, page);
+                    y = yStart - 20f;
+                    pageNumber++;
+                }
+
+                // Row background
+                if (alternate) {
+                    content.setNonStrokingColor(245, 245, 245);
+                    content.addRect(margin, y - rowHeight + 4, tableWidth, rowHeight);
+                    content.fill();
+                    content.setNonStrokingColor(0, 0, 0);
+                }
+
+                // Row text
+                float rowTextY = y - 14f;
+                float cx = margin + 4f;
+                content.beginText();
+                content.setFont(font, 10);
+                content.newLineAtOffset(cx, rowTextY);
+                content.showText(r.getId() != null ? String.valueOf(r.getId()) : "");
+                content.endText();
+
+                // Nombre (wrap/truncate if needed)
+                String nombre = r.getNombre() != null ? r.getNombre() : "";
+                String tipo = r.getTipo() != null ? r.getTipo() : "";
+                String fecha = r.getFecha() != null ? r.getFecha().toString() : "";
+                String estado = r.getEstado() != null ? r.getEstado() : "";
+
+                // Helper to draw text within a column width
+                drawTextInColumn(content, font, 10, nombre, margin + colId + 6f, rowTextY, colNombre - 8f);
+                drawTextInColumn(content, font, 10, tipo, margin + colId + colNombre + 6f, rowTextY, colTipo - 8f);
+                drawTextInColumn(content, font, 10, fecha, margin + colId + colNombre + colTipo + 6f, rowTextY, colFecha - 8f);
+                drawTextInColumn(content, font, 10, estado, margin + colId + colNombre + colTipo + colFecha + 6f, rowTextY, colEstado - 8f);
+
+                y -= rowHeight;
+                alternate = !alternate;
+            }
+
+            // Footer page number
+            content.beginText();
+            content.setFont(font, 9);
+            content.newLineAtOffset(page.getMediaBox().getWidth() / 2 - 20, margin / 2);
+            content.showText("Página " + pageNumber);
+            content.endText();
+
+            content.close();
+
+            try (java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+                doc.save(baos);
+                return baos.toByteArray();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error generando PDF: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Dibuja texto dentro de una columna con ancho máximo, haciendo wrap en espacios.
+     */
+    private void drawTextInColumn(org.apache.pdfbox.pdmodel.PDPageContentStream content,
+                                  org.apache.pdfbox.pdmodel.font.PDFont font,
+                                  float fontSize,
+                                  String text,
+                                  float x,
+                                  float y,
+                                  float maxWidth) {
+        try {
+            if (text == null) text = "";
+            java.util.List<String> lines = new java.util.ArrayList<>();
+            String[] words = text.split(" ");
+            StringBuilder current = new StringBuilder();
+            for (int i = 0; i < words.length; i++) {
+                String w = words[i];
+                String candidate = current.length() == 0 ? w : current + " " + w;
+                float width = font.getStringWidth(candidate) / 1000f * fontSize;
+                if (width <= maxWidth) {
+                    current.setLength(0);
+                    current.append(candidate);
+                } else {
+                    if (current.length() == 0) {
+                        // single long word -> truncate
+                        String truncated = truncateToWidth(font, fontSize, w, maxWidth);
+                        lines.add(truncated);
+                    } else {
+                        lines.add(current.toString());
+                        current.setLength(0);
+                        current.append(w);
+                    }
+                }
+            }
+            if (current.length() > 0) lines.add(current.toString());
+
+            float leading = fontSize + 2f;
+            for (int i = 0; i < lines.size(); i++) {
+                String line = lines.get(i);
+                content.beginText();
+                content.setFont(font, fontSize);
+                content.newLineAtOffset(x, y - (i * leading));
+                content.showText(line);
+                content.endText();
+            }
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("Error escribiendo texto en PDF: " + e.getMessage(), e);
+        }
+    }
+
+    private String truncateToWidth(org.apache.pdfbox.pdmodel.font.PDFont font, float fontSize, String text, float maxWidth) {
+        if (text == null) return "";
+        StringBuilder sb = new StringBuilder();
+        try {
+            for (int i = 0; i < text.length(); i++) {
+                sb.append(text.charAt(i));
+                float w = font.getStringWidth(sb.toString() + "...") / 1000f * fontSize;
+                if (w > maxWidth) {
+                    if (sb.length() > 3) {
+                        return sb.substring(0, Math.max(0, sb.length() - 3)) + "...";
+                    } else {
+                        return "...";
+                    }
+                }
+            }
+            return sb.toString();
+        } catch (java.io.IOException e) {
+            // Fallback: approximate by character count
+            int approxChars = Math.max(1, (int) (maxWidth / (fontSize * 0.6f)));
+            if (text.length() > approxChars) {
+                if (approxChars > 3) {
+                    return text.substring(0, approxChars - 3) + "...";
+                } else {
+                    return text.substring(0, approxChars);
+                }
+            }
+            return text;
+        }
+    }
+
+    private String abbreviate(String s, int max) {
+        if (s == null) return "";
+        return s.length() <= max ? s : s.substring(0, max-3) + "...";
+    }
+
+    // Generar Excel básico usando Apache POI (opcional) - por ahora devolver Excel en blanco simple
+    public byte[] generarExcelDesdeReporte(List<ReporteDTO> datos) {
+        try (org.apache.poi.ss.usermodel.Workbook wb = new org.apache.poi.xssf.usermodel.XSSFWorkbook()) {
+            org.apache.poi.ss.usermodel.Sheet sheet = wb.createSheet("Reporte");
+            int rownum = 0;
+            org.apache.poi.ss.usermodel.Row header = sheet.createRow(rownum++);
+            header.createCell(0).setCellValue("ID");
+            header.createCell(1).setCellValue("Nombre");
+            header.createCell(2).setCellValue("Tipo");
+            header.createCell(3).setCellValue("Fecha");
+            header.createCell(4).setCellValue("Estado");
+
+            for (ReporteDTO r : datos) {
+                org.apache.poi.ss.usermodel.Row row = sheet.createRow(rownum++);
+                row.createCell(0).setCellValue(r.getId() != null ? r.getId() : 0);
+                row.createCell(1).setCellValue(r.getNombre() != null ? r.getNombre() : "");
+                row.createCell(2).setCellValue(r.getTipo() != null ? r.getTipo() : "");
+                row.createCell(3).setCellValue(r.getFecha() != null ? r.getFecha().toString() : "");
+                row.createCell(4).setCellValue(r.getEstado() != null ? r.getEstado() : "");
+            }
+
+            try (java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream()) {
+                wb.write(baos);
+                return baos.toByteArray();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error generando Excel: " + e.getMessage(), e);
+        }
+    }
 }
 

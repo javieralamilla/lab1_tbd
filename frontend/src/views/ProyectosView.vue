@@ -75,6 +75,72 @@
       </div>
     </div>
 
+    <!-- Modal / Panel Editar Proyecto -->
+    <div v-if="showEditModal" class="modal-overlay">
+      <div class="modal-panel">
+        <div class="modal-header">
+          <h3>✏️ Editar Proyecto</h3>
+          <button class="btn-cerrar" @click="cancelEdit">✖</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Nombre del Proyecto</label>
+            <input v-model="editProjectData.nombre" type="text" placeholder="Nombre" />
+          </div>
+
+          <div class="form-group">
+            <label>Tipo de Proyecto</label>
+            <select v-model="editProjectData.tipo_proyecto">
+              <option value="RESIDENCIAL">Residencial</option>
+              <option value="COMERCIAL">Comercial</option>
+              <option value="INDUSTRIAL">Industrial</option>
+              <option value="EDUCATIVO">Educativo</option>
+              <option value="SALUD">Salud</option>
+              <option value="RECREATIVO">Recreativo</option>
+              <option value="TRANSPORTE">Transporte</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Inicio</label>
+            <input v-model="editProjectData.fecha_inicio" type="date" />
+          </div>
+
+          <div class="form-group">
+            <label>Presupuesto (CLP)</label>
+            <input v-model.number="editProjectData.presupuesto" type="number" min="0" />
+          </div>
+
+          <div class="form-group">
+            <label>Estado</label>
+            <select v-model="editProjectData.estado">
+              <option value="Planeado">Planeado</option>
+              <option value="En Curso">En Curso</option>
+              <option value="Completado">Completado</option>
+              <option value="Retrasado">Retrasado</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea v-model="editProjectData.descripcion" rows="3" placeholder="Descripción breve"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Geometría (GeoJSON)</label>
+            <textarea v-model="editProjectData.geometria" rows="4" placeholder='GeoJSON como texto (ej: {"type":"Polygon",...})'></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-guardar" @click="saveEdit" :disabled="editing">Guardar Cambios</button>
+          <button class="btn-cancel" @click="cancelEdit" :disabled="editing">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
     <LoadingSpinner v-if="loading" message="Cargando proyectos..." />
 
     <ErrorAlert
@@ -242,6 +308,19 @@ const newProject = ref({
   fecha_inicio: '',
   presupuesto: 0
 });
+// Editar proyecto
+const showEditModal = ref(false);
+const editing = ref(false);
+const editProjectData = ref({
+  id: null,
+  nombre: '',
+  descripcion: '',
+  tipo_proyecto: 'RESIDENCIAL',
+  fecha_inicio: '',
+  presupuesto: 0,
+  estado: 'Planeado',
+  geometria: ''
+});
 const showMapDraw = ref(false);
 const filteredProyectos = computed(() => {
   return proyectos.value.filter(proyecto => {
@@ -295,7 +374,74 @@ const viewProject = (proyecto) => {
   alert(`Ver detalles de: ${proyecto.nombre}`);
 };
 const editProject = (proyecto) => {
-  alert(`Editar proyecto: ${proyecto.nombre}`);
+  const id = proyecto.proyectoUrbanoId || proyecto.proyecto_urbano_id || proyecto.id || proyecto.proyectoId;
+  editProjectData.value = {
+    id: id,
+    nombre: proyecto.nombre || '',
+    descripcion: proyecto.descripcion || '',
+    tipo_proyecto: proyecto.tipoProyecto || proyecto.tipo_proyecto || 'RESIDENCIAL',
+    fecha_inicio: (proyecto.fechaInicio || proyecto.fecha_inicio) ? (proyecto.fechaInicio || proyecto.fecha_inicio).slice(0,10) : '',
+    presupuesto: proyecto.presupuesto || 0,
+    estado: proyecto.estado || 'Planeado',
+    geometria: typeof proyecto.geometria === 'string' ? proyecto.geometria : (proyecto.geometria ? JSON.stringify(proyecto.geometria) : '')
+  };
+  showEditModal.value = true;
+};
+
+const cancelEdit = () => {
+  showEditModal.value = false;
+};
+
+const saveEdit = async () => {
+  if (!editProjectData.value || !editProjectData.value.id) {
+    error.value = 'No se puede identificar el proyecto a editar.';
+    return;
+  }
+
+  editing.value = true;
+  error.value = null;
+
+  try {
+    // Normalizar fecha
+    let fechaIso = null;
+    if (editProjectData.value.fecha_inicio) {
+      const d = new Date(editProjectData.value.fecha_inicio);
+      if (!isNaN(d.getTime())) fechaIso = d.toISOString().slice(0,10);
+      else fechaIso = editProjectData.value.fecha_inicio;
+    }
+
+    // Geometría: asegurar que sea string
+    let geom = editProjectData.value.geometria || null;
+    if (geom && typeof geom !== 'string') {
+      try { geom = JSON.stringify(geom); } catch(e) { geom = String(geom); }
+    }
+
+    const payload = {
+      nombre: editProjectData.value.nombre,
+      descripcion: editProjectData.value.descripcion,
+      tipoProyecto: editProjectData.value.tipo_proyecto,
+      fechaInicio: fechaIso,
+      presupuesto: editProjectData.value.presupuesto ? Number(editProjectData.value.presupuesto) : null,
+      estado: editProjectData.value.estado,
+      geometria: geom
+    };
+
+    await proyectosService.update(editProjectData.value.id, payload);
+    await loadProyectos();
+    showEditModal.value = false;
+    alert('Proyecto actualizado correctamente');
+  } catch (err) {
+    console.error('Error actualizando proyecto:', err);
+    let msg = 'Error al actualizar proyecto';
+    if (!err) msg = 'Error desconocido';
+    else if (typeof err === 'string') msg = err;
+    else if (err.message) msg = err.message;
+    else if (err.response && err.response.data) msg = err.response.data;
+    else { try { msg = JSON.stringify(err); } catch(e) { msg = String(err); } }
+    error.value = msg;
+  } finally {
+    editing.value = false;
+  }
 };
 const createProject = () => {
   // Abrir la interfaz de dibujo en el mapa para seleccionar el área primero

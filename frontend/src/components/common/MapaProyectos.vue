@@ -186,6 +186,8 @@ const addProyectosToMap = () => {
 
     try {
       let layer;
+      let iconMarker = null;
+      let addedIcon = false;
 
       // Determinar tipo de geometría
       if (Array.isArray(coords[0]) && Array.isArray(coords[0][0])) {
@@ -201,6 +203,22 @@ const addProyectosToMap = () => {
           bounds.push(...polygon);
           proyectosLayers.value.push(layer);
           addProyectoInteraction(layer, proyecto);
+
+          // Añadir un marcador con emoji en el centro del primer polígono
+          if (!addedIcon) {
+            try {
+              const center = layer.getBounds().getCenter();
+              iconMarker = L.marker([center.lat, center.lng], {
+                icon: createCustomIcon(proyecto.estado),
+                zIndexOffset: 1000
+              }).addTo(map);
+              proyectosLayers.value.push(iconMarker);
+              addProyectoInteraction(iconMarker, proyecto);
+              addedIcon = true;
+            } catch (e) {
+              // Silenciar errores al calcular centro
+            }
+          }
         });
       } else if (Array.isArray(coords[0]) && typeof coords[0][0] === 'number') {
         // Polygon o LineString
@@ -215,6 +233,19 @@ const addProyectosToMap = () => {
           bounds.push(...coords);
           proyectosLayers.value.push(layer);
           addProyectoInteraction(layer, proyecto);
+
+          // Añadir marcador con emoji en el centro del polígono/linea
+          try {
+            const center = layer.getBounds().getCenter();
+            const markerIcon = L.marker([center.lat, center.lng], {
+              icon: createCustomIcon(proyecto.estado),
+              zIndexOffset: 1000
+            }).addTo(map);
+            proyectosLayers.value.push(markerIcon);
+            addProyectoInteraction(markerIcon, proyecto);
+          } catch (e) {
+            // Silenciar errores
+          }
         }
       } else if (typeof coords[0] === 'number') {
         // Point

@@ -58,7 +58,25 @@
 
       <!-- Sección de resultados -->
       <div v-if="reporteGenerado" class="results-section">
+        <ErrorAlert v-if="error" :message="error" type="error" @close="error = null" />
         <h2>Resultados del Reporte</h2>
+        <div class="report-summary" v-if="resumen.total >= 0">
+          <p><strong>Total registros:</strong> {{ resumen.total }}</p>
+          <div class="summary-grid">
+            <div class="summary-block">
+              <h4>Por Estado</h4>
+              <ul>
+                <li v-for="(count, estado) in resumen.porEstado" :key="estado">{{ estado }}: {{ count }}</li>
+              </ul>
+            </div>
+            <div class="summary-block">
+              <h4>Por Tipo</h4>
+              <ul>
+                <li v-for="(count, tipo) in resumen.porTipo" :key="tipo">{{ tipo }}: {{ count }}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
         <div class="results-table">
           <p v-if="loading" class="loading-message">Cargando datos...</p>
           <p v-else-if="!datosReporte.length" class="no-data-message">
@@ -91,11 +109,13 @@
         </div>
 
         <div class="export-section">
-          <button @click="exportarPDF" class="btn btn-success">
-            Exportar a PDF
+          <button @click="exportarPDF" class="btn btn-success" :disabled="loading || !reporteGenerado || datosReporte.length === 0">
+            <span v-if="loading">Procesando...</span>
+            <span v-else>Exportar a PDF</span>
           </button>
-          <button @click="exportarExcel" class="btn btn-success">
-            Exportar a Excel
+          <button @click="exportarExcel" class="btn btn-success" :disabled="loading || !reporteGenerado || datosReporte.length === 0">
+            <span v-if="loading">Procesando...</span>
+            <span v-else>Exportar a Excel</span>
           </button>
         </div>
       </div>
@@ -104,8 +124,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import reportesService from '@/services/reportesService'
+import ErrorAlert from '@/components/common/ErrorAlert.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 // Estado reactivo
 const loading = ref(false)
@@ -126,23 +148,42 @@ const generarReporte = async () => {
   try {
     loading.value = true
     error.value = null
-    reporteGenerado.value = true
+    // Marcar como no generado hasta que la carga finalice correctamente
+    reporteGenerado.value = false
 
     // Llamar al servicio con los filtros
     const data = await reportesService.generarReporte(filtros)
     datosReporte.value = data
+    // Marcar que se generó el reporte solo si la carga fue exitosa
+    reporteGenerado.value = true
 
     if (data.length === 0) {
       console.info('No se encontraron datos para los filtros seleccionados')
     }
   } catch (err) {
     console.error('Error al generar reporte:', err)
-    error.value = 'Error al generar el reporte. Intente nuevamente.'
+    error.value = err.message || 'Error al generar el reporte. Intente nuevamente.'
     datosReporte.value = []
   } finally {
     loading.value = false
   }
 }
+
+// Conteos y resumen del reporte
+const resumen = computed(() => {
+  const total = datosReporte.value.length
+  const porEstado = {}
+  const porTipo = {}
+
+  datosReporte.value.forEach(item => {
+    const est = item.estado || 'Desconocido'
+    const tip = item.tipo || 'Desconocido'
+    porEstado[est] = (porEstado[est] || 0) + 1
+    porTipo[tip] = (porTipo[tip] || 0) + 1
+  })
+
+  return { total, porEstado, porTipo }
+})
 
 const limpiarFiltros = () => {
   filtros.fechaInicio = ''
@@ -159,38 +200,90 @@ const formatearFecha = (fecha) => {
 }
 
 const exportarPDF = async () => {
-  try {
-    loading.value = true
+  loading.value = true
+  error.value = null
+  let backendErr = null
 
+  try {
     const titulo = filtros.tipoReporte
       ? `Reporte de ${filtros.tipoReporte}`
       : 'Reporte General'
 
-    await reportesService.exportarPDF(datosReporte.value, titulo)
+    // Intentar descarga desde backend primero
+    try {
+      await reportesService.exportarDesdeBackend(filtros, 'pdf')
+      console.log('Reporte PDF descargado desde backend')
+      return
+    } catch (e) {
+      backendErr = e
+      console.warn('Export desde backend falló, intentando generación local:', e)
+    }
 
-    console.log('Reporte PDF generado exitosamente')
+    // Si no hay datos locales, informar y mostrar detalle del fallo backend
+    if (!datosReporte.value || datosReporte.value.length === 0) {
+      error.value = backendErr && backendErr.message
+        ? `Error al exportar desde backend: ${backendErr.message}. Además no hay datos locales para generar el PDF.`
+        : 'No hay datos cargados para exportar a PDF.'
+      return
+    }
+
+    // Generar PDF en cliente como fallback
+    try {
+      await reportesService.exportarPDF(datosReporte.value, titulo)
+      console.log('Reporte PDF generado en cliente exitosamente')
+    } catch (clientErr) {
+      console.error('Error generando PDF en cliente:', clientErr)
+      const backendMsg = backendErr && backendErr.message ? `Backend: ${backendErr.message}. ` : ''
+      const clientMsg = clientErr && clientErr.message ? clientErr.message : String(clientErr)
+      error.value = `Error al exportar a PDF. ${backendMsg}Generación local falló: ${clientMsg}`
+    }
   } catch (err) {
-    console.error('Error al exportar a PDF:', err)
-    alert('Error al exportar a PDF. Asegúrese de que los datos del reporte estén cargados.')
+    console.error('Error inesperado en exportarPDF:', err)
+    error.value = err && err.message ? `Error al exportar a PDF: ${err.message}` : 'Error al exportar a PDF.'
   } finally {
     loading.value = false
   }
 }
 
 const exportarExcel = async () => {
-  try {
-    loading.value = true
+  loading.value = true
+  error.value = null
+  let backendErr = null
 
+  try {
     const nombreArchivo = filtros.tipoReporte
       ? `reporte_${filtros.tipoReporte}`
       : 'reporte_general'
 
-    await reportesService.exportarExcel(datosReporte.value, nombreArchivo)
+    // Intentar descargar desde backend primero
+    try {
+      await reportesService.exportarDesdeBackend(filtros, 'xlsx')
+      console.log('Reporte Excel descargado desde backend')
+      return
+    } catch (e) {
+      backendErr = e
+      console.warn('Export desde backend falló, intentando generación local:', e)
+    }
 
-    console.log('Reporte Excel generado exitosamente')
+    if (!datosReporte.value || datosReporte.value.length === 0) {
+      error.value = backendErr && backendErr.message
+        ? `Error al exportar desde backend: ${backendErr.message}. Además no hay datos locales para generar el Excel.`
+        : 'No hay datos cargados para exportar a Excel.'
+      return
+    }
+
+    try {
+      await reportesService.exportarExcel(datosReporte.value, nombreArchivo)
+      console.log('Reporte Excel generado en cliente exitosamente')
+    } catch (clientErr) {
+      console.error('Error generando Excel en cliente:', clientErr)
+      const backendMsg = backendErr && backendErr.message ? `Backend: ${backendErr.message}. ` : ''
+      const clientMsg = clientErr && clientErr.message ? clientErr.message : String(clientErr)
+      error.value = `Error al exportar a Excel. ${backendMsg}Generación local falló: ${clientMsg}`
+    }
   } catch (err) {
-    console.error('Error al exportar a Excel:', err)
-    alert('Error al exportar a Excel. Asegúrese de que los datos del reporte estén cargados.')
+    console.error('Error inesperado en exportarExcel:', err)
+    error.value = err && err.message ? `Error al exportar a Excel: ${err.message}` : 'Error al exportar a Excel.'
   } finally {
     loading.value = false
   }
@@ -230,6 +323,11 @@ onMounted(() => {
   flex-direction: column;
   gap: 2rem;
 }
+
+.report-summary { padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; }
+.summary-grid { display:flex; gap:16px; margin-top:8px; }
+.summary-block h4 { margin:0 0 6px 0; font-size:14px; }
+.summary-block ul { margin:0; padding-left: 18px; color: var(--text-secondary); }
 
 /* Filtros */
 .filters-section {

@@ -95,5 +95,36 @@ public class ReporteController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportarReporte(
+            @RequestParam(required = false, defaultValue = "proyectos") String tipo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+            @RequestParam(required = false, defaultValue = "pdf") String format
+    ) {
+        try {
+            List<ReporteDTO> reporte = reporteService.generarReporteConsolidado(tipo, fechaInicio, fechaFin);
+
+            if ("pdf".equalsIgnoreCase(format)) {
+                byte[] pdfBytes = reporteService.generarPdfDesdeReporte(reporte, "Reporte - " + tipo);
+                return ResponseEntity.ok()
+                        .header("Content-Type", "application/pdf")
+                        .header("Content-Disposition", "attachment; filename=reporte.pdf")
+                        .body(pdfBytes);
+            } else if ("xlsx".equalsIgnoreCase(format) || "xls".equalsIgnoreCase(format)) {
+                byte[] xlsx = reporteService.generarExcelDesdeReporte(reporte);
+                return ResponseEntity.ok()
+                        .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                        .header("Content-Disposition", "attachment; filename=reporte.xlsx")
+                        .body(xlsx);
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
 
