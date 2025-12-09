@@ -87,12 +87,30 @@
       <table class="data-table">
         <thead>
         <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Tipo</th>
-          <th>Área (km²)</th>
-          <th>Población (2025)</th>
-          <th>Densidad</th>
+          <th @click="sortBy('zona_urbana_id')" class="sortable">
+            ID
+            <span class="sort-icon" :class="{ active: sortColumn === 'zona_urbana_id' }">
+              {{ sortColumn === 'zona_urbana_id' && sortDirection === 'desc' ? '↓' : '↑' }}
+            </span>
+          </th>
+          <th @click="sortBy('nombre')" class="sortable">
+            Nombre
+            <span class="sort-icon" :class="{ active: sortColumn === 'nombre' }">
+              {{ sortColumn === 'nombre' && sortDirection === 'desc' ? '↓' : '↑' }}
+            </span>
+          </th>
+          <th @click="sortBy('tipo_zona')" class="sortable">
+            Tipo
+            <span class="sort-icon" :class="{ active: sortColumn === 'tipo_zona' }">
+              {{ sortColumn === 'tipo_zona' && sortDirection === 'desc' ? '↓' : '↑' }}
+            </span>
+          </th>
+          <th @click="sortBy('area_km2')" class="sortable">
+            Área (km²)
+            <span class="sort-icon" :class="{ active: sortColumn === 'area_km2' }">
+              {{ sortColumn === 'area_km2' && sortDirection === 'desc' ? '↓' : '↑' }}
+            </span>
+          </th>
           <th>Acciones</th>
         </tr>
         </thead>
@@ -102,14 +120,8 @@
           <td class="zona-name">
             {{ zona.nombre }}
           </td>
-          <td>
-                <span class="type-badge" :class="zona.tipo_zona ? zona.tipo_zona.toLowerCase() : ''">
-                  {{ zona.tipo_zona || 'Sin definir' }}
-                </span>
-          </td>
+          <td>{{ zona.tipo_zona || 'Sin definir' }}</td>
           <td>{{ formatNumber(zona.area_km2) }}</td>
-          <td>{{ formatNumber(zona.poblacion || 0) }}</td>
-          <td>{{ formatNumber(zona.densidad_poblacion || 0) }} hab/km²</td>
           <td>
             <div class="action-buttons">
               <button @click="viewDetails(zona)" class="btn-icon" title="Ver detalles">
@@ -149,6 +161,48 @@
 
     <div v-if="!loading && zonas.length > 0" class="stats-section">
     </div>
+
+    <!-- Modal de Edición -->
+    <div v-if="showEditModal" class="modal-overlay" @click.self="cancelEdit">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Editar Zona Urbana</h2>
+          <button @click="cancelEdit" class="btn-close">×</button>
+        </div>
+        
+        <div class="modal-body" v-if="editingZona">
+          <div class="form-group">
+            <label>ID</label>
+            <input type="text" :value="editingZona.zona_urbana_id" disabled class="form-control-disabled" />
+          </div>
+
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" v-model="editingZona.nombre" class="form-control" />
+          </div>
+
+          <div class="form-group">
+            <label>Tipo de Zona</label>
+            <select v-model="editingZona.tipo_zona" class="form-control">
+              <option value="Residencial">Residencial</option>
+              <option value="Comercial">Comercial</option>
+              <option value="Industrial">Industrial</option>
+              <option value="Mixto">Mixto</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Área (km²)</label>
+            <input type="number" step="0.1" v-model="editingZona.area_km2" class="form-control" />
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button @click="cancelEdit" class="btn-secondary">Cancelar</button>
+          <button @click="saveZona" class="btn-primary">Guardar Cambios</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -168,21 +222,87 @@ const zonas = ref([]);
 const searchQuery = ref('');
 const filterTipo = ref('');
 const showCreateModal = ref(false);
+const sortColumn = ref('nombre');
+const sortDirection = ref('asc');
 const formatNumber = (num) => {
   return new Intl.NumberFormat('es-CL').format(num);
 };
+
+const getTipoClass = (tipoZona) => {
+  if (!tipoZona) return '';
+  return tipoZona.toLowerCase().trim().replace(/\s+/g, '-');
+};
+
+const getBadgeStyle = (tipoZona) => {
+  const baseStyle = {
+    display: 'inline-block',
+    padding: '6px 14px',
+    fontSize: '12px',
+    fontWeight: '600',
+    textTransform: 'capitalize'
+  };
+  
+  const tipo = tipoZona?.toLowerCase().trim();
+  
+  if (tipo === 'residencial') {
+    return { ...baseStyle, backgroundColor: '#dbeafe', color: '#1e40af' };
+  } else if (tipo === 'comercial') {
+    return { ...baseStyle, backgroundColor: '#fef3c7', color: '#92400e' };
+  } else if (tipo === 'industrial') {
+    return { ...baseStyle, backgroundColor: '#fee2e2', color: '#991b1b' };
+  } else if (tipo === 'mixto') {
+    return { ...baseStyle, backgroundColor: '#8b5cf6', color: 'white' };
+  }
+  
+  return baseStyle;
+};
+
+const sortBy = (column) => {
+  if (sortColumn.value === column) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortColumn.value = column;
+    sortDirection.value = 'asc';
+  }
+};
+
 const filteredZonas = computed(() => {
-  return zonas.value.filter(zona => {
+  const filtered = zonas.value.filter(zona => {
     const matchesSearch = zona.nombre.toLowerCase().includes(searchQuery.value.toLowerCase());
     const matchesTipo = !filterTipo.value || zona.tipo_zona === filterTipo.value;
     return matchesSearch && matchesTipo;
   });
+
+  // Ordenar
+  return filtered.sort((a, b) => {
+    let aVal = a[sortColumn.value];
+    let bVal = b[sortColumn.value];
+
+    // Manejar valores nulos
+    if (aVal === null || aVal === undefined) aVal = 0;
+    if (bVal === null || bVal === undefined) bVal = 0;
+
+    // Comparar strings (para nombre y tipo_zona)
+    if (typeof aVal === 'string' && typeof bVal === 'string') {
+      aVal = aVal.toLowerCase();
+      bVal = bVal.toLowerCase();
+      if (sortDirection.value === 'asc') {
+        return aVal.localeCompare(bVal);
+      } else {
+        return bVal.localeCompare(aVal);
+      }
+    }
+
+    // Comparar números
+    if (sortDirection.value === 'asc') {
+      return aVal - bVal;
+    } else {
+      return bVal - aVal;
+    }
+  });
 });
 const totalArea = computed(() => {
   return zonas.value.reduce((sum, zona) => sum + (zona.area_km2 || 0), 0);
-});
-const totalPoblacion = computed(() => {
-  return zonas.value.reduce((sum, zona) => sum + (zona.poblacion || 0), 0);
 });
 const loadZonas = async () => {
   loading.value = true;
@@ -197,11 +317,50 @@ const loadZonas = async () => {
   }
 };
 const viewDetails = (zona) => {
-  alert(`Ver detalles de: ${zona.nombre}\n\nID: ${zona.zona_urbana_id}\nTipo: ${zona.tipo_zona}\nÁrea: ${zona.area_km2} km²`);
+  // Mostrar detalles en el mapa o en un modal
+  console.log('Ver detalles de:', zona);
 };
+
+const showEditModal = ref(false);
+const editingZona = ref(null);
+
 const editZona = (zona) => {
-  alert(`Editar zona: ${zona.nombre}`);
+  editingZona.value = { ...zona };
+  showEditModal.value = true;
 };
+
+const saveZona = async () => {
+  if (!editingZona.value) return;
+  
+  try {
+    // Preparar datos para enviar al backend
+    const zonaData = {
+      zona_urbana_id: editingZona.value.zona_urbana_id,
+      nombre: editingZona.value.nombre,
+      tipo_zona: editingZona.value.tipo_zona,
+      area_km2: parseFloat(editingZona.value.area_km2)
+    };
+    
+    console.log('Enviando datos al backend:', zonaData);
+    await zonasService.update(editingZona.value.zona_urbana_id, zonaData);
+    
+    showEditModal.value = false;
+    editingZona.value = null;
+    
+    // Recargar datos
+    await loadZonas();
+    console.log('Zona actualizada exitosamente');
+  } catch (err) {
+    console.error('Error al actualizar zona:', err);
+    error.value = err.message || 'Error al actualizar zona';
+  }
+};
+
+const cancelEdit = () => {
+  showEditModal.value = false;
+  editingZona.value = null;
+};
+
 const deleteZona = async (zona) => {
   if (confirm(`¿Estás seguro de eliminar la zona "${zona.nombre}"?`)) {
     try {
@@ -223,6 +382,41 @@ onMounted(() => {
 .page-container {
   max-width: 1400px;
 }
+</style>
+
+<style>
+/* Estilos sin scope para los badges */
+.data-table .type-badge {
+  display: inline-block !important;
+  padding: 6px 14px !important;
+  border-radius: 16px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: capitalize !important;
+}
+
+.data-table .type-badge.residencial {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+}
+
+.data-table .type-badge.comercial {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+}
+
+.data-table .type-badge.industrial {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+.data-table .type-badge.mixto {
+  background-color: #8b5cf6 !important;
+  color: white !important;
+}
+</style>
+
+<style scoped>
 
 .page-header {
   display: flex;
@@ -431,11 +625,50 @@ onMounted(() => {
   letter-spacing: 0.5px;
 }
 
+.data-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s;
+}
+
+.data-table th.sortable:hover {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.data-table th .sort-icon {
+  margin-left: 8px;
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-weight: bold;
+  opacity: 0.4;
+  transition: all 0.2s;
+}
+
+.data-table th .sort-icon.active {
+  color: var(--primary-color);
+  opacity: 1;
+}
+
+.data-table th.sortable:hover .sort-icon {
+  opacity: 0.7;
+}
+
 .data-table td {
   padding: 16px;
   border-top: 1px solid var(--border-color); /* CAMBIADO */
   font-size: 14px;
   color: var(--text-primary); /* CAMBIADO */
+}
+
+.data-table .type-badge {
+  display: inline-block !important;
+  padding: 6px 14px !important;
+  border-radius: 16px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: capitalize !important;
+  box-sizing: border-box !important;
 }
 
 .zona-name {
@@ -444,31 +677,42 @@ onMounted(() => {
 
 .type-badge {
   display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
+  padding: 6px 14px;
+  border-radius: 16px;
   font-size: 12px;
   font-weight: 600;
+  text-transform: capitalize;
 }
 
 /* Mapeo a colores de estado */
+.data-table .type-badge.residencial,
 .type-badge.residencial {
-  background-color: var(--status-en-curso-bg);
-  color: var(--status-en-curso-border);
+  background-color: var(--status-en-curso-bg) !important;
+  color: var(--status-en-curso-border) !important;
+  border-radius: 16px !important;
 }
 
+.data-table .type-badge.comercial,
 .type-badge.comercial {
-  background-color: var(--status-planeado-bg);
-  color: var(--status-planeado-border);
+  background-color: var(--status-planeado-bg) !important;
+  color: var(--status-planeado-border) !important;
+  border-radius: 16px !important;
 }
 
+.data-table .type-badge.industrial,
 .type-badge.industrial {
-  background-color: var(--status-retrasado-bg);
-  color: var(--status-retrasado-border);
+  background-color: var(--status-retrasado-bg) !important;
+  color: var(--status-retrasado-border) !important;
+  border-radius: 16px !important;
 }
 
+.data-table .type-badge.mixto,
 .type-badge.mixto {
-  background-color: var(--icon-zonas-bg);
-  color: white;
+  background-color: var(--icon-zonas-bg) !important;
+  color: white !important;
+  border-radius: 16px !important;
+  display: inline-block !important;
+  padding: 6px 14px !important;
 }
 
 .action-buttons {
@@ -547,6 +791,132 @@ onMounted(() => {
   }
 }
 
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: var(--text-primary);
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.btn-close:hover {
+  background-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.form-control-disabled {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: not-allowed;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 24px;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: var(--border-color);
+}
+
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
@@ -570,6 +940,11 @@ onMounted(() => {
   .data-table th,
   .data-table td {
     padding: 12px 8px;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-height: 95vh;
   }
 }
 </style>

@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ZonaUrbana {
+    @JsonProperty("zona_urbana_id")
     private Long zonaUrbanaId;
     private String nombre;
     
@@ -25,11 +26,4 @@ public class ZonaUrbana {
     
     @JsonProperty("fecha_creacion")
     private LocalDateTime fechaCreacion;
-
-    // Datos demográficos del año actual (opcional - viene del JOIN)
-    @JsonProperty("poblacion_estimada_2025")
-    private Long poblacion;
-    
-    @JsonProperty("densidad_poblacion")
-    private Double densidadPoblacion; // Calculado: poblacion / areaKm2
 }

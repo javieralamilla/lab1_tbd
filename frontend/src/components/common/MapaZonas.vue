@@ -174,8 +174,7 @@ const loadZonas = () => {
           <h3 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">${zona.nombre}</h3>
           <p style="margin: 4px 0; font-size: 13px;"><strong>Tipo:</strong> ${tipoString}</p>
           ${zona.area_km2 ? `<p style="margin: 4px 0; font-size: 13px;"><strong>Área:</strong> ${zona.area_km2.toFixed(2)} km²</p>` : ''}
-          ${zona.poblacion ? `<p style="margin: 4px 0; font-size: 13px;"><strong>Población:</strong> ${zona.poblacion.toLocaleString('es-CL')}</p>` : ''}
-          ${zona.densidad_poblacion ? `<p style="margin: 4px 0; font-size: 13px;"><strong>Densidad:</strong> ${zona.densidad_poblacion.toFixed(0)} hab/km²</p>` : ''}
+          ${zona.poblacion ? `<p style="margin: 4px 0; font-size: 13px;"><strong>Población Total:</strong> ${zona.poblacion.toLocaleString('es-CL')}</p>` : ''}
         </div>
       `);
 

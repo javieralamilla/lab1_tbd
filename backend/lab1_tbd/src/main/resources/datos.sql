@@ -453,58 +453,61 @@ INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urb
 -- ==================================================
 -- 4. DATOS DEMOGRÁFICOS
 -- ==================================================
--- BORRAR DATOS ANTERIORES (Opcional, si estás re-insertando)
--- DELETE FROM datos_demograficos WHERE poblacion IS NOT NULL;
+-- Datos demográficos para todas las comunas de la RM (2024)
 
--- Santiago Centro
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (1, 404495, 39.2, 134832, 2020), (1, 408123, 39.4, 136041, 2021), (1, 410856, 39.6, 136952, 2022),
-                                                                                                      (1, 412340, 39.8, 137447, 2023), (1, 413892, 40.0, 137964, 2024), (1, 415234, 40.1, 138411, 2025);
--- Providencia
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (2, 142079, 42.3, 47360, 2020), (2, 143891, 42.5, 47964, 2021), (2, 145234, 42.7, 48411, 2022),
-                                                                                                      (2, 146123, 42.9, 48708, 2023), (2, 147456, 43.1, 49152, 2024), (2, 148678, 43.3, 49559, 2025);
--- Las Condes
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (3, 330759, 40.8, 110253, 2020), (3, 335421, 41.0, 111807, 2021), (3, 339872, 41.2, 113291, 2022),
-                                                                                                      (3, 343891, 41.4, 114630, 2023), (3, 348234, 41.6, 116078, 2024), (3, 352567, 41.8, 117522, 2025);
--- Vitacura
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (4, 85384, 43.5, 28461, 2020), (4, 86712, 43.7, 28904, 2021), (4, 87891, 43.9, 29297, 2022),
-                                                                                                      (4, 89023, 44.1, 29674, 2023), (4, 90234, 44.3, 30078, 2024), (4, 91456, 44.5, 30485, 2025);
--- La Florida
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (5, 402433, 34.2, 134144, 2020), (5, 411234, 34.4, 137078, 2021), (5, 419872, 34.6, 139957, 2022),
-                                                                                                      (5, 428156, 34.8, 142719, 2023), (5, 436891, 35.0, 145630, 2024), (5, 445234, 35.2, 148411, 2025);
--- Maipú
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (6, 578605, 32.8, 192868, 2020), (6, 595234, 33.0, 198411, 2021), (6, 611456, 33.2, 203819, 2022),
-                                                                                                      (6, 627891, 33.4, 209297, 2023), (6, 644523, 33.6, 214841, 2024), (6, 661789, 33.8, 220596, 2025);
--- Puente Alto
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (7, 645909, 31.5, 215303, 2020), (7, 663234, 31.7, 221078, 2021), (7, 680456, 31.9, 226819, 2022),
-                                                                                                      (7, 697891, 32.1, 232630, 2023), (7, 715234, 32.3, 238411, 2024), (7, 732567, 32.5, 244189, 2025);
--- La Reina
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (8, 100252, 38.7, 33417, 2020), (8, 101891, 38.9, 33964, 2021), (8, 103234, 39.1, 34411, 2022),
-                                                                                                      (8, 104567, 39.3, 34856, 2023), (8, 105891, 39.5, 35297, 2024), (8, 107123, 39.7, 35708, 2025);
--- Ñuñoa
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (9, 208237, 37.4, 69412, 2020), (9, 211234, 37.6, 70411, 2021), (9, 214123, 37.8, 71374, 2022),
-                                                                                                      (9, 216891, 38.0, 72297, 2023), (9, 219567, 38.2, 73189, 2024), (9, 222234, 38.4, 74078, 2025);
--- San Miguel
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (10, 133059, 36.8, 44353, 2020), (10, 134891, 37.0, 44964, 2021), (10, 136567, 37.2, 45522, 2022),
-                                                                                                      (10, 138123, 37.4, 46041, 2023), (10, 139891, 37.6, 46630, 2024), (10, 141567, 37.8, 47189, 2025);
--- Cerrillos
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (11, 88956, 35.2, 29652, 2020), (11, 90891, 35.4, 30297, 2021), (11, 92734, 35.6, 30911, 2022),
-                                                                                                      (11, 94567, 35.8, 31522, 2023), (11, 96234, 36.0, 32078, 2024), (11, 97891, 36.2, 32630, 2025);
--- Independencia
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, anio) VALUES
-                                                                                                      (12, 142065, 34.9, 47355, 2020), (12, 144234, 35.1, 48078, 2021), (12, 146123, 35.3, 48708, 2022),
-                                                                                                      (12, 147891, 35.5, 49297, 2023), (12, 149567, 35.7, 49856, 2024), (12, 151234, 35.9, 50411, 2025);
-
+INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, factor_personas_vivienda) 
+SELECT zona_urbana_id, 7768, 38, 2903, 2.7 FROM zonas_urbanas WHERE nombre = 'Alhué' UNION ALL
+SELECT zona_urbana_id, 116969, 34, 28320, 3.4 FROM zonas_urbanas WHERE nombre = 'Buin' UNION ALL
+SELECT zona_urbana_id, 25491, 36, 7641, 3.3 FROM zonas_urbanas WHERE nombre = 'Calera de Tango' UNION ALL
+SELECT zona_urbana_id, 85041, 36, 23497, 3.2 FROM zonas_urbanas WHERE nombre = 'Cerrillos' UNION ALL
+SELECT zona_urbana_id, 127250, 37, 37643, 3.6 FROM zonas_urbanas WHERE nombre = 'Cerro Navia' UNION ALL
+SELECT zona_urbana_id, 173293, 31, 42067, 3.2 FROM zonas_urbanas WHERE nombre = 'Colina' UNION ALL
+SELECT zona_urbana_id, 121587, 38, 39562, 3.3 FROM zonas_urbanas WHERE nombre = 'Conchalí' UNION ALL
+SELECT zona_urbana_id, 35165, 37, 13064, 2.8 FROM zonas_urbanas WHERE nombre = 'Curacaví' UNION ALL
+SELECT zona_urbana_id, 155257, 36, 45312, 3.5 FROM zonas_urbanas WHERE nombre = 'El Bosque' UNION ALL
+SELECT zona_urbana_id, 37497, 35, 11265, 3.3 FROM zonas_urbanas WHERE nombre = 'El Monte' UNION ALL
+SELECT zona_urbana_id, 181049, 34, 55234, 2.7 FROM zonas_urbanas WHERE nombre = 'Estación Central' UNION ALL
+SELECT zona_urbana_id, 101808, 33, 28566, 3.1 FROM zonas_urbanas WHERE nombre = 'Huechuraba' UNION ALL
+SELECT zona_urbana_id, 116943, 34, 36467, 2.7 FROM zonas_urbanas WHERE nombre = 'Independencia' UNION ALL
+SELECT zona_urbana_id, 39274, 34, 11144, 3.2 FROM zonas_urbanas WHERE nombre = 'Isla de Maipo' UNION ALL
+SELECT zona_urbana_id, 103157, 37, 32776, 3.5 FROM zonas_urbanas WHERE nombre = 'La Cisterna' UNION ALL
+SELECT zona_urbana_id, 374836, 37, 114717, 3.1 FROM zonas_urbanas WHERE nombre = 'La Florida' UNION ALL
+SELECT zona_urbana_id, 112022, 36, 32766, 3.5 FROM zonas_urbanas WHERE nombre = 'La Granja' UNION ALL
+SELECT zona_urbana_id, 175421, 32, 48663, 3.7 FROM zonas_urbanas WHERE nombre = 'La Pintana' UNION ALL
+SELECT zona_urbana_id, 89870, 41, 30678, 3.0 FROM zonas_urbanas WHERE nombre = 'La Reina' UNION ALL
+SELECT zona_urbana_id, 145160, 30, 33344, 3.4 FROM zonas_urbanas WHERE nombre = 'Lampa' UNION ALL
+SELECT zona_urbana_id, 296134, 40, 118966, 2.5 FROM zonas_urbanas WHERE nombre = 'Las Condes' UNION ALL
+SELECT zona_urbana_id, 112620, 33, 26657, 3.3 FROM zonas_urbanas WHERE nombre = 'Lo Barnechea' UNION ALL
+SELECT zona_urbana_id, 87295, 36, 26262, 3.6 FROM zonas_urbanas WHERE nombre = 'Lo Espejo' UNION ALL
+SELECT zona_urbana_id, 91290, 39, 29827, 3.4 FROM zonas_urbanas WHERE nombre = 'Lo Prado' UNION ALL
+SELECT zona_urbana_id, 123800, 38, 39771, 3.0 FROM zonas_urbanas WHERE nombre = 'Macul' UNION ALL
+SELECT zona_urbana_id, 503635, 34, 160865, 3.2 FROM zonas_urbanas WHERE nombre = 'Maipú' UNION ALL
+SELECT zona_urbana_id, 15352, 36, 4887, 2.9 FROM zonas_urbanas WHERE nombre = 'María Pinto' UNION ALL
+SELECT zona_urbana_id, 136325, 36, 42924, 3.4 FROM zonas_urbanas WHERE nombre = 'Melipilla' UNION ALL
+SELECT zona_urbana_id, 241467, 39, 88552, 2.6 FROM zonas_urbanas WHERE nombre = 'Ñuñoa' UNION ALL
+SELECT zona_urbana_id, 81243, 33, 19467, 3.3 FROM zonas_urbanas WHERE nombre = 'Padre Hurtado' UNION ALL
+SELECT zona_urbana_id, 78828, 35, 22844, 3.2 FROM zonas_urbanas WHERE nombre = 'Paine' UNION ALL
+SELECT zona_urbana_id, 96062, 39, 30760, 3.4 FROM zonas_urbanas WHERE nombre = 'Pedro Aguirre Cerda' UNION ALL
+SELECT zona_urbana_id, 95402, 35, 28490, 3.3 FROM zonas_urbanas WHERE nombre = 'Peñaflor' UNION ALL
+SELECT zona_urbana_id, 236478, 34, 70088, 3.2 FROM zonas_urbanas WHERE nombre = 'Peñalolén' UNION ALL
+SELECT zona_urbana_id, 29060, 36, 8308, 3.2 FROM zonas_urbanas WHERE nombre = 'Pirque' UNION ALL
+SELECT zona_urbana_id, 143974, 41, 83251, 2.2 FROM zonas_urbanas WHERE nombre = 'Providencia' UNION ALL
+SELECT zona_urbana_id, 227820, 33, 68307, 3.3 FROM zonas_urbanas WHERE nombre = 'Pudahuel' UNION ALL
+SELECT zona_urbana_id, 568086, 32, 165342, 3.4 FROM zonas_urbanas WHERE nombre = 'Puente Alto' UNION ALL
+SELECT zona_urbana_id, 205624, 31, 63385, 3.3 FROM zonas_urbanas WHERE nombre = 'Quilicura' UNION ALL
+SELECT zona_urbana_id, 129351, 36, 38077, 3.1 FROM zonas_urbanas WHERE nombre = 'Quinta Normal' UNION ALL
+SELECT zona_urbana_id, 154615, 35, 52417, 3.3 FROM zonas_urbanas WHERE nombre = 'Recoleta' UNION ALL
+SELECT zona_urbana_id, 145622, 34, 41516, 3.3 FROM zonas_urbanas WHERE nombre = 'Renca' UNION ALL
+SELECT zona_urbana_id, 306371, 33, 92427, 3.3 FROM zonas_urbanas WHERE nombre = 'San Bernardo' UNION ALL
+SELECT zona_urbana_id, 95602, 37, 29566, 3.1 FROM zonas_urbanas WHERE nombre = 'San Joaquín' UNION ALL
+SELECT zona_urbana_id, 17441, 37, 8877, 2.8 FROM zonas_urbanas WHERE nombre = 'San José de Maipo' UNION ALL
+SELECT zona_urbana_id, 150829, 36, 45422, 2.6 FROM zonas_urbanas WHERE nombre = 'San Miguel' UNION ALL
+SELECT zona_urbana_id, 11108, 39, 4606, 2.6 FROM zonas_urbanas WHERE nombre = 'San Pedro' UNION ALL
+SELECT zona_urbana_id, 76002, 36, 23493, 3.5 FROM zonas_urbanas WHERE nombre = 'San Ramón' UNION ALL
+SELECT zona_urbana_id, 438856, 33, 193628, 2.1 FROM zonas_urbanas WHERE nombre = 'Santiago' UNION ALL
+SELECT zona_urbana_id, 76429, 35, 24316, 3.2 FROM zonas_urbanas WHERE nombre = 'Talagante' UNION ALL
+SELECT zona_urbana_id, 19742, 35, 7420, 2.8 FROM zonas_urbanas WHERE nombre = 'Tiltil' UNION ALL
+SELECT zona_urbana_id, 86420, 40, 29702, 2.9 FROM zonas_urbanas WHERE nombre = 'Vitacura';
 
 -- ==================================================
 -- 5. PROYECTOS URBANOS (GEOMETRÍAS CORREGIDAS)
@@ -606,18 +609,16 @@ GROUP BY estado;
 
 -- Población total de Santiago
 SELECT '===== POBLACIÓN REGIÓN METROPOLITANA =====' as info;
-SELECT SUM(poblacion) as poblacion_total_2025,
+SELECT SUM(poblacion) as poblacion_total_2024,
        ROUND(AVG(edad_promedio), 1) as edad_promedio_regional,
        SUM(numero_viviendas) as total_viviendas
-FROM datos_demograficos
-WHERE anio = 2025;
+FROM datos_demograficos;
 
 -- Top 5 comunas más pobladas
-SELECT '===== TOP 5 COMUNAS MÁS POBLADAS (2025) =====' as info;
+SELECT '===== TOP 5 COMUNAS MÁS POBLADAS (2024) =====' as info;
 SELECT zu.nombre, dd.poblacion, dd.edad_promedio
 FROM zonas_urbanas zu
          JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
-WHERE dd.anio = 2025
 ORDER BY dd.poblacion DESC
     LIMIT 5;
 

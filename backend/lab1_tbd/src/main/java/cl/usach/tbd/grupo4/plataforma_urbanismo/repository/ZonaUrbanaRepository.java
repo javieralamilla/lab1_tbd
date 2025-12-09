@@ -30,22 +30,6 @@ public class ZonaUrbanaRepository {
             zona.setAreaKm2(rs.getBigDecimal("area_km2"));
             zona.setFechaCreacion(rs.getTimestamp("fecha_creacion").toLocalDateTime());
 
-            // Agregar datos demográficos si existen
-            try {
-                long poblacion = rs.getLong("poblacion");
-                if (!rs.wasNull()) {
-                    zona.setPoblacion(poblacion);
-
-                    // Calcular densidad
-                    if (zona.getAreaKm2() != null && zona.getAreaKm2().doubleValue() > 0) {
-                        double densidad = poblacion / zona.getAreaKm2().doubleValue();
-                        zona.setDensidadPoblacion(densidad);
-                    }
-                }
-            } catch (SQLException e) {
-                // Si no hay datos demográficos, continuar sin ellos
-            }
-
             return zona;
         }
     };
@@ -53,10 +37,8 @@ public class ZonaUrbanaRepository {
     public List<ZonaUrbana> findAll() {
         String sql = "SELECT zu.zona_urbana_id, zu.nombre, " +
                 "ST_AsGeoJSON(zu.geometria_poligono) as geometria_geojson, " +
-                "zu.tipo_zona, zu.area_km2, zu.fecha_creacion, " +
-                "dd.poblacion " +
+                "zu.tipo_zona, zu.area_km2, zu.fecha_creacion " +
                 "FROM zonas_urbanas zu " +
-                "LEFT JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id AND dd.anio = 2025 " +
                 "ORDER BY zu.nombre";
         return jdbcTemplate.query(sql, zonaUrbanaRowMapper);
     }
@@ -83,8 +65,7 @@ public class ZonaUrbanaRepository {
                 ROUND(dd.poblacion::NUMERIC / NULLIF(zu.area_km2, 0), 2) AS densidad_poblacion_km2
             FROM zonas_urbanas zu
             INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
-            WHERE dd.anio = EXTRACT(YEAR FROM CURRENT_DATE)
-              AND zu.area_km2 > 0
+            WHERE zu.area_km2 > 0
             ORDER BY densidad_poblacion_km2 DESC
         """;
         return jdbcTemplate.queryForList(sql);
@@ -99,7 +80,6 @@ public class ZonaUrbanaRepository {
             FROM zonas_urbanas zu
             INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
             LEFT JOIN cobertura_infraestructura ci ON zu.zona_urbana_id = ci.zona_urbana_id
-            WHERE dd.anio = EXTRACT(YEAR FROM CURRENT_DATE)
             ORDER BY dd.poblacion DESC, cantidad_hospitales ASC
             LIMIT 5
         """;
@@ -107,31 +87,14 @@ public class ZonaUrbanaRepository {
     }
 
     public List<Map<String, Object>> getZonasRapidoCrecimiento() {
+        // Sin datos históricos, retornamos las zonas con mayor población
         String sql = """
-            WITH poblacion_comparativa AS (
-                SELECT 
-                    zona_urbana_id,
-                    MAX(CASE WHEN anio = EXTRACT(YEAR FROM CURRENT_DATE) THEN poblacion END) AS poblacion_actual,
-                    MAX(CASE WHEN anio = EXTRACT(YEAR FROM CURRENT_DATE) - 5 THEN poblacion END) AS poblacion_hace_5_anios
-                FROM datos_demograficos
-                WHERE anio IN (EXTRACT(YEAR FROM CURRENT_DATE), EXTRACT(YEAR FROM CURRENT_DATE) - 5)
-                GROUP BY zona_urbana_id
-            )
             SELECT 
                 zu.nombre AS zona,
-                pc.poblacion_hace_5_anios,
-                pc.poblacion_actual,
-                ROUND(
-                    ((pc.poblacion_actual - pc.poblacion_hace_5_anios)::NUMERIC / 
-                    NULLIF(pc.poblacion_hace_5_anios, 0) * 100), 2
-                ) AS porcentaje_crecimiento
-            FROM poblacion_comparativa pc
-            INNER JOIN zonas_urbanas zu ON pc.zona_urbana_id = zu.zona_urbana_id
-            WHERE pc.poblacion_hace_5_anios IS NOT NULL 
-              AND pc.poblacion_actual IS NOT NULL
-              AND pc.poblacion_hace_5_anios > 0
-              AND ((pc.poblacion_actual - pc.poblacion_hace_5_anios)::NUMERIC / pc.poblacion_hace_5_anios) > 0.10
-            ORDER BY porcentaje_crecimiento DESC
+                dd.poblacion AS poblacion_actual
+            FROM zonas_urbanas zu
+            INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
+            ORDER BY dd.poblacion DESC
             LIMIT 3
         """;
         return jdbcTemplate.queryForList(sql);
@@ -169,14 +132,17 @@ public class ZonaUrbanaRepository {
     }
 
     public int update(ZonaUrbana zona) {
-        String sql = "UPDATE zonas_urbanas SET nombre = ?, tipo_zona = ?, area_km2 = ? " +
+        // Actualizar datos de la zona urbana
+        String sqlZona = "UPDATE zonas_urbanas SET nombre = ?, tipo_zona = ?, area_km2 = ? " +
                 "WHERE zona_urbana_id = ?";
 
-        return jdbcTemplate.update(sql,
+        int zonasAfectadas = jdbcTemplate.update(sqlZona,
                 zona.getNombre(),
                 zona.getTipoZona(),
                 zona.getAreaKm2(),
                 zona.getZonaUrbanaId());
+
+        return zonasAfectadas;
     }
 
     public int deleteById(Long id) {
@@ -197,8 +163,7 @@ public class ZonaUrbanaRepository {
             ), 0) as poblacion_total
             FROM zonas_urbanas zu
             INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
-            WHERE dd.anio = EXTRACT(YEAR FROM CURRENT_DATE)
-              AND ST_Intersects(zu.geometria_poligono, ST_GeomFromGeoJSON(?))
+            WHERE ST_Intersects(zu.geometria_poligono, ST_GeomFromGeoJSON(?))
         """;
 
         // Obtener cantidad de escuelas en el área
@@ -295,8 +260,7 @@ public class ZonaUrbanaRepository {
                 SELECT COALESCE(SUM(dd.poblacion), 0) as poblacion
                 FROM zonas_urbanas zu
                 INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
-                WHERE dd.anio = EXTRACT(YEAR FROM CURRENT_DATE)
-                  AND ST_DWithin(
+                WHERE ST_DWithin(
                       zu.geometria_poligono::geography,
                       ST_GeomFromGeoJSON(?)::geography,
                       ?

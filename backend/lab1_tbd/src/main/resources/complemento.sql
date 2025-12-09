@@ -1,8 +1,14 @@
 -- ==================================================
--- COMPLEMENTO SQL - CONSULTAS ADICIONALES REQUERIDAS
+-- COMPLEMENTO SQL - VISTAS Y PROCEDIMIENTOS ADICIONALES
+-- ==================================================
+-- Este archivo contiene vistas y procedimientos adicionales que complementan
+-- el schema principal para consultas y operaciones avanzadas.
+
+-- ==================================================
+-- VISTAS DE ANÁLISIS
 -- ==================================================
 
--- 🆕 3. Análisis de Proximidad a Proyectos
+-- VISTA: Análisis de Proximidad a Proyectos
 -- Encuentra escuelas a menos de 500 metros de proyectos 'En Curso'
 CREATE OR REPLACE VIEW escuelas_cerca_proyectos AS
 SELECT DISTINCT
@@ -25,7 +31,7 @@ WHERE pi.tipo = 'Escuela'
   AND pi.activo = TRUE
 ORDER BY distancia_metros;
 
--- 🆕 9. Análisis de Superposición de Proyectos
+-- VISTA: Análisis de Superposición de Proyectos
 -- Identifica proyectos que se superponen geográficamente
 CREATE OR REPLACE VIEW proyectos_superpuestos AS
 SELECT 
@@ -47,10 +53,10 @@ WHERE ST_Intersects(p1.geometria, p2.geometria)
 ORDER BY area_superposicion_m2 DESC;
 
 -- ==================================================
--- PROCEDIMIENTOS ADICIONALES PARA REFRESCAR VISTAS
+-- PROCEDIMIENTOS ALMACENADOS
 -- ==================================================
 
--- Procedimiento para refrescar vista de cobertura de infraestructura
+-- Procedimiento para refrescar vista materializada de cobertura de infraestructura
 CREATE OR REPLACE PROCEDURE refrescar_cobertura_infraestructura()
 LANGUAGE plpgsql
 AS $$

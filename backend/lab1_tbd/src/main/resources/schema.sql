@@ -90,14 +90,11 @@ CREATE TABLE datos_demograficos (
                                     dato_demografico_id SERIAL PRIMARY KEY,
                                     zona_urbana_id INTEGER NOT NULL,
                                     poblacion INTEGER NOT NULL CHECK (poblacion >= 0),
-                                    densidad_poblacion DECIMAL(10, 2),
                                     edad_promedio DECIMAL(5, 2),
                                     numero_viviendas INTEGER DEFAULT 0,
                                     factor_personas_vivienda DECIMAL(4, 2) DEFAULT 3.0,
-                                    anio INTEGER NOT NULL,
-                                    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                     FOREIGN KEY (zona_urbana_id) REFERENCES zonas_urbanas(zona_urbana_id) ON DELETE CASCADE,
-                                    UNIQUE (zona_urbana_id, anio)
+                                    UNIQUE (zona_urbana_id)
 );
 
 -- ==================================================
@@ -146,7 +143,6 @@ CREATE INDEX idx_usuarios_email ON usuarios(email);
 CREATE INDEX idx_puntos_tipo ON puntos_interes(tipo);
 CREATE INDEX idx_puntos_zona ON puntos_interes(zona_urbana_id);
 CREATE INDEX idx_datos_demo_zona ON datos_demograficos(zona_urbana_id);
-CREATE INDEX idx_datos_demo_anio ON datos_demograficos(anio);
 CREATE INDEX idx_proyectos_estado ON proyectos_urbanos(estado);
 CREATE INDEX idx_proyectos_usuario ON proyectos_urbanos(usuario_id);
 CREATE INDEX idx_proyectos_fecha ON proyectos_urbanos(fecha_termino);
@@ -207,33 +203,6 @@ CREATE TRIGGER trigger_validar_proyecto
                          EXECUTE FUNCTION validar_proyecto_insert();
 
 -- ==================================================
--- TRIGGER: Actualizar densidad automáticamente
--- ==================================================
-CREATE OR REPLACE FUNCTION actualizar_densidad()
-RETURNS TRIGGER AS $$
-DECLARE
-v_area_km2 DECIMAL(10, 2);
-BEGIN
-    -- Obtener área de la zona
-SELECT area_km2 INTO v_area_km2
-FROM zonas_urbanas
-WHERE zona_urbana_id = NEW.zona_urbana_id;
-
--- Calcular densidad
-IF v_area_km2 IS NOT NULL AND v_area_km2 > 0 THEN
-        NEW.densidad_poblacion := NEW.poblacion / v_area_km2;
-END IF;
-
-RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_actualizar_densidad
-    BEFORE INSERT OR UPDATE ON datos_demograficos
-                         FOR EACH ROW
-                         EXECUTE FUNCTION actualizar_densidad();
-
--- ==================================================
 -- PROCEDIMIENTO: simular_crecimiento_poblacion
 -- ==================================================
 CREATE OR REPLACE PROCEDURE simular_crecimiento_poblacion(
@@ -245,42 +214,28 @@ AS $$
 DECLARE
 v_factor DECIMAL(4, 2);
     v_incremento_poblacion INTEGER;
-    v_anio_actual INTEGER;
 BEGIN
-    -- Obtener año actual
-    v_anio_actual := EXTRACT(YEAR FROM CURRENT_DATE);
-
-    -- Obtener factor de personas por vivienda (usar el más reciente o 3.0 por defecto)
-SELECT COALESCE(factor_personas_vivienda, 3.0) INTO v_factor
-FROM datos_demograficos
-WHERE zona_urbana_id = p_zona_id
-ORDER BY anio DESC
+    -- Obtener factor de personas por vivienda (usar 3.0 por defecto)
+    SELECT COALESCE(factor_personas_vivienda, 3.0) INTO v_factor
+    FROM datos_demograficos
+    WHERE zona_urbana_id = p_zona_id
     LIMIT 1;
 
--- Calcular incremento
-v_incremento_poblacion := p_nuevas_viviendas * v_factor;
+    -- Calcular incremento
+    v_incremento_poblacion := p_nuevas_viviendas * v_factor;
 
-    -- Actualizar población del año actual
-UPDATE datos_demograficos
-SET
-    poblacion = poblacion + v_incremento_poblacion,
-    numero_viviendas = numero_viviendas + p_nuevas_viviendas
-WHERE zona_urbana_id = p_zona_id AND anio = v_anio_actual;
+    -- Actualizar población
+    UPDATE datos_demograficos
+    SET
+        poblacion = poblacion + v_incremento_poblacion,
+        numero_viviendas = numero_viviendas + p_nuevas_viviendas
+    WHERE zona_urbana_id = p_zona_id;
 
--- Si no existe registro para el año actual, crear uno
-IF NOT FOUND THEN
-        INSERT INTO datos_demograficos (zona_urbana_id, poblacion, numero_viviendas, factor_personas_vivienda, anio)
-SELECT p_zona_id,
-       COALESCE(d.poblacion, 0) + v_incremento_poblacion,
-       COALESCE(d.numero_viviendas, 0) + p_nuevas_viviendas,
-       v_factor,
-       v_anio_actual
-FROM (SELECT poblacion, numero_viviendas
-      FROM datos_demograficos
-      WHERE zona_urbana_id = p_zona_id
-      ORDER BY anio DESC
-          LIMIT 1) d;
-END IF;
+    -- Si no existe registro, crear uno
+    IF NOT FOUND THEN
+        INSERT INTO datos_demograficos (zona_urbana_id, poblacion, numero_viviendas, factor_personas_vivienda)
+        VALUES (p_zona_id, v_incremento_poblacion, p_nuevas_viviendas, v_factor);
+    END IF;
 
     RAISE NOTICE 'Población actualizada: +% habitantes en zona %', v_incremento_poblacion, p_zona_id;
 END;

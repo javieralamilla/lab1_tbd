@@ -46,6 +46,12 @@ const routes = [
         meta: { title: 'Puntos de Interés' }
       },
       {
+        path: 'datos-demograficos',
+        name: 'DatosDemograficos',
+        component: () => import('@/views/DatosView.vue'),
+        meta: { title: 'Datos Demográficos' }
+      },
+      {
         path: 'mapa-integrado',
         name: 'MapaIntegrado',
         component: () => import('@/views/MapaIntegradoView.vue'),
