@@ -119,6 +119,40 @@
           </button>
         </div>
       </div>
+
+      <!-- Sección de Escasez de Hospitales -->
+      <div class="escasez-hospitales-section">
+        <h2>Identificación de Zonas con Escasez de Servicios Hospitalarios</h2>
+        <p class="section-subtitle">Top 5 zonas con mayor población pero menor cantidad de hospitales</p>
+        
+        <button @click="cargarEscasezHospitales" class="btn btn-primary" :disabled="loadingEscasez">
+          <span v-if="loadingEscasez">Cargando...</span>
+          <span v-else>Actualizar Análisis</span>
+        </button>
+
+        <div v-if="zonasEscasez.length > 0" class="escasez-results">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Zona Urbana</th>
+                <th>Población</th>
+                <th>Cantidad de Hospitales</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(zona, index) in zonasEscasez" :key="index">
+                <td>{{ zona.zona }}</td>
+                <td>{{ formatNumber(zona.poblacion) }}</td>
+                <td class="hospital-count">{{ zona.cantidad_hospitales }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <p v-else-if="!loadingEscasez" class="no-data-message">
+          No hay datos disponibles. Haz clic en "Actualizar Análisis" para cargar los datos.
+        </p>
+      </div>
     </div>
   </div>
 </template>
@@ -134,6 +168,8 @@ const loading = ref(false)
 const reporteGenerado = ref(false)
 const datosReporte = ref([])
 const error = ref(null)
+const loadingEscasez = ref(false)
+const zonasEscasez = ref([])
 
 const filtros = reactive({
   fechaInicio: '',
@@ -197,6 +233,26 @@ const limpiarFiltros = () => {
 const formatearFecha = (fecha) => {
   if (!fecha) return '-'
   return new Date(fecha).toLocaleDateString('es-ES')
+}
+
+const formatNumber = (num) => {
+  if (!num && num !== 0) return '-'
+  return new Intl.NumberFormat('es-ES').format(num)
+}
+
+const cargarEscasezHospitales = async () => {
+  try {
+    loadingEscasez.value = true
+    error.value = null
+    const data = await reportesService.obtenerZonasEscasezHospitales()
+    zonasEscasez.value = data
+  } catch (err) {
+    console.error('Error al cargar zonas con escasez de hospitales:', err)
+    error.value = err.message || 'Error al cargar el análisis. Intente nuevamente.'
+    zonasEscasez.value = []
+  } finally {
+    loadingEscasez.value = false
+  }
 }
 
 const exportarPDF = async () => {
@@ -291,7 +347,7 @@ const exportarExcel = async () => {
 
 // Lifecycle
 onMounted(() => {
-  // No es necesario cargar nada al montar
+  cargarEscasezHospitales()
 })
 </script>
 
@@ -513,6 +569,37 @@ onMounted(() => {
   box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
 }
 
+/* Escasez de Hospitales Section */
+.escasez-hospitales-section {
+  background: var(--card-background);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 2rem;
+}
+
+.escasez-hospitales-section h2 {
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.section-subtitle {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.escasez-results {
+  margin-top: 1.5rem;
+}
+
+.hospital-count {
+  font-weight: 600;
+  color: var(--accent-primary);
+  text-align: center;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .reportes-container {
@@ -534,4 +621,5 @@ onMounted(() => {
   }
 }
 </style>
+
 

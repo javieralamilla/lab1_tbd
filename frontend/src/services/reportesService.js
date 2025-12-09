@@ -329,8 +329,19 @@ const reportesService = {
       }
       throw error;
     }
+  },
+
+  obtenerZonasEscasezHospitales: async () => {
+    try {
+      const response = await api.get('/reportes/zonas-escasez-hospitales');
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener zonas con escasez de hospitales:', error);
+      throw error;
+    }
   }
 };
 
 export default reportesService;
+
 

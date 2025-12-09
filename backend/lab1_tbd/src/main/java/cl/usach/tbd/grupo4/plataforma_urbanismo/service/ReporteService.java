@@ -493,5 +493,27 @@ public class ReporteService {
             throw new RuntimeException("Error generando Excel: " + e.getMessage(), e);
         }
     }
+
+    /**
+     * Identifica las 5 zonas urbanas con mayor población pero menor cantidad de hospitales
+     */
+    public List<Map<String, Object>> obtenerZonasEscasezHospitales() {
+        String sql = """
+            SELECT 
+                zu.nombre as zona,
+                dd.poblacion,
+                COALESCE(COUNT(pi.punto_interes_id), 0) as cantidad_hospitales
+            FROM zonas_urbanas zu
+            INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
+            LEFT JOIN puntos_interes pi ON ST_Contains(zu.geometria_poligono, pi.coordenadas_punto)
+                AND pi.tipo = 'Hospital'
+            GROUP BY zu.zona_urbana_id, zu.nombre, dd.poblacion
+            ORDER BY dd.poblacion DESC, cantidad_hospitales ASC
+            LIMIT 5
+        """;
+        
+        return jdbcTemplate.queryForList(sql);
+    }
 }
+
 

@@ -57,6 +57,16 @@ public class ReporteController {
         }
     }
 
+    @GetMapping("/zonas-escasez-hospitales")
+    public ResponseEntity<List<Map<String, Object>>> obtenerZonasEscasezHospitales() {
+        try {
+            List<Map<String, Object>> zonas = reporteService.obtenerZonasEscasezHospitales();
+            return ResponseEntity.ok(zonas);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
 
     @GetMapping("/proyectos")
     public ResponseEntity<List<ReporteDTO>> generarReporteProyectos(
