@@ -58,9 +58,10 @@ public class ReporteController {
     }
 
     @GetMapping("/zonas-escasez-hospitales")
-    public ResponseEntity<List<Map<String, Object>>> obtenerZonasEscasezHospitales() {
+    public ResponseEntity<List<Map<String, Object>>> obtenerZonasEscasezHospitales(
+            @RequestParam(required = false, defaultValue = "2024") Long año) {
         try {
-            List<Map<String, Object>> zonas = reporteService.obtenerZonasEscasezHospitales();
+            List<Map<String, Object>> zonas = reporteService.obtenerZonasEscasezHospitales(año);
             return ResponseEntity.ok(zonas);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

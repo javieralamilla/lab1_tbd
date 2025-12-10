@@ -331,9 +331,9 @@ const reportesService = {
     }
   },
 
-  obtenerZonasEscasezHospitales: async () => {
+  obtenerZonasEscasezHospitales: async (año = 2024) => {
     try {
-      const response = await api.get('/reportes/zonas-escasez-hospitales');
+      const response = await api.get(`/reportes/zonas-escasez-hospitales?año=${año}`);
       return response.data;
     } catch (error) {
       console.error('Error al obtener zonas con escasez de hospitales:', error);

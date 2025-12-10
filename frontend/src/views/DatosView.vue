@@ -39,6 +39,15 @@
           placeholder="Buscar por zona..."
         />
       </div>
+      <div class="filter-group">
+        <label for="yearFilter">Año:</label>
+        <select id="yearFilter" v-model="selectedYear" class="form-select">
+          <option value="">Todos los años</option>
+          <option v-for="year in availableYears" :key="year" :value="year">
+            {{ year }}
+          </option>
+        </select>
+      </div>
     </div>
 
     <div v-if="!loading && !error" class="table-container">
@@ -49,6 +58,12 @@
             ID Zona
             <span class="sort-icon" :class="{ active: sortColumn === 'zona_urbana_id' }">
               {{ sortColumn === 'zona_urbana_id' && sortDirection === 'desc' ? '↓' : '↑' }}
+            </span>
+          </th>
+          <th @click="sortBy('año')" class="sortable">
+            Año
+            <span class="sort-icon" :class="{ active: sortColumn === 'año' }">
+              {{ sortColumn === 'año' && sortDirection === 'desc' ? '↓' : '↑' }}
             </span>
           </th>
           <th @click="sortBy('zona_nombre')" class="sortable">
@@ -105,6 +120,7 @@
         <tbody>
         <tr v-for="dato in filteredDatos" :key="dato.dato_demografico_id">
           <td>{{ dato.zona_urbana_id }}</td>
+          <td><strong>{{ dato.año || 2024 }}</strong></td>
           <td>{{ dato.zona_nombre || 'Sin zona' }}</td>
           <td>{{ dato.zona_tipo || 'N/A' }}</td>
           <td>{{ dato.zona_area_km2 ? formatNumber(dato.zona_area_km2) : 'N/A' }}</td>
@@ -165,6 +181,19 @@
                   {{ zona.nombre }}
                 </option>
               </select>
+            </div>
+
+            <div class="form-group">
+              <label>Año *</label>
+              <input
+                v-model.number="editingDato.año"
+                type="number"
+                class="form-control"
+                min="2019"
+                max="2030"
+                :required="!showEditModal"
+                :disabled="showEditModal"
+              />
             </div>
 
             <div class="form-group">
@@ -240,11 +269,17 @@ const error = ref(null);
 const datos = ref([]);
 const zonas = ref([]);
 const searchQuery = ref('');
+const selectedYear = ref('');
 const showCreateModal = ref(false);
 const showEditModal = ref(false);
 const editingDato = ref(null);
 const sortColumn = ref('zona_nombre');
 const sortDirection = ref('asc');
+
+const availableYears = computed(() => {
+  const years = [...new Set(datos.value.map(d => d.año).filter(y => y != null))];
+  return years.sort((a, b) => b - a); // Ordenar descendente
+});
 
 const formatNumber = (num) => {
   return new Intl.NumberFormat('es-CL').format(num);
@@ -263,7 +298,8 @@ const filteredDatos = computed(() => {
   let filtered = datos.value.filter(dato => {
     const matchesSearch = !searchQuery.value || 
       (dato.zona_nombre && dato.zona_nombre.toLowerCase().includes(searchQuery.value.toLowerCase()));
-    return matchesSearch;
+    const matchesYear = !selectedYear.value || dato.año == selectedYear.value;
+    return matchesSearch && matchesYear;
   });
 
   return filtered.sort((a, b) => {
@@ -333,7 +369,14 @@ const saveDato = async () => {
       });
     } else {
       // Crear
-      await datosService.create(editingDato.value);
+      await datosService.create({
+        zona_urbana_id: editingDato.value.zona_urbana_id,
+        año: editingDato.value.año,
+        poblacion: editingDato.value.poblacion,
+        edad_promedio: editingDato.value.edad_promedio,
+        numero_viviendas: editingDato.value.numero_viviendas,
+        factor_personas_vivienda: editingDato.value.factor_personas_vivienda
+      });
     }
 
     showEditModal.value = false;
@@ -372,6 +415,7 @@ watch(showCreateModal, (newVal) => {
   if (newVal) {
     editingDato.value = {
       zona_urbana_id: '',
+      año: new Date().getFullYear(),
       poblacion: 0,
       edad_promedio: null,
       numero_viviendas: 0,
@@ -431,6 +475,7 @@ watch(showCreateModal, (newVal) => {
   display: flex;
   gap: 16px;
   margin-bottom: 24px;
+  align-items: center;
 }
 
 .search-box {
@@ -454,6 +499,42 @@ watch(showCreateModal, (newVal) => {
   background-color: var(--bg-secondary);
   color: var(--text-primary);
   font-size: 14px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.form-select {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.form-select:hover {
+  border-color: var(--primary-color);
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .filter-select {

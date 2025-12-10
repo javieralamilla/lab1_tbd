@@ -17,6 +17,9 @@ public class DatoDemografico {
     @JsonProperty("zona_urbana_id")
     private Long zonaUrbanaId;
     
+    @JsonProperty("año")
+    private Integer año;
+    
     @JsonProperty("poblacion")
     private Integer poblacion;
     

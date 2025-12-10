@@ -345,22 +345,67 @@ INSERT INTO zonas_urbanas (nombre, geometria_poligono, tipo_zona, area_km2) VALU
 
 -- SALUD
 INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urbana_id) VALUES
-                                                                                            ('Hospital Clínico U. de Chile', 'Hospital', ST_GeomFromText('POINT(-70.653940 -33.420350)', 4326), 'Av. Santos Dumont 999', 1),
-                                                                                            ('Hospital del Salvador', 'Hospital', ST_GeomFromText('POINT(-70.62382 -33.43691)', 4326), 'Av. Salvador 364', 2),
-                                                                                            ('Clínica Las Condes', 'Hospital', ST_GeomFromText('POINT(-70.530800 -33.384700)', 4326), 'Estoril 450', 3),
-                                                                                            ('Clínica Alemana', 'Hospital', ST_GeomFromText('POINT(-70.57268 -33.39299)', 4326), 'Av. Vitacura 5951', 4),
-                                                                                            ('Hospital Barros Luco', 'Hospital', ST_GeomFromText('POINT(-70.64579 -33.48441)', 4326), 'Av. José Miguel Carrera 3204', 10),
-                                                                                            ('Hospital Sótero del Río', 'Hospital', ST_GeomFromText('POINT(-70.58124 -33.57679)', 4326), 'Av. Concha y Toro 3459', 5),
-                                                                                            ('Hospital Félix Bulnes (Nuevo)', 'Hospital', ST_GeomFromText('POINT(-70.74182 -33.42297)', 4326), 'Av. Mapocho 7432', 6),
-                                                                                            ('Hospital Militar', 'Hospital', ST_GeomFromText('POINT(-70.53818 -33.45052)', 4326), 'Av. Fernando Castillo Velasco 9100', 8),
-                                                                                            ('Clínica Santa María', 'Hospital', ST_GeomFromText('POINT(-70.62906 -33.43223)', 4326), 'Av. Santa María 0500', 2),
-                                                                                            ('Hospital De Urgencia Asistencia Pública', 'Hospital', ST_GeomFromText('POINT(-70.63852 -33.44441)', 4326), 'Av. Portugal 125', 1),
-                                                                                            ('Clínica Indisa', 'Hospital', ST_GeomFromText('POINT(-70.61845 -33.42109)', 4326), 'Av. Santa María 1810', 2),
+                                                                                            ('Hospital Clínico U. de Chile', 'Hospital', ST_GeomFromText('POINT(-70.653940 -33.420350)', 4326), 'Av. Santos Dumont 999', 13),
+                                                                                            ('Hospital del Salvador', 'Hospital', ST_GeomFromText('POINT(-70.62382 -33.43691)', 4326), 'Av. Salvador 364', 32),
+                                                                                            ('Clínica Las Condes', 'Hospital', ST_GeomFromText('POINT(-70.530800 -33.384700)', 4326), 'Estoril 450', 21),
+                                                                                            ('Clínica Alemana', 'Hospital', ST_GeomFromText('POINT(-70.57268 -33.39299)', 4326), 'Av. Vitacura 5951', 52),
+                                                                                            ('Hospital Barros Luco', 'Hospital', ST_GeomFromText('POINT(-70.64579 -33.48441)', 4326), 'Av. José Miguel Carrera 3204', 46),
+                                                                                            ('Hospital Sótero del Río', 'Hospital', ST_GeomFromText('POINT(-70.58124 -33.57679)', 4326), 'Av. Concha y Toro 3459', 34),
+                                                                                            ('Hospital Félix Bulnes (Nuevo)', 'Hospital', ST_GeomFromText('POINT(-70.74182 -33.42297)', 4326), 'Av. Mapocho 7432', 5),
+                                                                                            ('Hospital Militar', 'Hospital', ST_GeomFromText('POINT(-70.53818 -33.45052)', 4326), 'Av. Fernando Castillo Velasco 9100', 22),
+                                                                                            ('Clínica Santa María', 'Hospital', ST_GeomFromText('POINT(-70.62906 -33.43223)', 4326), 'Av. Santa María 0500', 32),
+                                                                                            ('Hospital De Urgencia Asistencia Pública', 'Hospital', ST_GeomFromText('POINT(-70.63852 -33.44441)', 4326), 'Av. Portugal 125', 46),
+                                                                                            ('Clínica Indisa', 'Hospital', ST_GeomFromText('POINT(-70.61845 -33.42109)', 4326), 'Av. Santa María 1810', 32),
                                                                                             ('Hospital San José', 'Hospital', ST_GeomFromText('POINT(-70.65336 -33.41632)', 4326), 'Av. Independencia 1792', 12),
-                                                                                            ('CESFAM San Joaquín', 'Hospital', ST_GeomFromText('POINT(-70.62363 -33.48673)', 4326), 'Av. Vicuña Mackenna 6630', 10),
-                                                                                            ('CESFAM Dr. Hernán Alessandri', 'Hospital', ST_GeomFromText('POINT(-70.62047 -33.44415)', 4326), 'Los Jesuitas 857', 2),
+                                                                                            ('CESFAM San Joaquín', 'Hospital', ST_GeomFromText('POINT(-70.62363 -33.48673)', 4326), 'Av. Vicuña Mackenna 6630', 41),
+                                                                                            ('CESFAM Dr. Hernán Alessandri', 'Hospital', ST_GeomFromText('POINT(-70.62047 -33.44415)', 4326), 'Los Jesuitas 857', 32),
                                                                                             ('CESFAM Padre Orellana', 'Hospital', ST_GeomFromText('POINT(-70.62967 -33.46644)', 4326), 'Av. Pajaritos 2551', 6),
-                                                                                            ('CESFAM Recreo', 'Hospital', ST_GeomFromText('POINT(-70.64336 -33.50402)', 4326), 'Av. Departamental 879', 10);
+                                                                                            ('CESFAM Recreo', 'Hospital', ST_GeomFromText('POINT(-70.64336 -33.50402)', 4326), 'Av. Departamental 879', 10),
+
+-- Hospitales adicionales
+('Hospital San Juan de Dios', 'Hospital', ST_GeomFromText('POINT(-70.68050 -33.44040)', 4326), 'Huérfanos 3255', 1),
+('Hospital San Borja Arriarán', 'Hospital', ST_GeomFromText('POINT(-70.64230 -33.46120)', 4326), 'Av. Santa Rosa 1234', 1),
+('Hospital El Carmen de Maipú', 'Hospital', ST_GeomFromText('POINT(-70.77800 -33.53150)', 4326), 'Av. Camino a Rinconada 1201', 26),
+('Hospital Eloísa Díaz (La Florida)', 'Hospital', ST_GeomFromText('POINT(-70.56580 -33.53780)', 4326), 'Froilán Roa 6542', 13),
+('Hospital Luis Calvo Mackenna', 'Hospital', ST_GeomFromText('POINT(-70.61670 -33.44310)', 4326), 'Av. Antonio Varas 360', 2),
+('Hospital El Pino', 'Hospital', ST_GeomFromText('POINT(-70.67667422698791 -33.58434775967871)', 4326), 'Av. Padre Hurtado 1390', 36),
+('Hospital Parroquial de San Bernardo', 'Hospital', ST_GeomFromText('POINT(-70.69713510451734 -33.59214064637502)', 4326), 'Freire 856', 36),
+('Hospital Luis Tisné Brousse', 'Hospital', ST_GeomFromText('POINT(-70.55200 -33.49800)', 4326), 'Av. Las Torres 5150', 32),
+('Hospital de Talagante', 'Hospital', ST_GeomFromText('POINT(-70.92710 -33.66810)', 4326), 'Camino a Melipilla 1230', 45),
+('Hospital de Melipilla', 'Hospital', ST_GeomFromText('POINT(-71.21090 -33.68560)', 4326), 'Serrano 125', 27),
+('Hospital San José de Maipo', 'Hospital', ST_GeomFromText('POINT(-70.36650 -33.65370)', 4326), 'Camino al Volcán 16499', 40),
+('Hospital de Curacaví', 'Hospital', ST_GeomFromText('POINT(-71.13620 -33.40360)', 4326), 'Av. Ambrosio O''Higgins S/N', 8),
+('Hospital de Peñaflor', 'Hospital', ST_GeomFromText('POINT(-70.87820 -33.61470)', 4326), 'Av. Vicuña Mackenna 1115', 46),
+('Hospital de Buin', 'Hospital', ST_GeomFromText('POINT(-70.74120 -33.73210)', 4326), 'Av. San Martín 350', 2),
+('Hospital de Colina', 'Hospital', ST_GeomFromText('POINT(-70.67220 -33.20140)', 4326), 'Gral. San Martín 50', 6),
+('Instituto Nacional del Cáncer', 'Hospital', ST_GeomFromText('POINT(-70.66560 -33.41280)', 4326), 'Profesor Zañartu 1010', 12),
+('Instituto Psiquiátrico Dr. José Horwitz', 'Hospital', ST_GeomFromText('POINT(-70.64170 -33.41810)', 4326), 'Av. La Paz 841', 41),
+('Instituto Nacional de Geriatría', 'Hospital', ST_GeomFromText('POINT(-70.62350 -33.43800)', 4326), 'Av. Salvador 364', 2),
+('Instituto Nacional de Neurocirugía', 'Hospital', ST_GeomFromText('POINT(-70.62200 -33.43700)', 4326), 'Dr. José Manuel Infante 553', 2),
+('Instituto Nacional de Rehabilitación Pedro Aguirre Cerda', 'Hospital', ST_GeomFromText('POINT(-70.55510 -33.50020)', 4326), 'Av. Grecia 3201', 32),
+('Hospital Clínico FACH', 'Hospital', ST_GeomFromText('POINT(-70.53800 -33.40020)', 4326), 'Av. Las Condes 8631', 20),
+('Hospital DIPRECA', 'Hospital', ST_GeomFromText('POINT(-70.53700 -33.38440)', 4326), 'Av. Salvador Izquierdo 1900', 20),
+('Hospital de Carabineros (HOSCAR)', 'Hospital', ST_GeomFromText('POINT(-70.59310 -33.46300)', 4326), 'Antonio Varas 250', 29),
+('Clínica Dávila', 'Hospital', ST_GeomFromText('POINT(-70.63950 -33.41410)', 4326), 'Av. Recoleta 464', 41),
+('Clínica Bupa Santiago', 'Hospital', ST_GeomFromText('POINT(-70.57920 -33.53200)', 4326), 'Av. La Florida 9555', 13),
+('Clínica Vespucio', 'Hospital', ST_GeomFromText('POINT(-70.58000 -33.53350)', 4326), 'Av. Vespucio Sur', 13),
+('Clínica Bicentenario', 'Hospital', ST_GeomFromText('POINT(-70.70440 -33.45330)', 4326), 'Av. Libertador Bernardo O''Higgins 4850', 11),
+('Clínica Hospital del Profesor', 'Hospital', ST_GeomFromText('POINT(-70.70880 -33.46110)', 4326), 'Av. Padre Alberto Hurtado 0151', 11),
+('Clínica RedSalud Vitacura', 'Hospital', ST_GeomFromText('POINT(-70.59280 -33.39550)', 4326), 'Av. Vitacura 8029', 52),
+('Clínica RedSalud Santiago', 'Hospital', ST_GeomFromText('POINT(-70.70300 -33.45690)', 4326), 'Av. Libertador Bernardo O''Higgins 3363', 11),
+('Clínica Tabancura', 'Hospital', ST_GeomFromText('POINT(-70.53600 -33.38380)', 4326), 'Av. Tabancura 1223', 52),
+('Clínica Cordillera', 'Hospital', ST_GeomFromText('POINT(-70.53360 -33.40440)', 4326), 'Fleming 7885', 20),
+('Clínica Miraflores', 'Hospital', ST_GeomFromText('POINT(-70.65100 -33.41460)', 4326), 'Av. Independencia 499', 12),
+('Clínica Colonial', 'Hospital', ST_GeomFromText('POINT(-70.54640 -33.40520)', 4326), 'Colón 4240', 20),
+('Clínica Ciudad del Niño', 'Hospital', ST_GeomFromText('POINT(-70.64720 -33.50640)', 4326), 'Gran Avenida José Miguel Carrera 6150', 10),
+('Clínica Los Coihues', 'Hospital', ST_GeomFromText('POINT(-70.54600 -33.49320)', 4326), 'Av. Tobalaba 13651', 32),
+('Clínica Ñuñoa', 'Hospital', ST_GeomFromText('POINT(-70.59410 -33.45680)', 4326), 'Covarrubias 4354', 29),
+('Clínica Santa Raquel', 'Hospital', ST_GeomFromText('POINT(-70.58360 -33.53680)', 4326), 'Av. Santa Raquel 9615', 13),
+('Clínica San Cristóbal', 'Hospital', ST_GeomFromText('POINT(-70.65010 -33.44570)', 4326), 'Portugal 30', 1),
+('Clínica UC San Carlos de Apoquindo', 'Hospital', ST_GeomFromText('POINT(-70.51050 -33.38790)', 4326), 'Camino El Alba 12351', 20),
+('Clínica UC Christus Marcoleta', 'Hospital', ST_GeomFromText('POINT(-70.63670 -33.44500)', 4326), 'Marcoleta 347', 1),
+('Hospital Metropolitano', 'Hospital', ST_GeomFromText('POINT(-70.60050 -33.43230)', 4326), 'Av. Holanda 2570', 2),
+('Hospital Clínico FUSAT (Sede Santiago)', 'Hospital', ST_GeomFromText('POINT(-70.61500 -33.42900)', 4326), 'Los Conquistadores 1950', 2);
 
 -- ==================================================
 -- PUNTOS DE INTERÉS - EDUCACIÓN
@@ -384,7 +429,217 @@ INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urb
 ('Colegio The Grange School', 'Escuela', ST_GeomFromText('POINT(-70.56817 -33.43705)', 4326), 'Av. Príncipe de Gales 6154', 3),
 ('Colegio Santiago College', 'Escuela', ST_GeomFromText('POINT(-70.54450 -33.33977)', 4326), 'Camino Las Flores 12000', 3),
 ('Instituto Alonso de Ercilla', 'Escuela', ST_GeomFromText('POINT(-70.66675 -33.43763)', 4326), 'Av. Central 5555', 6),
-('Colegio San Ignacio El Bosque', 'Escuela', ST_GeomFromText('POINT(-70.59370 -33.43431)', 4326), 'Pocuro 2801', 9);
+('Colegio San Ignacio El Bosque', 'Escuela', ST_GeomFromText('POINT(-70.59370 -33.43431)', 4326), 'Pocuro 2801', 9),
+
+-- Colegios por comuna
+-- ALHUÉ (ID = 1)
+('Colegio Municipal de Alhué', 'Escuela', ST_GeomFromText('POINT(-71.0265 -34.0382)', 4326), 'Camino Alhué S/N', 1),
+('Escuela Básica Pichi', 'Escuela', ST_GeomFromText('POINT(-71.0401 -34.0478)', 4326), 'Sector Pichi S/N', 1),
+('Escuela El Asiento', 'Escuela', ST_GeomFromText('POINT(-70.9980 -34.0169)', 4326), 'El Asiento S/N', 1),
+-- BUIN (ID = 2)
+('Colegio Buin', 'Escuela', ST_GeomFromText('POINT(-70.7430 -33.7329)', 4326), 'Av. O´Higgins 250', 2),
+('Colegio Los Aromos', 'Escuela', ST_GeomFromText('POINT(-70.7380 -33.7450)', 4326), 'Los Aromos 450', 2),
+('Colegio Patricio Mekis', 'Escuela', ST_GeomFromText('POINT(-70.7265 -33.7287)', 4326), 'Av. San Martín 320', 2),
+-- CALERA DE TANGO (ID = 3)
+('Colegio Calera de Tango', 'Escuela', ST_GeomFromText('POINT(-70.8148 -33.6065)', 4326), 'Av. Calera de Tango S/N', 3),
+('Colegio Kimen', 'Escuela', ST_GeomFromText('POINT(-70.8281 -33.6144)', 4326), 'Camino Lonquén 3450', 3),
+('Escuela Básica El Tránsito', 'Escuela', ST_GeomFromText('POINT(-70.8033 -33.5872)', 4326), 'Sector El Tránsito S/N', 3),
+-- CERRILLOS (ID = 4)
+('Colegio Santiago de Cerrillos', 'Escuela', ST_GeomFromText('POINT(-70.7168 -33.4942)', 4326), 'Av. Cerrillos 5800', 4),
+('Escuela Los Halcones', 'Escuela', ST_GeomFromText('POINT(-70.7065 -33.4925)', 4326), 'Av. Pedro Aguirre Cerda 6100', 4),
+('Colegio San Luis Beltrán', 'Escuela', ST_GeomFromText('POINT(-70.7201 -33.5008)', 4326), 'Los Quillayes 1450', 4),
+-- CERRO NAVIA (ID = 5)
+('Colegio Republica de Noruega', 'Escuela', ST_GeomFromText('POINT(-70.7259 -33.4258)', 4326), 'Mapocho 6220', 5),
+('Colegio San Andrés de Cerro Navia', 'Escuela', ST_GeomFromText('POINT(-70.7312 -33.4210)', 4326), 'Av. Neptuno 1200', 5),
+('Escuela Teniente Merino', 'Escuela', ST_GeomFromText('POINT(-70.7184 -33.4297)', 4326), 'Av. Los Aromos 3200', 5),
+-- COLINA (ID = 6)
+('Colegio Sembrador', 'Escuela', ST_GeomFromText('POINT(-70.6691 -33.2090)', 4326), 'Av. Concepción 345', 6),
+('Colegio Algarrobal', 'Escuela', ST_GeomFromText('POINT(-70.6745 -33.2004)', 4326), 'Camino Chicureo S/N', 6),
+('Colegio Pumahue Chicureo', 'Escuela', ST_GeomFromText('POINT(-70.6551 -33.2312)', 4326), 'Av. del Valle 11.000', 6),
+-- CONCHALÍ (ID = 7)
+('Colegio Conchalí', 'Escuela', ST_GeomFromText('POINT(-70.6793 -33.3832)', 4326), 'Av. Independencia 9800', 7),
+('Colegio San Gaspar', 'Escuela', ST_GeomFromText('POINT(-70.6732 -33.3904)', 4326), 'Av. Guanaco 2450', 7),
+('Colegio Raúl Silva Henríquez', 'Escuela', ST_GeomFromText('POINT(-70.6871 -33.3851)', 4326), 'Diego Silva 340', 7),
+-- CURACAVÍ (ID = 8)
+('Colegio Curacaví', 'Escuela', ST_GeomFromText('POINT(-71.1401 -33.4025)', 4326), 'Av. Ambrosio O''Higgins 250', 8),
+('Escuela Matta', 'Escuela', ST_GeomFromText('POINT(-71.1312 -33.3993)', 4326), 'Calle Matta 350', 8),
+('Escuela Cerrillos', 'Escuela', ST_GeomFromText('POINT(-71.1620 -33.4188)', 4326), 'Sector Cerrillos S/N', 8),
+-- EL BOSQUE (ID = 9)
+('Colegio El Bosque', 'Escuela', ST_GeomFromText('POINT(-70.6661 -33.5542)', 4326), 'Av. Padre Hurtado 13500', 9),
+('Colegio Santa Magdalena Sofía', 'Escuela', ST_GeomFromText('POINT(-70.6668 -33.5459)', 4326), 'Calle Júpiter 1450', 9),
+('Colegio Inmaculada Concepción', 'Escuela', ST_GeomFromText('POINT(-70.6643 -33.5590)', 4326), 'Gran Avenida 12890', 9),
+-- EL MONTE (ID = 10)
+('Colegio El Monte', 'Escuela', ST_GeomFromText('POINT(-71.0074 -33.6865)', 4326), 'Av. Independencia 455', 10),
+('Escuela El Paico', 'Escuela', ST_GeomFromText('POINT(-71.0481 -33.7142)', 4326), 'Sector El Paico S/N', 10),
+('Colegio María Reina', 'Escuela', ST_GeomFromText('POINT(-71.0125 -33.6820)', 4326), 'Baquedano 950', 10),
+-- ESTACIÓN CENTRAL (ID = 11)
+('Colegio República de Austria', 'Escuela', ST_GeomFromText('POINT(-70.7021 -33.4629)', 4326), 'Av. Las Rejas Sur 1250', 11),
+('Colegio San Francisco de Asís', 'Escuela', ST_GeomFromText('POINT(-70.7045 -33.4578)', 4326), 'Calle Toro Mazotte 621', 11),
+('Colegio Alberto Hurtado', 'Escuela', ST_GeomFromText('POINT(-70.7059 -33.4638)', 4326), 'Av. Libertador B. O''Higgins 4840', 11),
+-- HUECHURABA (ID = 12)
+('Colegio Grange School Norte', 'Escuela', ST_GeomFromText('POINT(-70.6389 -33.3674)', 4326), 'Pedro Fontova 8500', 12),
+('Colegio Trewhela''s', 'Escuela', ST_GeomFromText('POINT(-70.6321 -33.3552)', 4326), 'Av. El Carmen 1550', 12),
+('Colegio Santa Marta de Huechuraba', 'Escuela', ST_GeomFromText('POINT(-70.6401 -33.3705)', 4326), 'Los Libertadores 3050', 12),
+-- INDEPENDENCIA (ID = 13)
+('Colegio Sagrados Corazones de Independencia', 'Escuela', ST_GeomFromText('POINT(-70.6535 -33.4130)', 4326), 'Av. Independencia 1899', 13),
+('Colegio Nueva Era Siglo XXI', 'Escuela', ST_GeomFromText('POINT(-70.6480 -33.4185)', 4326), 'Gamero 2750', 13),
+('Colegio Lena', 'Escuela', ST_GeomFromText('POINT(-70.6461 -33.4098)', 4326), 'Av. Fermín Vivaceta 1600', 13),
+-- ISLA DE MAIPO (ID = 14)
+('Colegio Eyzaguirre', 'Escuela', ST_GeomFromText('POINT(-70.9052 -33.7554)', 4326), 'Av. Santelices 1150', 14),
+('Colegio País de María', 'Escuela', ST_GeomFromText('POINT(-70.9304 -33.7612)', 4326), 'Camino La Islita 2400', 14),
+('Colegio El Maitén', 'Escuela', ST_GeomFromText('POINT(-70.8913 -33.7461)', 4326), 'Los Aromos 455', 14),
+-- LA CISTERNA (ID = 15)
+('Colegio Villa Las Vegas', 'Escuela', ST_GeomFromText('POINT(-70.6567 -33.5308)', 4326), 'Av. Lo Ovalle 1050', 15),
+('Colegio Hogar del Buen Pastor', 'Escuela', ST_GeomFromText('POINT(-70.6542 -33.5241)', 4326), 'Gran Avenida 8800', 15),
+('Colegio José Abelardo Núñez', 'Escuela', ST_GeomFromText('POINT(-70.6481 -33.5402)', 4326), 'Rivas 345', 15),
+-- LA FLORIDA (ID = 16)
+('Colegio Alicante', 'Escuela', ST_GeomFromText('POINT(-70.5668 -33.5292)', 4326), 'Av. Trinidad 6570', 16),
+('Colegio Santa Irene', 'Escuela', ST_GeomFromText('POINT(-70.5741 -33.5356)', 4326), 'Av. Walker Martínez 4500', 16),
+('Colegio Castilla y Aragón', 'Escuela', ST_GeomFromText('POINT(-70.5870 -33.5401)', 4326), 'Froilán Roa 7200', 16),
+-- LA GRANJA (ID = 17)
+('Colegio Cardenal Silva Henríquez', 'Escuela', ST_GeomFromText('POINT(-70.6079 -33.5377)', 4326), 'Av. Santa Rosa 10980', 17),
+('Colegio Antilhue', 'Escuela', ST_GeomFromText('POINT(-70.5995 -33.5279)', 4326), 'Av. Juan Valiente 4510', 17),
+('Colegio Poeta Neruda', 'Escuela', ST_GeomFromText('POINT(-70.6131 -33.5299)', 4326), 'Av. Cardenal Raúl Silva 7800', 17),
+-- LAMPA (ID = 18)
+('Colegio Lampa', 'Escuela', ST_GeomFromText('POINT(-70.9065 -33.2853)', 4326), 'Av. Baquedano 250', 18),
+('Colegio Pucará de Chicauma', 'Escuela', ST_GeomFromText('POINT(-70.9079 -33.2650)', 4326), 'Av. Chicauma 3100', 18),
+('Colegio Rayún', 'Escuela', ST_GeomFromText('POINT(-70.8890 -33.2861)', 4326), 'Calle Los Aromos 920', 18),
+-- LA PINTANA (ID = 19)
+('Colegio Santo Tomás de Aquino', 'Escuela', ST_GeomFromText('POINT(-70.6229 -33.5851)', 4326), 'Av. Santa Rosa 12900', 19),
+('Colegio San Francisco de Asís', 'Escuela', ST_GeomFromText('POINT(-70.6312 -33.5924)', 4326), 'Av. Lo Martínez 2100', 19),
+('Colegio Ciudad del Niño', 'Escuela', ST_GeomFromText('POINT(-70.6198 -33.5732)', 4326), 'Av. Santa Rosa 11680', 19),
+-- LA REINA (ID = 20)
+('Colegio Andrée English School', 'Escuela', ST_GeomFromText('POINT(-70.5564 -33.4493)', 4326), 'Av. Alcalde Fernando Castillo Velasco 7200', 20),
+('Colegio La Salle', 'Escuela', ST_GeomFromText('POINT(-70.5511 -33.4560)', 4326), 'Carlos Ossandón 1600', 20),
+('Colegio The Grange School (Sede La Reina)', 'Escuela', ST_GeomFromText('POINT(-70.5598 -33.4388)', 4326), 'Av. Príncipe de Gales 6150', 20),
+-- LAS CONDES (ID = 21)
+('Colegio Los Andes', 'Escuela', ST_GeomFromText('POINT(-70.5129 -33.3834)', 4326), 'Camino El Alba 11000', 21),
+('Colegio San Benito', 'Escuela', ST_GeomFromText('POINT(-70.5184 -33.3900)', 4326), 'Av. Las Condes 14370', 21),
+('Colegio Nido de Águilas', 'Escuela', ST_GeomFromText('POINT(-70.5072 -33.3857)', 4326), 'Av. El Rodeo 14200', 21),
+-- LO BARNECHEA (ID = 22)
+('Everest School', 'Escuela', ST_GeomFromText('POINT(-70.4945 -33.3559)', 4326), 'Av. La Dehesa 12000', 22),
+('Mayflower School', 'Escuela', ST_GeomFromText('POINT(-70.5024 -33.3672)', 4326), 'Av. Las Condes 14890', 22),
+('Colegio Monte Tabor y Nazaret', 'Escuela', ST_GeomFromText('POINT(-70.4982 -33.3458)', 4326), 'La Dehesa 22000', 22),
+-- LO ESPEJO (ID = 23)
+('Colegio Francisco Varela', 'Escuela', ST_GeomFromText('POINT(-70.6833 -33.5336)', 4326), 'Av. Central 8500', 23),
+('Colegio Alessandri Palma', 'Escuela', ST_GeomFromText('POINT(-70.6760 -33.5261)', 4326), 'Los Olmos 2410', 23),
+('Colegio Ciudad de Bogotá', 'Escuela', ST_GeomFromText('POINT(-70.6902 -33.5378)', 4326), 'Av. Juanita Aguirre 3200', 23),
+-- LO PRADO (ID = 24)
+('Colegio Alberto Blest Gana', 'Escuela', ST_GeomFromText('POINT(-70.7254 -33.4431)', 4326), 'Av. San Pablo 5930', 24),
+('Colegio Los Almendros', 'Escuela', ST_GeomFromText('POINT(-70.7155 -33.4498)', 4326), 'Av. Neptuno 2000', 24),
+('Colegio San Francisco de Asís', 'Escuela', ST_GeomFromText('POINT(-70.7209 -33.4406)', 4326), 'Av. San Pablo 5300', 24),
+-- MACUL (ID = 25)
+('Colegio San Marcos', 'Escuela', ST_GeomFromText('POINT(-70.5978 -33.4862)', 4326), 'Av. Macul 4500', 25),
+('Colegio Los Alerces', 'Escuela', ST_GeomFromText('POINT(-70.5869 -33.4801)', 4326), 'Av. Quilín 3000', 25),
+('Colegio Santa Julia', 'Escuela', ST_GeomFromText('POINT(-70.6004 -33.4934)', 4326), 'Av. Macul 5500', 25),
+-- MAIPÚ (ID = 26)
+('Colegio Mayor de Maipú', 'Escuela', ST_GeomFromText('POINT(-70.7577 -33.5084)', 4326), 'Av. Los Pajaritos 7000', 26),
+('Colegio San Sebastián de Maipú', 'Escuela', ST_GeomFromText('POINT(-70.7522 -33.5111)', 4326), 'Av. Tres Poniente 3450', 26),
+('Colegio Alicante del Sol', 'Escuela', ST_GeomFromText('POINT(-70.7479 -33.5240)', 4326), 'Av. El Sol 985', 26),
+-- MARÍA PINTO (ID = 27)
+('Colegio María Pinto', 'Escuela', ST_GeomFromText('POINT(-71.1301 -33.5058)', 4326), 'Av. Santa Emilia S/N', 27),
+('Escuela Chorombo', 'Escuela', ST_GeomFromText('POINT(-71.1519 -33.4672)', 4326), 'Sector Chorombo S/N', 27),
+('Colegio Las Mercedes', 'Escuela', ST_GeomFromText('POINT(-71.0966 -33.4900)', 4326), 'Las Mercedes 500', 27),
+-- MELIPILLA (ID = 28)
+('Colegio Melipilla', 'Escuela', ST_GeomFromText('POINT(-71.2160 -33.6891)', 4326), 'Av. Vicuña Mackenna 420', 28),
+('Colegio San Agustín', 'Escuela', ST_GeomFromText('POINT(-71.2040 -33.6820)', 4326), 'Serrano 950', 28),
+('Colegio Santo Cura de Ars', 'Escuela', ST_GeomFromText('POINT(-71.2125 -33.6942)', 4326), 'Av. Libertad 900', 28),
+-- ÑUÑOA (ID = 29)
+('Colegio San Agustín', 'Escuela', ST_GeomFromText('POINT(-70.6004 -33.4574)', 4326), 'Av. Américo Vespucio 350', 29),
+('Colegio República de Siria', 'Escuela', ST_GeomFromText('POINT(-70.5991 -33.4622)', 4326), 'Av. Grecia 3500', 29),
+('Colegio Nido de Las Águilas (Ñuñoa)', 'Escuela', ST_GeomFromText('POINT(-70.6068 -33.4699)', 4326), 'Av. Pedro de Valdivia 7200', 29),
+-- PADRE HURTADO (ID = 30)
+('Colegio Padre Hurtado', 'Escuela', ST_GeomFromText('POINT(-70.8179 -33.5754)', 4326), 'Av. Padre Hurtado 1900', 30),
+('Colegio El Prado', 'Escuela', ST_GeomFromText('POINT(-70.8052 -33.5733)', 4326), 'Av. Los Silos 450', 30),
+('Escuela Básica Santa Rosa', 'Escuela', ST_GeomFromText('POINT(-70.8240 -33.5648)', 4326), 'Camino La Vara S/N', 30),
+-- PAINE (ID = 31)
+('Colegio Paine', 'Escuela', ST_GeomFromText('POINT(-70.7411 -33.8180)', 4326), 'Av. Baquedano 80', 31),
+('Colegio El Tranque', 'Escuela', ST_GeomFromText('POINT(-70.7562 -33.8062)', 4326), 'Camino El Tranque S/N', 31),
+('Colegio Santa Teresa de Paine', 'Escuela', ST_GeomFromText('POINT(-70.7268 -33.8221)', 4326), 'Av. 18 de Septiembre 510', 31),
+-- PEDRO AGUIRRE CERDA (ID = 32)
+('Colegio Pedro Aguirre Cerda', 'Escuela', ST_GeomFromText('POINT(-70.6823 -33.4785)', 4326), 'Av. La Marina 1400', 32),
+('Colegio Nueva Zelandia', 'Escuela', ST_GeomFromText('POINT(-70.6704 -33.4861)', 4326), 'Clotario Blest 4100', 32),
+('Colegio República de México', 'Escuela', ST_GeomFromText('POINT(-70.6790 -33.4742)', 4326), 'Av. La Serena 1500', 32),
+-- PEÑAFLOR (ID = 33)
+('Colegio Peñaflor', 'Escuela', ST_GeomFromText('POINT(-70.8770 -33.6142)', 4326), 'Av. Vicuña Mackenna 1350', 33),
+('Colegio El Bosque', 'Escuela', ST_GeomFromText('POINT(-70.8865 -33.6104)', 4326), 'Av. Miraflores 455', 33),
+('Colegio Alicante', 'Escuela', ST_GeomFromText('POINT(-70.8688 -33.6037)', 4326), 'Av. Peñaflor 2200', 33),
+-- PEÑALOLÉN (ID = 34)
+('Colegio Altazor', 'Escuela', ST_GeomFromText('POINT(-70.5482 -33.4988)', 4326), 'Av. Consistorial 2100', 34),
+('Colegio Pedro de Valdivia Peñalolén', 'Escuela', ST_GeomFromText('POINT(-70.5420 -33.4855)', 4326), 'Av. Quilín 5700', 34),
+('Colegio Trewhela''s Peñalolén', 'Escuela', ST_GeomFromText('POINT(-70.5550 -33.4940)', 4326), 'Camino Las Perdices 9990', 34),
+-- PIRQUE (ID = 35)
+('Colegio El Principal', 'Escuela', ST_GeomFromText('POINT(-70.5514 -33.7063)', 4326), 'Av. El Principal 3500', 35),
+('Colegio Puelmapu', 'Escuela', ST_GeomFromText('POINT(-70.5640 -33.6592)', 4326), 'Av. Concha y Toro 9000', 35),
+('Colegio Salesiano de Pirque', 'Escuela', ST_GeomFromText('POINT(-70.5050 -33.6505)', 4326), 'Camino a San Juan 10500', 35),
+-- PROVIDENCIA (ID = 36)
+('Colegio Providencia', 'Escuela', ST_GeomFromText('POINT(-70.6161 -33.4324)', 4326), 'Av. Holanda 15', 36),
+('Colegio San Ignacio El Bosque', 'Escuela', ST_GeomFromText('POINT(-70.6064 -33.4359)', 4326), 'Padre Hurtado Sur 200', 36),
+('Colegio Sagrados Corazones de Providencia', 'Escuela', ST_GeomFromText('POINT(-70.6185 -33.4287)', 4326), 'Av. Eliodoro Yáñez 2760', 36),
+-- PUDAHUEL (ID = 37)
+('Colegio Pudahuel Norte', 'Escuela', ST_GeomFromText('POINT(-70.7405 -33.4320)', 4326), 'Av. La Estrella 1180', 37),
+('Colegio City College', 'Escuela', ST_GeomFromText('POINT(-70.7542 -33.4441)', 4326), 'Av. Laguna Sur 6251', 37),
+('Colegio Alicante de Pudahuel', 'Escuela', ST_GeomFromText('POINT(-70.7429 -33.4492)', 4326), 'Av. Teniente Cruz 4500', 37),
+-- PUENTE ALTO (ID = 38)
+('Colegio Puente Alto', 'Escuela', ST_GeomFromText('POINT(-70.5755 -33.5981)', 4326), 'Av. Concha y Toro 2400', 38),
+('Colegio Los Nogales', 'Escuela', ST_GeomFromText('POINT(-70.5674 -33.6050)', 4326), 'Av. Eyzaguirre 4500', 38),
+('Colegio Boston College Puente Alto', 'Escuela', ST_GeomFromText('POINT(-70.5618 -33.5914)', 4326), 'Av. Gabriela Oriente 850', 38),
+-- QUILICURA (ID = 39)
+('Colegio Alicante de Quilicura', 'Escuela', ST_GeomFromText('POINT(-70.7362 -33.3585)', 4326), 'Av. Lo Marcoleta 500', 39),
+('Colegio Mayor de Quilicura', 'Escuela', ST_GeomFromText('POINT(-70.7301 -33.3641)', 4326), 'Av. Bernardo O''Higgins 1300', 39),
+('Colegio San Isaac Jogues', 'Escuela', ST_GeomFromText('POINT(-70.7420 -33.3664)', 4326), 'Av. Santa Luisa 2500', 39),
+-- QUINTA NORMAL (ID = 40)
+('Colegio Dr. Luis Molina', 'Escuela', ST_GeomFromText('POINT(-70.6915 -33.4381)', 4326), 'Av. Mapocho 4200', 40),
+('Colegio Cristóbal Colón', 'Escuela', ST_GeomFromText('POINT(-70.6804 -33.4335)', 4326), 'Av. Matucana 1500', 40),
+('Colegio República de Austria', 'Escuela', ST_GeomFromText('POINT(-70.6850 -33.4423)', 4326), 'Calle Maipú 2500', 40),
+-- RECOLETA (ID = 41)
+('Colegio San Cristóbal', 'Escuela', ST_GeomFromText('POINT(-70.6402 -33.4078)', 4326), 'Av. Recoleta 3500', 41),
+('Colegio Juan Verdaguer', 'Escuela', ST_GeomFromText('POINT(-70.6331 -33.4149)', 4326), 'Av. México 200', 41),
+('Colegio Santa Marta de Recoleta', 'Escuela', ST_GeomFromText('POINT(-70.6475 -33.4084)', 4326), 'Av. Santos Dumont 3450', 41),
+-- RENCA (ID = 42)
+('Colegio José Bernardo Suárez', 'Escuela', ST_GeomFromText('POINT(-70.7234 -33.4072)', 4326), 'Av. Domingo Santa María 2500', 42),
+('Colegio Cumbre de Cóndores', 'Escuela', ST_GeomFromText('POINT(-70.7319 -33.4094)', 4326), 'Av. José Manuel Infante 4300', 42),
+('Colegio República de Alemania', 'Escuela', ST_GeomFromText('POINT(-70.7178 -33.4005)', 4326), 'Calle Apóstol Santiago 2350', 42),
+-- SAN BERNARDO (ID = 43)
+('Colegio Cardenal Oviedo', 'Escuela', ST_GeomFromText('POINT(-70.7061 -33.5922)', 4326), 'Av. Portales 2600', 43),
+('Colegio San José', 'Escuela', ST_GeomFromText('POINT(-70.7050 -33.5964)', 4326), 'Urmeneta 350', 43),
+('Colegio New Heinrich High School', 'Escuela', ST_GeomFromText('POINT(-70.7175 -33.5798)', 4326), 'Av. Colón 1200', 43),
+-- SAN JOAQUÍN (ID = 44)
+('Colegio Patricio Mekis', 'Escuela', ST_GeomFromText('POINT(-70.6240 -33.4930)', 4326), 'Av. Vicuña Mackenna 6200', 44),
+('Colegio Laura Vicuña', 'Escuela', ST_GeomFromText('POINT(-70.6297 -33.4869)', 4326), 'Av. Santa Rosa 9800', 44),
+('Colegio Poeta Víctor Jara', 'Escuela', ST_GeomFromText('POINT(-70.6362 -33.4881)', 4326), 'Las Industrias 4500', 44),
+-- SAN JOSÉ DE MAIPO (ID = 45)
+('Colegio San José de Maipo', 'Escuela', ST_GeomFromText('POINT(-70.3548 -33.6500)', 4326), 'Camino al Volcán 16000', 45),
+('Colegio El Melocotón', 'Escuela', ST_GeomFromText('POINT(-70.3062 -33.6288)', 4326), 'Sector El Melocotón S/N', 45),
+('Colegio San Alfonso', 'Escuela', ST_GeomFromText('POINT(-70.3569 -33.6881)', 4326), 'Sector San Alfonso S/N', 45),
+-- SAN MIGUEL (ID = 46)
+('Colegio Andrés Bello', 'Escuela', ST_GeomFromText('POINT(-70.6462 -33.4977)', 4326), 'Av. Departamental 50', 46),
+('Colegio Panamericano', 'Escuela', ST_GeomFromText('POINT(-70.6499 -33.4887)', 4326), 'Llano Subercaseaux 3200', 46),
+('Colegio San Miguel Arcángel', 'Escuela', ST_GeomFromText('POINT(-70.6360 -33.4943)', 4326), 'Av. Isabel Riquelme 2380', 46),
+-- SAN PEDRO (ID = 47)
+('Colegio San Pedro', 'Escuela', ST_GeomFromText('POINT(-71.4530 -33.9010)', 4326), 'Av. O''Higgins 250', 47),
+('Escuela Lo Encañado', 'Escuela', ST_GeomFromText('POINT(-71.4650 -33.8800)', 4326), 'Sector Lo Encañado S/N', 47),
+('Escuela La Manga', 'Escuela', ST_GeomFromText('POINT(-71.4400 -33.8933)', 4326), 'Sector La Manga S/N', 47),
+-- SAN RAMÓN (ID = 48)
+('Colegio Cardenal José María Caro', 'Escuela', ST_GeomFromText('POINT(-70.6315 -33.5310)', 4326), 'Av. Santa Rosa 10200', 48),
+('Colegio San José de San Ramón', 'Escuela', ST_GeomFromText('POINT(-70.6398 -33.5201)', 4326), 'Av. Ossa 1450', 48),
+('Colegio República Dominicana', 'Escuela', ST_GeomFromText('POINT(-70.6354 -33.5268)', 4326), 'Las Encinas 4300', 48),
+-- SANTIAGO (ID = 49)
+('Colegio Instituto Nacional', 'Escuela', ST_GeomFromText('POINT(-70.6506 -33.4452)', 4326), 'Alameda 340', 49),
+('Colegio Liceo Carmela Carvajal', 'Escuela', ST_GeomFromText('POINT(-70.6308 -33.4381)', 4326), 'Av. Providencia 711', 49),
+('Colegio San Ignacio Alonso Ovalle', 'Escuela', ST_GeomFromText('POINT(-70.6442 -33.4510)', 4326), 'Alonso Ovalle 1452', 49),
+-- TALAGANTE (ID = 50)
+('Colegio Talagante', 'Escuela', ST_GeomFromText('POINT(-70.9270 -33.6660)', 4326), 'Av. Bernardo O''Higgins 350', 50),
+('Colegio Francisco de Miranda', 'Escuela', ST_GeomFromText('POINT(-70.9105 -33.6555)', 4326), 'Av. Balmaceda 2200', 50),
+('Colegio El Bosque Talagante', 'Escuela', ST_GeomFromText('POINT(-70.9350 -33.6701)', 4326), 'Ruta 78 Km 34', 50),
+-- TILTIL (ID = 51)
+('Colegio Tiltil', 'Escuela', ST_GeomFromText('POINT(-70.9280 -33.0831)', 4326), 'Calle Manuel Rodríguez 450', 51),
+('Escuela Montenegro', 'Escuela', ST_GeomFromText('POINT(-70.9610 -33.0560)', 4326), 'Sector Montenegro S/N', 51),
+('Colegio San Vicente', 'Escuela', ST_GeomFromText('POINT(-70.9145 -33.0952)', 4326), 'Av. Principal 800', 51),
+-- VITACURA (ID = 52)
+('Colegio San Pedro Nolasco', 'Escuela', ST_GeomFromText('POINT(-70.5920 -33.3839)', 4326), 'Av. Vitacura 7500', 52),
+('Colegio Antártica Chilena', 'Escuela', ST_GeomFromText('POINT(-70.5822 -33.3831)', 4326), 'Av. Luis Pasteur 6300', 52),
+('Colegio Saint George''s College', 'Escuela', ST_GeomFromText('POINT(-70.5641 -33.3702)', 4326), 'Av. Santa María 9000', 52);
 
 -- ==================================================
 -- PUNTOS DE INTERÉS - PARQUES Y ÁREAS VERDES
@@ -453,61 +708,522 @@ INSERT INTO puntos_interes (nombre, tipo, coordenadas_punto, direccion, zona_urb
 -- ==================================================
 -- 4. DATOS DEMOGRÁFICOS
 -- ==================================================
+-- Datos demográficos históricos para todas las comunas de la RM (2019-2024)
+-- Calculados con base en datos reales de 2024 y crecimiento promedio anual por comuna
+-- Fuente crecimiento: Proyecciones INE y registros municipales
+
+-- NOTA: Los datos de población se calcularon restando el crecimiento anual desde 2024 hacia atrás
+-- hasta 2019 para cada comuna según su tasa específica de crecimiento
+
+-- Año 2019
+INSERT INTO datos_demograficos (zona_urbana_id, año, poblacion, edad_promedio, numero_viviendas, factor_personas_vivienda)
+SELECT zona_urbana_id, 2019, 6823, 37.5, 2527, 2.7 FROM zonas_urbanas WHERE nombre = 'Alhué' UNION ALL
+SELECT zona_urbana_id, 2019, 102425, 33.5, 30125, 3.4 FROM zonas_urbanas WHERE nombre = 'Buin' UNION ALL
+SELECT zona_urbana_id, 2019, 25421, 35.5, 7704, 3.3 FROM zonas_urbanas WHERE nombre = 'Calera de Tango' UNION ALL
+SELECT zona_urbana_id, 2019, 82637, 35.5, 25194, 3.2 FROM zonas_urbanas WHERE nombre = 'Cerrillos' UNION ALL
+SELECT zona_urbana_id, 2019, 130318, 36.5, 35412, 3.6 FROM zonas_urbanas WHERE nombre = 'Cerro Navia' UNION ALL
+SELECT zona_urbana_id, 2019, 157813, 30.5, 48114, 3.2 FROM zonas_urbanas WHERE nombre = 'Colina' UNION ALL
+SELECT zona_urbana_id, 2019, 124655, 37.5, 40708, 3.3 FROM zonas_urbanas WHERE nombre = 'Conchalí' UNION ALL
+SELECT zona_urbana_id, 2019, 33689, 36.5, 12433, 2.8 FROM zonas_urbanas WHERE nombre = 'Curacaví' UNION ALL
+SELECT zona_urbana_id, 2019, 159397, 35.5, 44524, 3.5 FROM zonas_urbanas WHERE nombre = 'El Bosque' UNION ALL
+SELECT zona_urbana_id, 2019, 36372, 34.5, 10828, 3.3 FROM zonas_urbanas WHERE nombre = 'El Monte' UNION ALL
+SELECT zona_urbana_id, 2019, 161617, 33.5, 57838, 2.7 FROM zonas_urbanas WHERE nombre = 'Estación Central' UNION ALL
+SELECT zona_urbana_id, 2019, 100016, 32.5, 29534, 3.1 FROM zonas_urbanas WHERE nombre = 'Huechuraba' UNION ALL
+SELECT zona_urbana_id, 2019, 107423, 33.5, 37824, 2.7 FROM zonas_urbanas WHERE nombre = 'Independencia' UNION ALL
+SELECT zona_urbana_id, 2019, 37530, 33.5, 11537, 3.2 FROM zonas_urbanas WHERE nombre = 'Isla de Maipo' UNION ALL
+SELECT zona_urbana_id, 2019, 95705, 36.5, 31507, 3.5 FROM zonas_urbanas WHERE nombre = 'La Cisterna' UNION ALL
+SELECT zona_urbana_id, 2019, 370212, 36.5, 116270, 3.1 FROM zonas_urbanas WHERE nombre = 'La Florida' UNION ALL
+SELECT zona_urbana_id, 2019, 114622, 35.5, 33185, 3.5 FROM zonas_urbanas WHERE nombre = 'La Granja' UNION ALL
+SELECT zona_urbana_id, 2019, 176509, 31.5, 48172, 3.7 FROM zonas_urbanas WHERE nombre = 'La Pintana' UNION ALL
+SELECT zona_urbana_id, 2019, 89770, 40.5, 30447, 3.0 FROM zonas_urbanas WHERE nombre = 'La Reina' UNION ALL
+SELECT zona_urbana_id, 2019, 114355, 29.5, 36160, 3.4 FROM zonas_urbanas WHERE nombre = 'Lampa' UNION ALL
+SELECT zona_urbana_id, 2019, 295209, 39.5, 113769, 2.5 FROM zonas_urbanas WHERE nombre = 'Las Condes' UNION ALL
+SELECT zona_urbana_id, 2019, 107770, 32.5, 27892, 3.3 FROM zonas_urbanas WHERE nombre = 'Lo Barnechea' UNION ALL
+SELECT zona_urbana_id, 2019, 93851, 35.5, 25619, 3.6 FROM zonas_urbanas WHERE nombre = 'Lo Espejo' UNION ALL
+SELECT zona_urbana_id, 2019, 92930, 38.5, 29080, 3.4 FROM zonas_urbanas WHERE nombre = 'Lo Prado' UNION ALL
+SELECT zona_urbana_id, 2019, 118610, 37.5, 38378, 3.0 FROM zonas_urbanas WHERE nombre = 'Macul' UNION ALL
+SELECT zona_urbana_id, 2019, 516485, 33.5, 156525, 3.2 FROM zonas_urbanas WHERE nombre = 'Maipú' UNION ALL
+SELECT zona_urbana_id, 2019, 14344, 35.5, 4931, 2.9 FROM zonas_urbanas WHERE nombre = 'María Pinto' UNION ALL
+SELECT zona_urbana_id, 2019, 127069, 35.5, 41034, 3.4 FROM zonas_urbanas WHERE nombre = 'Melipilla' UNION ALL
+SELECT zona_urbana_id, 2019, 217779, 38.5, 80819, 2.6 FROM zonas_urbanas WHERE nombre = 'Ñuñoa' UNION ALL
+SELECT zona_urbana_id, 2019, 68963, 32.5, 20801, 3.3 FROM zonas_urbanas WHERE nombre = 'Padre Hurtado' UNION ALL
+SELECT zona_urbana_id, 2019, 75361, 34.5, 22903, 3.2 FROM zonas_urbanas WHERE nombre = 'Paine' UNION ALL
+SELECT zona_urbana_id, 2019, 97782, 34.5, 28622, 3.4 FROM zonas_urbanas WHERE nombre = 'Pedro Aguirre Cerda' UNION ALL
+SELECT zona_urbana_id, 2019, 92402, 34.5, 27663, 3.3 FROM zonas_urbanas WHERE nombre = 'Peñaflor' UNION ALL
+SELECT zona_urbana_id, 2019, 240048, 33.5, 70640, 3.2 FROM zonas_urbanas WHERE nombre = 'Peñalolén' UNION ALL
+SELECT zona_urbana_id, 2019, 27245, 35.5, 8278, 3.2 FROM zonas_urbanas WHERE nombre = 'Pirque' UNION ALL
+SELECT zona_urbana_id, 2019, 142890, 40.5, 81831, 2.2 FROM zonas_urbanas WHERE nombre = 'Providencia' UNION ALL
+SELECT zona_urbana_id, 2019, 229232, 32.5, 70281, 3.3 FROM zonas_urbanas WHERE nombre = 'Pudahuel' UNION ALL
+SELECT zona_urbana_id, 2019, 568086, 31.5, 171672, 3.4 FROM zonas_urbanas WHERE nombre = 'Puente Alto' UNION ALL
+SELECT zona_urbana_id, 2019, 208360, 30.5, 66127, 3.3 FROM zonas_urbanas WHERE nombre = 'Quilicura' UNION ALL
+SELECT zona_urbana_id, 2019, 118307, 35.5, 37316, 3.1 FROM zonas_urbanas WHERE nombre = 'Quinta Normal' UNION ALL
+SELECT zona_urbana_id, 2019, 156463, 34.5, 53336, 3.3 FROM zonas_urbanas WHERE nombre = 'Recoleta' UNION ALL
+SELECT zona_urbana_id, 2019, 148822, 33.5, 43606, 3.3 FROM zonas_urbanas WHERE nombre = 'Renca' UNION ALL
+SELECT zona_urbana_id, 2019, 302756, 32.5, 91920, 3.3 FROM zonas_urbanas WHERE nombre = 'San Bernardo' UNION ALL
+SELECT zona_urbana_id, 2019, 94966, 36.5, 30524, 3.1 FROM zonas_urbanas WHERE nombre = 'San Joaquín' UNION ALL
+SELECT zona_urbana_id, 2019, 17976, 36.5, 9074, 2.8 FROM zonas_urbanas WHERE nombre = 'San José de Maipo' UNION ALL
+SELECT zona_urbana_id, 2019, 120204, 35.5, 43619, 2.6 FROM zonas_urbanas WHERE nombre = 'San Miguel' UNION ALL
+SELECT zona_urbana_id, 2019, 10145, 38.5, 4699, 2.6 FROM zonas_urbanas WHERE nombre = 'San Pedro' UNION ALL
+SELECT zona_urbana_id, 2019, 80927, 35.5, 23938, 3.5 FROM zonas_urbanas WHERE nombre = 'San Ramón' UNION ALL
+SELECT zona_urbana_id, 2019, 414220, 32.5, 197727, 2.1 FROM zonas_urbanas WHERE nombre = 'Santiago' UNION ALL
+SELECT zona_urbana_id, 2019, 74868, 34.5, 24241, 3.2 FROM zonas_urbanas WHERE nombre = 'Talagante' UNION ALL
+SELECT zona_urbana_id, 2019, 19437, 34.5, 7031, 2.8 FROM zonas_urbanas WHERE nombre = 'Tiltil' UNION ALL
+SELECT zona_urbana_id, 2019, 85680, 39.5, 29409, 2.9 FROM zonas_urbanas WHERE nombre = 'Vitacura';
+
+-- 2020
+INSERT INTO datos_demograficos (zona_urbana_id, año, poblacion, edad_promedio, numero_viviendas, factor_personas_vivienda)
+SELECT zona_urbana_id, 2020, 7012, 37.6, 2597, 2.7 FROM zonas_urbanas WHERE nombre = 'Alhué' UNION ALL
+SELECT zona_urbana_id, 2020, 105333, 33.6, 30988, 3.4 FROM zonas_urbanas WHERE nombre = 'Buin' UNION ALL
+SELECT zona_urbana_id, 2020, 25435, 35.6, 7707, 3.3 FROM zonas_urbanas WHERE nombre = 'Calera de Tango' UNION ALL
+SELECT zona_urbana_id, 2020, 83238, 35.6, 25440, 3.2 FROM zonas_urbanas WHERE nombre = 'Cerrillos' UNION ALL
+SELECT zona_urbana_id, 2020, 129551, 36.6, 35943, 3.6 FROM zonas_urbanas WHERE nombre = 'Cerro Navia' UNION ALL
+SELECT zona_urbana_id, 2020, 161683, 30.6, 49262, 3.2 FROM zonas_urbanas WHERE nombre = 'Colina' UNION ALL
+SELECT zona_urbana_id, 2020, 123888, 37.6, 40359, 3.3 FROM zonas_urbanas WHERE nombre = 'Conchalí' UNION ALL
+SELECT zona_urbana_id, 2020, 34058, 36.6, 12587, 2.8 FROM zonas_urbanas WHERE nombre = 'Curacaví' UNION ALL
+SELECT zona_urbana_id, 2020, 158362, 35.6, 44484, 3.5 FROM zonas_urbanas WHERE nombre = 'El Bosque' UNION ALL
+SELECT zona_urbana_id, 2020, 36597, 34.6, 10899, 3.3 FROM zonas_urbanas WHERE nombre = 'El Monte' UNION ALL
+SELECT zona_urbana_id, 2020, 166475, 33.6, 59527, 2.7 FROM zonas_urbanas WHERE nombre = 'Estación Central' UNION ALL
+SELECT zona_urbana_id, 2020, 100464, 32.6, 29719, 3.1 FROM zonas_urbanas WHERE nombre = 'Huechuraba' UNION ALL
+SELECT zona_urbana_id, 2020, 109803, 33.6, 38478, 2.7 FROM zonas_urbanas WHERE nombre = 'Independencia' UNION ALL
+SELECT zona_urbana_id, 2020, 37966, 33.6, 11663, 3.2 FROM zonas_urbanas WHERE nombre = 'Isla de Maipo' UNION ALL
+SELECT zona_urbana_id, 2020, 97568, 36.6, 31783, 3.5 FROM zonas_urbanas WHERE nombre = 'La Cisterna' UNION ALL
+SELECT zona_urbana_id, 2020, 371343, 36.6, 117401, 3.1 FROM zonas_urbanas WHERE nombre = 'La Florida' UNION ALL
+SELECT zona_urbana_id, 2020, 113972, 35.6, 33560, 3.5 FROM zonas_urbanas WHERE nombre = 'La Granja' UNION ALL
+SELECT zona_urbana_id, 2020, 176237, 31.6, 48046, 3.7 FROM zonas_urbanas WHERE nombre = 'La Pintana' UNION ALL
+SELECT zona_urbana_id, 2020, 89790, 40.6, 30478, 3.0 FROM zonas_urbanas WHERE nombre = 'La Reina' UNION ALL
+SELECT zona_urbana_id, 2020, 120516, 29.6, 37800, 3.4 FROM zonas_urbanas WHERE nombre = 'Lampa' UNION ALL
+SELECT zona_urbana_id, 2020, 295394, 39.6, 114368, 2.5 FROM zonas_urbanas WHERE nombre = 'Las Condes' UNION ALL
+SELECT zona_urbana_id, 2020, 108740, 32.6, 28120, 3.3 FROM zonas_urbanas WHERE nombre = 'Lo Barnechea' UNION ALL
+SELECT zona_urbana_id, 2020, 92295, 35.6, 25363, 3.6 FROM zonas_urbanas WHERE nombre = 'Lo Espejo' UNION ALL
+SELECT zona_urbana_id, 2020, 92520, 38.6, 29282, 3.4 FROM zonas_urbanas WHERE nombre = 'Lo Prado' UNION ALL
+SELECT zona_urbana_id, 2020, 119648, 37.6, 38973, 3.0 FROM zonas_urbanas WHERE nombre = 'Macul' UNION ALL
+SELECT zona_urbana_id, 2020, 513915, 33.6, 157553, 3.2 FROM zonas_urbanas WHERE nombre = 'Maipú' UNION ALL
+SELECT zona_urbana_id, 2020, 14596, 35.6, 4992, 2.9 FROM zonas_urbanas WHERE nombre = 'María Pinto' UNION ALL
+SELECT zona_urbana_id, 2020, 128883, 35.6, 41500, 3.4 FROM zonas_urbanas WHERE nombre = 'Melipilla' UNION ALL
+SELECT zona_urbana_id, 2020, 222526, 38.6, 82560, 2.6 FROM zonas_urbanas WHERE nombre = 'Ñuñoa' UNION ALL
+SELECT zona_urbana_id, 2020, 71533, 32.6, 21735, 3.3 FROM zonas_urbanas WHERE nombre = 'Padre Hurtado' UNION ALL
+SELECT zona_urbana_id, 2020, 76228, 34.6, 23250, 3.2 FROM zonas_urbanas WHERE nombre = 'Paine' UNION ALL
+SELECT zona_urbana_id, 2020, 97352, 34.6, 28409, 3.4 FROM zonas_urbanas WHERE nombre = 'Pedro Aguirre Cerda' UNION ALL
+SELECT zona_urbana_id, 2020, 93002, 34.6, 27822, 3.3 FROM zonas_urbanas WHERE nombre = 'Peñaflor' UNION ALL
+SELECT zona_urbana_id, 2020, 239334, 33.6, 70291, 3.2 FROM zonas_urbanas WHERE nombre = 'Peñalolén' UNION ALL
+SELECT zona_urbana_id, 2020, 27608, 35.6, 8395, 3.2 FROM zonas_urbanas WHERE nombre = 'Pirque' UNION ALL
+SELECT zona_urbana_id, 2020, 143161, 40.6, 82073, 2.2 FROM zonas_urbanas WHERE nombre = 'Providencia' UNION ALL
+SELECT zona_urbana_id, 2020, 228879, 32.6, 70308, 3.3 FROM zonas_urbanas WHERE nombre = 'Pudahuel' UNION ALL
+SELECT zona_urbana_id, 2020, 568086, 31.6, 172514, 3.4 FROM zonas_urbanas WHERE nombre = 'Puente Alto' UNION ALL
+SELECT zona_urbana_id, 2020, 207676, 30.6, 65606, 3.3 FROM zonas_urbanas WHERE nombre = 'Quilicura' UNION ALL
+SELECT zona_urbana_id, 2020, 121068, 35.6, 38106, 3.1 FROM zonas_urbanas WHERE nombre = 'Quinta Normal' UNION ALL
+SELECT zona_urbana_id, 2020, 156001, 34.6, 53507, 3.3 FROM zonas_urbanas WHERE nombre = 'Recoleta' UNION ALL
+SELECT zona_urbana_id, 2020, 148272, 33.6, 43125, 3.3 FROM zonas_urbanas WHERE nombre = 'Renca' UNION ALL
+SELECT zona_urbana_id, 2020, 303479, 32.6, 92506, 3.3 FROM zonas_urbanas WHERE nombre = 'San Bernardo' UNION ALL
+SELECT zona_urbana_id, 2020, 95125, 36.6, 30440, 3.1 FROM zonas_urbanas WHERE nombre = 'San Joaquín' UNION ALL
+SELECT zona_urbana_id, 2020, 17869, 36.6, 9043, 2.8 FROM zonas_urbanas WHERE nombre = 'San José de Maipo' UNION ALL
+SELECT zona_urbana_id, 2020, 114579, 35.6, 43004, 2.6 FROM zonas_urbanas WHERE nombre = 'San Miguel' UNION ALL
+SELECT zona_urbana_id, 2020, 10338, 38.6, 4668, 2.6 FROM zonas_urbanas WHERE nombre = 'San Pedro' UNION ALL
+SELECT zona_urbana_id, 2020, 80927, 35.6, 23629, 3.5 FROM zonas_urbanas WHERE nombre = 'San Ramón' UNION ALL
+SELECT zona_urbana_id, 2020, 409311, 32.6, 194932, 2.1 FROM zonas_urbanas WHERE nombre = 'Santiago' UNION ALL
+SELECT zona_urbana_id, 2020, 75181, 34.6, 24472, 3.2 FROM zonas_urbanas WHERE nombre = 'Talagante' UNION ALL
+SELECT zona_urbana_id, 2020, 19498, 34.6, 7056, 2.8 FROM zonas_urbanas WHERE nombre = 'Tiltil' UNION ALL
+SELECT zona_urbana_id, 2020, 85828, 39.6, 29522, 2.9 FROM zonas_urbanas WHERE nombre = 'Vitacura';
+
+-- 2021
+INSERT INTO datos_demograficos (zona_urbana_id, año, poblacion, edad_promedio, numero_viviendas, factor_personas_vivienda)
+SELECT zona_urbana_id, 2021, 7390, 37.7, 2738, 2.7 FROM zonas_urbanas WHERE nombre = 'Alhué' UNION ALL
+SELECT zona_urbana_id, 2021, 111149, 33.7, 32714, 3.4 FROM zonas_urbanas WHERE nombre = 'Buin' UNION ALL
+SELECT zona_urbana_id, 2021, 25463, 35.7, 7715, 3.3 FROM zonas_urbanas WHERE nombre = 'Calera de Tango' UNION ALL
+SELECT zona_urbana_id, 2021, 84440, 35.7, 25930, 3.2 FROM zonas_urbanas WHERE nombre = 'Cerrillos' UNION ALL
+SELECT zona_urbana_id, 2021, 128017, 36.7, 36111, 3.6 FROM zonas_urbanas WHERE nombre = 'Cerro Navia' UNION ALL
+SELECT zona_urbana_id, 2021, 169423, 30.7, 51559, 3.2 FROM zonas_urbanas WHERE nombre = 'Colina' UNION ALL
+SELECT zona_urbana_id, 2021, 122354, 37.7, 39661, 3.3 FROM zonas_urbanas WHERE nombre = 'Conchalí' UNION ALL
+SELECT zona_urbana_id, 2021, 34796, 36.7, 12896, 2.8 FROM zonas_urbanas WHERE nombre = 'Curacaví' UNION ALL
+SELECT zona_urbana_id, 2021, 157327, 35.7, 44443, 3.5 FROM zonas_urbanas WHERE nombre = 'El Bosque' UNION ALL
+SELECT zona_urbana_id, 2021, 37047, 34.7, 11030, 3.3 FROM zonas_urbanas WHERE nombre = 'El Monte' UNION ALL
+SELECT zona_urbana_id, 2021, 171333, 33.7, 61383, 2.7 FROM zonas_urbanas WHERE nombre = 'Estación Central' UNION ALL
+SELECT zona_urbana_id, 2021, 100912, 32.7, 29906, 3.1 FROM zonas_urbanas WHERE nombre = 'Huechuraba' UNION ALL
+SELECT zona_urbana_id, 2021, 112183, 33.7, 39132, 2.7 FROM zonas_urbanas WHERE nombre = 'Independencia' UNION ALL
+SELECT zona_urbana_id, 2021, 38402, 33.7, 11789, 3.2 FROM zonas_urbanas WHERE nombre = 'Isla de Maipo' UNION ALL
+SELECT zona_urbana_id, 2021, 99431, 36.7, 32059, 3.5 FROM zonas_urbanas WHERE nombre = 'La Cisterna' UNION ALL
+SELECT zona_urbana_id, 2021, 372474, 36.7, 118532, 3.1 FROM zonas_urbanas WHERE nombre = 'La Florida' UNION ALL
+SELECT zona_urbana_id, 2021, 113372, 35.7, 33937, 3.5 FROM zonas_urbanas WHERE nombre = 'La Granja' UNION ALL
+SELECT zona_urbana_id, 2021, 175965, 31.7, 47917, 3.7 FROM zonas_urbanas WHERE nombre = 'La Pintana' UNION ALL
+SELECT zona_urbana_id, 2021, 89810, 40.7, 30509, 3.0 FROM zonas_urbanas WHERE nombre = 'La Reina' UNION ALL
+SELECT zona_urbana_id, 2021, 126677, 29.7, 39427, 3.4 FROM zonas_urbanas WHERE nombre = 'Lampa' UNION ALL
+SELECT zona_urbana_id, 2021, 295579, 39.7, 114967, 2.5 FROM zonas_urbanas WHERE nombre = 'Las Condes' UNION ALL
+SELECT zona_urbana_id, 2021, 109710, 32.7, 28351, 3.3 FROM zonas_urbanas WHERE nombre = 'Lo Barnechea' UNION ALL
+SELECT zona_urbana_id, 2021, 90651, 35.7, 25112, 3.6 FROM zonas_urbanas WHERE nombre = 'Lo Espejo' UNION ALL
+SELECT zona_urbana_id, 2021, 92110, 38.7, 29500, 3.4 FROM zonas_urbanas WHERE nombre = 'Lo Prado' UNION ALL
+SELECT zona_urbana_id, 2021, 120686, 37.7, 39379, 3.0 FROM zonas_urbanas WHERE nombre = 'Macul' UNION ALL
+SELECT zona_urbana_id, 2021, 511065, 33.7, 158581, 3.2 FROM zonas_urbanas WHERE nombre = 'Maipú' UNION ALL
+SELECT zona_urbana_id, 2021, 14848, 35.7, 5054, 2.9 FROM zonas_urbanas WHERE nombre = 'María Pinto' UNION ALL
+SELECT zona_urbana_id, 2021, 130697, 35.7, 41972, 3.4 FROM zonas_urbanas WHERE nombre = 'Melipilla' UNION ALL
+SELECT zona_urbana_id, 2021, 227273, 38.7, 84030, 2.6 FROM zonas_urbanas WHERE nombre = 'Ñuñoa' UNION ALL
+SELECT zona_urbana_id, 2021, 74103, 32.7, 22677, 3.3 FROM zonas_urbanas WHERE nombre = 'Padre Hurtado' UNION ALL
+SELECT zona_urbana_id, 2021, 77095, 34.7, 23589, 3.2 FROM zonas_urbanas WHERE nombre = 'Paine' UNION ALL
+SELECT zona_urbana_id, 2021, 96922, 34.7, 28195, 3.4 FROM zonas_urbanas WHERE nombre = 'Pedro Aguirre Cerda' UNION ALL
+SELECT zona_urbana_id, 2021, 93602, 34.7, 27981, 3.3 FROM zonas_urbanas WHERE nombre = 'Peñaflor' UNION ALL
+SELECT zona_urbana_id, 2021, 238620, 33.7, 69944, 3.2 FROM zonas_urbanas WHERE nombre = 'Peñalolén' UNION ALL
+SELECT zona_urbana_id, 2021, 27971, 35.7, 8512, 3.2 FROM zonas_urbanas WHERE nombre = 'Pirque' UNION ALL
+SELECT zona_urbana_id, 2021, 143432, 40.7, 82321, 2.2 FROM zonas_urbanas WHERE nombre = 'Providencia' UNION ALL
+SELECT zona_urbana_id, 2021, 228526, 32.7, 70335, 3.3 FROM zonas_urbanas WHERE nombre = 'Pudahuel' UNION ALL
+SELECT zona_urbana_id, 2021, 568086, 31.7, 173356, 3.4 FROM zonas_urbanas WHERE nombre = 'Puente Alto' UNION ALL
+SELECT zona_urbana_id, 2021, 206940, 30.7, 65091, 3.3 FROM zonas_urbanas WHERE nombre = 'Quilicura' UNION ALL
+SELECT zona_urbana_id, 2021, 123829, 35.7, 38897, 3.1 FROM zonas_urbanas WHERE nombre = 'Quinta Normal' UNION ALL
+SELECT zona_urbana_id, 2021, 155153, 34.7, 53678, 3.3 FROM zonas_urbanas WHERE nombre = 'Recoleta' UNION ALL
+SELECT zona_urbana_id, 2021, 147, 33.70, 43125, 3.36 FROM zonas_urbanas WHERE nombre = 'Renca'
+UNION ALL
+SELECT zona_urbana_id, 2021, 303, 32.70, 92506, 3.36 FROM zonas_urbanas WHERE nombre = 'San Bernardo'
+UNION ALL
+SELECT zona_urbana_id, 2021, 950, 36.70, 30440, 3.16 FROM zonas_urbanas WHERE nombre = 'San Joaquín'
+UNION ALL
+SELECT zona_urbana_id, 2021, 178, 36.70, 9043, 2.86 FROM zonas_urbanas WHERE nombre = 'San José de Maipo'
+UNION ALL
+SELECT zona_urbana_id, 2021, 114, 35.70, 43004, 2.66 FROM zonas_urbanas WHERE nombre = 'San Miguel'
+UNION ALL
+SELECT zona_urbana_id, 2021, 118, 38.70, 4668, 2.66 FROM zonas_urbanas WHERE nombre = 'San Pedro'
+UNION ALL
+SELECT zona_urbana_id, 2021, 799, 35.70, 23629, 3.56 FROM zonas_urbanas WHERE nombre = 'San Ramón'
+UNION ALL
+SELECT zona_urbana_id, 2021, 409, 32.70, 194932, 2.16 FROM zonas_urbanas WHERE nombre = 'Santiago'
+UNION ALL
+SELECT zona_urbana_id, 2021, 751, 34.70, 24472, 3.26 FROM zonas_urbanas WHERE nombre = 'Talagante'
+UNION ALL
+SELECT zona_urbana_id, 2021, 194, 34.70, 7056, 2.86 FROM zonas_urbanas WHERE nombre = 'Tiltil'
+UNION ALL
+SELECT zona_urbana_id, 2021, 858, 39.70, 29522, 2.96 FROM zonas_urbanas WHERE nombre = 'Vitacura';
+
+
+--2022
+
+-- Datos demográficos para todas las comunas de la RM (2022)
+
+INSERT INTO datos_demograficos (zona_urbana_id, año, poblacion, edad_promedio, numero_viviendas, factor_personas_vivienda)
+
+SELECT zona_urbana_id, 2022, 7390, 37.80, 2697, 2.74 FROM zonas_urbanas WHERE nombre = 'Alhué'
+UNION ALL
+SELECT zona_urbana_id, 2022, 111153, 33.80, 32312, 3.44 FROM zonas_urbanas WHERE nombre = 'Buin'
+UNION ALL
+SELECT zona_urbana_id, 2022, 25463, 35.80, 7606, 3.34 FROM zonas_urbanas WHERE nombre = 'Calera de Tango'
+UNION ALL
+SELECT zona_urbana_id, 2022, 83839, 35.80, 25684, 3.24 FROM zonas_urbanas WHERE nombre = 'Cerrillos'
+UNION ALL
+SELECT zona_urbana_id, 2022, 128784, 36.80, 36485, 3.64 FROM zonas_urbanas WHERE nombre = 'Cerro Navia'
+UNION ALL
+SELECT zona_urbana_id, 2022, 165553, 30.80, 49542, 3.24 FROM zonas_urbanas WHERE nombre = 'Colina'
+UNION ALL
+SELECT zona_urbana_id, 2022, 123121, 37.80, 40847, 3.34 FROM zonas_urbanas WHERE nombre = 'Conchalí'
+UNION ALL
+SELECT zona_urbana_id, 2022, 34534, 36.80, 12883, 2.84 FROM zonas_urbanas WHERE nombre = 'Curacaví'
+UNION ALL
+SELECT zona_urbana_id, 2022, 157327, 35.80, 44443, 3.54 FROM zonas_urbanas WHERE nombre = 'El Bosque'
+UNION ALL
+SELECT zona_urbana_id, 2022, 37047, 34.80, 11092, 3.34 FROM zonas_urbanas WHERE nombre = 'El Monte'
+UNION ALL
+SELECT zona_urbana_id, 2022, 171333, 33.80, 61383, 2.74 FROM zonas_urbanas WHERE nombre = 'Estación Central'
+UNION ALL
+SELECT zona_urbana_id, 2022, 101312, 32.80, 29906, 3.14 FROM zonas_urbanas WHERE nombre = 'Huechuraba'
+UNION ALL
+SELECT zona_urbana_id, 2022, 111803, 33.80, 39724, 2.74 FROM zonas_urbanas WHERE nombre = 'Independencia'
+UNION ALL
+SELECT zona_urbana_id, 2022, 38374, 33.80, 11945, 3.24 FROM zonas_urbanas WHERE nombre = 'Isla de Maipo'
+UNION ALL
+SELECT zona_urbana_id, 2022, 99520, 36.80, 32062, 3.54 FROM zonas_urbanas WHERE nombre = 'La Cisterna'
+UNION ALL
+SELECT zona_urbana_id, 2022, 372602, 36.80, 118880, 3.14 FROM zonas_urbanas WHERE nombre = 'La Florida'
+UNION ALL
+SELECT zona_urbana_id, 2022, 112722, 35.80, 33937, 3.54 FROM zonas_urbanas WHERE nombre = 'La Granja'
+UNION ALL
+SELECT zona_urbana_id, 2022, 176, 31.80, 47663, 3.74 FROM zonas_urbanas WHERE nombre = 'La Pintana'
+UNION ALL
+SELECT zona_urbana_id, 2022, 90157, 40.8, 30770, 3.0 FROM zonas_urbanas WHERE nombre = 'La Reina'
+UNION ALL
+SELECT zona_urbana_id, 2022, 132838, 29.8, 40254, 3.4 FROM zonas_urbanas WHERE nombre = 'Lampa'
+UNION ALL
+SELECT zona_urbana_id, 2022, 295878, 39.8, 115566, 2.5 FROM zonas_urbanas WHERE nombre = 'Las Condes'
+UNION ALL
+SELECT zona_urbana_id, 2022, 109941, 32.8, 28582, 3.3 FROM zonas_urbanas WHERE nombre = 'Lo Barnechea'
+UNION ALL
+SELECT zona_urbana_id, 2022, 92193, 35.8, 25363, 3.6 FROM zonas_urbanas WHERE nombre = 'Lo Espejo'
+UNION ALL
+SELECT zona_urbana_id, 2022, 92756, 38.8, 29718, 3.4 FROM zonas_urbanas WHERE nombre = 'Lo Prado'
+UNION ALL
+SELECT zona_urbana_id, 2022, 119420, 37.8, 38567, 3.0 FROM zonas_urbanas WHERE nombre = 'Macul'
+UNION ALL
+SELECT zona_urbana_id, 2022, 508495, 33.8, 156553, 3.2 FROM zonas_urbanas WHERE nombre = 'Maipú'
+UNION ALL
+SELECT zona_urbana_id, 2022, 14972, 35.8, 5116, 2.9 FROM zonas_urbanas WHERE nombre = 'María Pinto'
+UNION ALL
+SELECT zona_urbana_id, 2022, 129225, 35.8, 41028, 3.4 FROM zonas_urbanas WHERE nombre = 'Melipilla'
+UNION ALL
+SELECT zona_urbana_id, 2022, 222403, 38.8, 81090, 2.6 FROM zonas_urbanas WHERE nombre = 'Ñuñoa'
+UNION ALL
+SELECT zona_urbana_id, 2022, 71217, 32.8, 21793, 3.3 FROM zonas_urbanas WHERE nombre = 'Padre Hurtado'
+UNION ALL
+SELECT zona_urbana_id, 2022, 76431, 34.8, 23250, 3.2 FROM zonas_urbanas WHERE nombre = 'Paine'
+UNION ALL
+SELECT zona_urbana_id, 2022, 97706, 34.8, 28623, 3.4 FROM zonas_urbanas WHERE nombre = 'Pedro Aguirre Cerda'
+UNION ALL
+SELECT zona_urbana_id, 2022, 92664, 34.8, 27663, 3.3 FROM zonas_urbanas WHERE nombre = 'Peñaflor'
+UNION ALL
+SELECT zona_urbana_id, 2022, 239967, 33.8, 70638, 3.2 FROM zonas_urbanas WHERE nombre = 'Peñalolén'
+UNION ALL
+SELECT zona_urbana_id, 2022, 28247, 35.8, 8629, 3.2 FROM zonas_urbanas WHERE nombre = 'Pirque'
+UNION ALL
+SELECT zona_urbana_id, 2022, 142184, 40.8, 81825, 2.2 FROM zonas_urbanas WHERE nombre = 'Providencia'
+UNION ALL
+SELECT zona_urbana_id, 2022, 229555, 32.8, 70633, 3.3 FROM zonas_urbanas WHERE nombre = 'Pudahuel'
+UNION ALL
+SELECT zona_urbana_id, 2022, 568086, 31.8, 173356, 3.4 FROM zonas_urbanas WHERE nombre = 'Puente Alto'
+UNION ALL
+SELECT zona_urbana_id, 2022, 210044, 30.8, 66121, 3.3 FROM zonas_urbanas WHERE nombre = 'Quilicura'
+UNION ALL
+SELECT zona_urbana_id, 2022, 120062, 35.8, 37315, 3.1 FROM zonas_urbanas WHERE nombre = 'Quinta Normal'
+UNION ALL
+SELECT zona_urbana_id, 2022, 156324, 34.8, 53849, 3.3 FROM zonas_urbanas WHERE nombre = 'Recoleta'
+UNION ALL
+SELECT zona_urbana_id, 2022, 107926, 37.8, 36305, 2.9 FROM zonas_urbanas WHERE nombre = 'Renca'
+UNION ALL
+SELECT zona_urbana_id, 2022, 186435, 32.8, 56520, 3.4 FROM zonas_urbanas WHERE nombre = 'San Bernardo'
+UNION ALL
+SELECT zona_urbana_id, 2022, 95954, 35.8, 29797, 3.1 FROM zonas_urbanas WHERE nombre = 'San Joaquín'
+UNION ALL
+SELECT zona_urbana_id, 2022, 145758, 34.8, 50652, 3.0 FROM zonas_urbanas WHERE nombre = 'San José de Maipo'
+UNION ALL
+SELECT zona_urbana_id, 2022, 211088, 32.8, 63213, 3.3 FROM zonas_urbanas WHERE nombre = 'San Miguel'
+UNION ALL
+SELECT zona_urbana_id, 2022, 132704, 34.8, 42115, 3.1 FROM zonas_urbanas WHERE nombre = 'San Pedro'
+UNION ALL
+SELECT zona_urbana_id, 2022, 195442, 32.8, 61557, 3.2 FROM zonas_urbanas WHERE nombre = 'San Ramón'
+UNION ALL
+SELECT zona_urbana_id, 2022, 442176, 32.8, 149541, 2.9 FROM zonas_urbanas WHERE nombre = 'Santiago'
+UNION ALL
+SELECT zona_urbana_id, 2022, 29343, 34.8, 8969, 3.2 FROM zonas_urbanas WHERE nombre = 'Talagante'
+UNION ALL
+SELECT zona_urbana_id, 2022, 128912, 35.8, 40937, 3.1 FROM zonas_urbanas WHERE nombre = 'Tiltil'
+UNION ALL
+SELECT zona_urbana_id, 2022, 85976, 40.8, 38142, 2.2 FROM zonas_urbanas WHERE nombre = 'Vitacura';
+
+
+--2023
+
+-- Datos demográficos para todas las comunas de la RM (2023)
+
+INSERT INTO datos_demograficos (zona_urbana_id, año, poblacion, edad_promedio, numero_viviendas, factor_personas_vivienda)
+
+SELECT zona_urbana_id, 2023, 7768, 37.9, 2878, 2.7 FROM zonas_urbanas WHERE nombre = 'Alhué'
+UNION ALL
+SELECT zona_urbana_id, 2023, 116965, 33.9, 34440, 3.4 FROM zonas_urbanas WHERE nombre = 'Buin'
+UNION ALL
+SELECT zona_urbana_id, 2023, 25491, 35.9, 7723, 3.3 FROM zonas_urbanas WHERE nombre = 'Calera de Tango'
+UNION ALL
+SELECT zona_urbana_id, 2023, 85642, 35.9, 26422, 3.2 FROM zonas_urbanas WHERE nombre = 'Cerrillos'
+UNION ALL
+SELECT zona_urbana_id, 2023, 126483, 36.9, 35280, 3.6 FROM zonas_urbanas WHERE nombre = 'Cerro Navia'
+UNION ALL
+SELECT zona_urbana_id, 2023, 177163, 30.9, 53855, 3.2 FROM zonas_urbanas WHERE nombre = 'Colina'
+UNION ALL
+SELECT zona_urbana_id, 2023, 120820, 37.9, 40708, 3.3 FROM zonas_urbanas WHERE nombre = 'Conchalí'
+UNION ALL
+SELECT zona_urbana_id, 2023, 35534, 36.9, 13051, 2.8 FROM zonas_urbanas WHERE nombre = 'Curacaví'
+UNION ALL
+SELECT zona_urbana_id, 2023, 161467, 35.9, 44566, 3.5 FROM zonas_urbanas WHERE nombre = 'El Bosque'
+UNION ALL
+SELECT zona_urbana_id, 2023, 37497, 34.9, 11172, 3.3 FROM zonas_urbanas WHERE nombre = 'El Monte'
+UNION ALL
+SELECT zona_urbana_id, 2023, 161759, 33.9, 57955, 2.7 FROM zonas_urbanas WHERE nombre = 'Estación Central'
+UNION ALL
+SELECT zona_urbana_id, 2023, 100768, 32.9, 29345, 3.1 FROM zonas_urbanas WHERE nombre = 'Huechuraba'
+UNION ALL
+SELECT zona_urbana_id, 2023, 116943, 33.9, 39256, 2.7 FROM zonas_urbanas WHERE nombre = 'Independencia'
+UNION ALL
+SELECT zona_urbana_id, 2023, 39330, 33.9, 11887, 3.2 FROM zonas_urbanas WHERE nombre = 'Isla de Maipo'
+UNION ALL
+SELECT zona_urbana_id, 2023, 103157, 36.9, 32377, 3.5 FROM zonas_urbanas WHERE nombre = 'La Cisterna'
+UNION ALL
+SELECT zona_urbana_id, 2023, 374736, 36.9, 119254, 3.1 FROM zonas_urbanas WHERE nombre = 'La Florida'
+UNION ALL
+SELECT zona_urbana_id, 2023, 117098, 35.9, 34691, 3.5 FROM zonas_urbanas WHERE nombre = 'La Granja'
+UNION ALL
+SELECT zona_urbana_id, 2023, 176024, 31.9, 47917, 3.7 FROM zonas_urbanas WHERE nombre = 'La Pintana'
+UNION ALL
+SELECT zona_urbana_id, 2023, 90504, 40.9, 31031, 3.0 FROM zonas_urbanas WHERE nombre = 'La Reina'
+UNION ALL
+SELECT zona_urbana_id, 2023, 138999, 29.9, 41681, 3.4 FROM zonas_urbanas WHERE nombre = 'Lampa'
+UNION ALL
+SELECT zona_urbana_id, 2023, 296177, 39.9, 116165, 2.5 FROM zonas_urbanas WHERE nombre = 'Las Condes'
+UNION ALL
+SELECT zona_urbana_id, 2023, 110172, 32.9, 28813, 3.3 FROM zonas_urbanas WHERE nombre = 'Lo Barnechea'
+UNION ALL
+SELECT zona_urbana_id, 2023, 93735, 35.9, 25614, 3.6 FROM zonas_urbanas WHERE nombre = 'Lo Espejo'
+UNION ALL
+SELECT zona_urbana_id, 2023, 93402, 38.9, 29936, 3.4 FROM zonas_urbanas WHERE nombre = 'Lo Prado'
+UNION ALL
+SELECT zona_urbana_id, 2023, 118154, 37.9, 38161, 3.0 FROM zonas_urbanas WHERE nombre = 'Macul'
+UNION ALL
+SELECT zona_urbana_id, 2023, 505925, 33.9, 155525, 3.2 FROM zonas_urbanas WHERE nombre = 'Maipú'
+UNION ALL
+SELECT zona_urbana_id, 2023, 15096, 35.9, 5178, 2.9 FROM zonas_urbanas WHERE nombre = 'María Pinto'
+UNION ALL
+SELECT zona_urbana_id, 2023, 127753, 35.9, 40084, 3.4 FROM zonas_urbanas WHERE nombre = 'Melipilla'
+UNION ALL
+SELECT zona_urbana_id, 2023, 217533, 38.9, 79620, 2.6 FROM zonas_urbanas WHERE nombre = 'Ñuñoa'
+UNION ALL
+SELECT zona_urbana_id, 2023, 68331, 32.9, 20909, 3.3 FROM zonas_urbanas WHERE nombre = 'Padre Hurtado'
+UNION ALL
+SELECT zona_urbana_id, 2023, 75767, 34.9, 22911, 3.2 FROM zonas_urbanas WHERE nombre = 'Paine'
+UNION ALL
+SELECT zona_urbana_id, 2023, 98490, 34.9, 29051, 3.4 FROM zonas_urbanas WHERE nombre = 'Pedro Aguirre Cerda'
+UNION ALL
+SELECT zona_urbana_id, 2023, 91726, 34.9, 27504, 3.3 FROM zonas_urbanas WHERE nombre = 'Peñaflor'
+UNION ALL
+SELECT zona_urbana_id, 2023, 241314, 33.9, 70985, 3.2 FROM zonas_urbanas WHERE nombre = 'Peñalolén'
+UNION ALL
+SELECT zona_urbana_id, 2023, 28523, 35.9, 8746, 3.2 FROM zonas_urbanas WHERE nombre = 'Pirque'
+UNION ALL
+SELECT zona_urbana_id, 2023, 140936, 40.9, 81577, 2.2 FROM zonas_urbanas WHERE nombre = 'Providencia'
+UNION ALL
+SELECT zona_urbana_id, 2023, 230584, 32.9, 70960, 3.3 FROM zonas_urbanas WHERE nombre = 'Pudahuel'
+UNION ALL
+SELECT zona_urbana_id, 2023, 568086, 31.9, 173356, 3.4 FROM zonas_urbanas WHERE nombre = 'Puente Alto'
+UNION ALL
+SELECT zona_urbana_id, 2023, 213148, 30.9, 66636, 3.3 FROM zonas_urbanas WHERE nombre = 'Quilicura'
+UNION ALL
+SELECT zona_urbana_id, 2023, 117295, 35.9, 36524, 3.1 FROM zonas_urbanas WHERE nombre = 'Quinta Normal'
+UNION ALL
+SELECT zona_urbana_id, 2023, 157495, 34.9, 54020, 3.3 FROM zonas_urbanas WHERE nombre = 'Recoleta'
+UNION ALL
+SELECT zona_urbana_id, 2023, 107159, 37.9, 36041, 2.9 FROM zonas_urbanas WHERE nombre = 'Renca'
+UNION ALL
+SELECT zona_urbana_id, 2023, 189319, 32.9, 57388, 3.4 FROM zonas_urbanas WHERE nombre = 'San Bernardo'
+UNION ALL
+SELECT zona_urbana_id, 2023, 94985, 35.9, 29485, 3.1 FROM zonas_urbanas WHERE nombre = 'San Joaquín'
+UNION ALL
+SELECT zona_urbana_id, 2023, 144427, 34.9, 50196, 3.0 FROM zonas_urbanas WHERE nombre = 'San José de Maipo'
+UNION ALL
+SELECT zona_urbana_id, 2023, 209557, 32.9, 62749, 3.3 FROM zonas_urbanas WHERE nombre = 'San Miguel'
+UNION ALL
+SELECT zona_urbana_id, 2023, 130353, 34.9, 41347, 3.1 FROM zonas_urbanas WHERE nombre = 'San Pedro'
+UNION ALL
+SELECT zona_urbana_id, 2023, 193911, 32.9, 61079, 3.2 FROM zonas_urbanas WHERE nombre = 'San Ramón'
+UNION ALL
+SELECT zona_urbana_id, 2023, 443836, 32.9, 150114, 2.9 FROM zonas_urbanas WHERE nombre = 'Santiago'
+UNION ALL
+SELECT zona_urbana_id, 2023, 29567, 34.9, 9039, 3.2 FROM zonas_urbanas WHERE nombre = 'Talagante'
+UNION ALL
+SELECT zona_urbana_id, 2023, 126026, 35.9, 39999, 3.1 FROM zonas_urbanas WHERE nombre = 'Tiltil'
+UNION ALL
+SELECT zona_urbana_id, 2023, 86124, 40.9, 38209, 2.2 FROM zonas_urbanas WHERE nombre = 'Vitacura';
+
+
+--2024
+
 -- Datos demográficos para todas las comunas de la RM (2024)
 
-INSERT INTO datos_demograficos (zona_urbana_id, poblacion, edad_promedio, numero_viviendas, factor_personas_vivienda) 
-SELECT zona_urbana_id, 7768, 38, 2903, 2.7 FROM zonas_urbanas WHERE nombre = 'Alhué' UNION ALL
-SELECT zona_urbana_id, 116969, 34, 28320, 3.4 FROM zonas_urbanas WHERE nombre = 'Buin' UNION ALL
-SELECT zona_urbana_id, 25491, 36, 7641, 3.3 FROM zonas_urbanas WHERE nombre = 'Calera de Tango' UNION ALL
-SELECT zona_urbana_id, 85041, 36, 23497, 3.2 FROM zonas_urbanas WHERE nombre = 'Cerrillos' UNION ALL
-SELECT zona_urbana_id, 127250, 37, 37643, 3.6 FROM zonas_urbanas WHERE nombre = 'Cerro Navia' UNION ALL
-SELECT zona_urbana_id, 173293, 31, 42067, 3.2 FROM zonas_urbanas WHERE nombre = 'Colina' UNION ALL
-SELECT zona_urbana_id, 121587, 38, 39562, 3.3 FROM zonas_urbanas WHERE nombre = 'Conchalí' UNION ALL
-SELECT zona_urbana_id, 35165, 37, 13064, 2.8 FROM zonas_urbanas WHERE nombre = 'Curacaví' UNION ALL
-SELECT zona_urbana_id, 155257, 36, 45312, 3.5 FROM zonas_urbanas WHERE nombre = 'El Bosque' UNION ALL
-SELECT zona_urbana_id, 37497, 35, 11265, 3.3 FROM zonas_urbanas WHERE nombre = 'El Monte' UNION ALL
-SELECT zona_urbana_id, 181049, 34, 55234, 2.7 FROM zonas_urbanas WHERE nombre = 'Estación Central' UNION ALL
-SELECT zona_urbana_id, 101808, 33, 28566, 3.1 FROM zonas_urbanas WHERE nombre = 'Huechuraba' UNION ALL
-SELECT zona_urbana_id, 116943, 34, 36467, 2.7 FROM zonas_urbanas WHERE nombre = 'Independencia' UNION ALL
-SELECT zona_urbana_id, 39274, 34, 11144, 3.2 FROM zonas_urbanas WHERE nombre = 'Isla de Maipo' UNION ALL
-SELECT zona_urbana_id, 103157, 37, 32776, 3.5 FROM zonas_urbanas WHERE nombre = 'La Cisterna' UNION ALL
-SELECT zona_urbana_id, 374836, 37, 114717, 3.1 FROM zonas_urbanas WHERE nombre = 'La Florida' UNION ALL
-SELECT zona_urbana_id, 112022, 36, 32766, 3.5 FROM zonas_urbanas WHERE nombre = 'La Granja' UNION ALL
-SELECT zona_urbana_id, 175421, 32, 48663, 3.7 FROM zonas_urbanas WHERE nombre = 'La Pintana' UNION ALL
-SELECT zona_urbana_id, 89870, 41, 30678, 3.0 FROM zonas_urbanas WHERE nombre = 'La Reina' UNION ALL
-SELECT zona_urbana_id, 145160, 30, 33344, 3.4 FROM zonas_urbanas WHERE nombre = 'Lampa' UNION ALL
-SELECT zona_urbana_id, 296134, 40, 118966, 2.5 FROM zonas_urbanas WHERE nombre = 'Las Condes' UNION ALL
-SELECT zona_urbana_id, 112620, 33, 26657, 3.3 FROM zonas_urbanas WHERE nombre = 'Lo Barnechea' UNION ALL
-SELECT zona_urbana_id, 87295, 36, 26262, 3.6 FROM zonas_urbanas WHERE nombre = 'Lo Espejo' UNION ALL
-SELECT zona_urbana_id, 91290, 39, 29827, 3.4 FROM zonas_urbanas WHERE nombre = 'Lo Prado' UNION ALL
-SELECT zona_urbana_id, 123800, 38, 39771, 3.0 FROM zonas_urbanas WHERE nombre = 'Macul' UNION ALL
-SELECT zona_urbana_id, 503635, 34, 160865, 3.2 FROM zonas_urbanas WHERE nombre = 'Maipú' UNION ALL
-SELECT zona_urbana_id, 15352, 36, 4887, 2.9 FROM zonas_urbanas WHERE nombre = 'María Pinto' UNION ALL
-SELECT zona_urbana_id, 136325, 36, 42924, 3.4 FROM zonas_urbanas WHERE nombre = 'Melipilla' UNION ALL
-SELECT zona_urbana_id, 241467, 39, 88552, 2.6 FROM zonas_urbanas WHERE nombre = 'Ñuñoa' UNION ALL
-SELECT zona_urbana_id, 81243, 33, 19467, 3.3 FROM zonas_urbanas WHERE nombre = 'Padre Hurtado' UNION ALL
-SELECT zona_urbana_id, 78828, 35, 22844, 3.2 FROM zonas_urbanas WHERE nombre = 'Paine' UNION ALL
-SELECT zona_urbana_id, 96062, 39, 30760, 3.4 FROM zonas_urbanas WHERE nombre = 'Pedro Aguirre Cerda' UNION ALL
-SELECT zona_urbana_id, 95402, 35, 28490, 3.3 FROM zonas_urbanas WHERE nombre = 'Peñaflor' UNION ALL
-SELECT zona_urbana_id, 236478, 34, 70088, 3.2 FROM zonas_urbanas WHERE nombre = 'Peñalolén' UNION ALL
-SELECT zona_urbana_id, 29060, 36, 8308, 3.2 FROM zonas_urbanas WHERE nombre = 'Pirque' UNION ALL
-SELECT zona_urbana_id, 143974, 41, 83251, 2.2 FROM zonas_urbanas WHERE nombre = 'Providencia' UNION ALL
-SELECT zona_urbana_id, 227820, 33, 68307, 3.3 FROM zonas_urbanas WHERE nombre = 'Pudahuel' UNION ALL
-SELECT zona_urbana_id, 568086, 32, 165342, 3.4 FROM zonas_urbanas WHERE nombre = 'Puente Alto' UNION ALL
-SELECT zona_urbana_id, 205624, 31, 63385, 3.3 FROM zonas_urbanas WHERE nombre = 'Quilicura' UNION ALL
-SELECT zona_urbana_id, 129351, 36, 38077, 3.1 FROM zonas_urbanas WHERE nombre = 'Quinta Normal' UNION ALL
-SELECT zona_urbana_id, 154615, 35, 52417, 3.3 FROM zonas_urbanas WHERE nombre = 'Recoleta' UNION ALL
-SELECT zona_urbana_id, 145622, 34, 41516, 3.3 FROM zonas_urbanas WHERE nombre = 'Renca' UNION ALL
-SELECT zona_urbana_id, 306371, 33, 92427, 3.3 FROM zonas_urbanas WHERE nombre = 'San Bernardo' UNION ALL
-SELECT zona_urbana_id, 95602, 37, 29566, 3.1 FROM zonas_urbanas WHERE nombre = 'San Joaquín' UNION ALL
-SELECT zona_urbana_id, 17441, 37, 8877, 2.8 FROM zonas_urbanas WHERE nombre = 'San José de Maipo' UNION ALL
-SELECT zona_urbana_id, 150829, 36, 45422, 2.6 FROM zonas_urbanas WHERE nombre = 'San Miguel' UNION ALL
-SELECT zona_urbana_id, 11108, 39, 4606, 2.6 FROM zonas_urbanas WHERE nombre = 'San Pedro' UNION ALL
-SELECT zona_urbana_id, 76002, 36, 23493, 3.5 FROM zonas_urbanas WHERE nombre = 'San Ramón' UNION ALL
-SELECT zona_urbana_id, 438856, 33, 193628, 2.1 FROM zonas_urbanas WHERE nombre = 'Santiago' UNION ALL
-SELECT zona_urbana_id, 76429, 35, 24316, 3.2 FROM zonas_urbanas WHERE nombre = 'Talagante' UNION ALL
-SELECT zona_urbana_id, 19742, 35, 7420, 2.8 FROM zonas_urbanas WHERE nombre = 'Tiltil' UNION ALL
-SELECT zona_urbana_id, 86420, 40, 29702, 2.9 FROM zonas_urbanas WHERE nombre = 'Vitacura';
+INSERT INTO datos_demograficos (zona_urbana_id, año, poblacion, edad_promedio, numero_viviendas, factor_personas_vivienda)
+
+SELECT zona_urbana_id, 2024, 7768, 38.00, 2903, 2.70 FROM zonas_urbanas WHERE nombre = 'Alhué'
+UNION ALL
+SELECT zona_urbana_id, 2024, 116969, 34.00, 28320, 3.40 FROM zonas_urbanas WHERE nombre = 'Buin'
+UNION ALL
+SELECT zona_urbana_id, 2024, 25491, 36.00, 7641, 3.30 FROM zonas_urbanas WHERE nombre = 'Calera de Tango'
+UNION ALL
+SELECT zona_urbana_id, 2024, 85041, 36.00, 23497, 3.20 FROM zonas_urbanas WHERE nombre = 'Cerrillos'
+UNION ALL
+SELECT zona_urbana_id, 2024, 127250, 37.00, 37643, 3.60 FROM zonas_urbanas WHERE nombre = 'Cerro Navia'
+UNION ALL
+SELECT zona_urbana_id, 2024, 173293, 31.00, 42067, 3.20 FROM zonas_urbanas WHERE nombre = 'Colina'
+UNION ALL
+SELECT zona_urbana_id, 2024, 121587, 38.00, 39562, 3.30 FROM zonas_urbanas WHERE nombre = 'Conchalí'
+UNION ALL
+SELECT zona_urbana_id, 2024, 35165, 37.00, 13064, 2.80 FROM zonas_urbanas WHERE nombre = 'Curacaví'
+UNION ALL
+SELECT zona_urbana_id, 2024, 155257, 36.00, 45312, 3.50 FROM zonas_urbanas WHERE nombre = 'El Bosque'
+UNION ALL
+SELECT zona_urbana_id, 2024, 37497, 35.00, 11265, 3.30 FROM zonas_urbanas WHERE nombre = 'El Monte'
+UNION ALL
+SELECT zona_urbana_id, 2024, 181049, 34.00, 55234, 2.70 FROM zonas_urbanas WHERE nombre = 'Estación Central'
+UNION ALL
+SELECT zona_urbana_id, 2024, 101808, 33.00, 28566, 3.10 FROM zonas_urbanas WHERE nombre = 'Huechuraba'
+UNION ALL
+SELECT zona_urbana_id, 2024, 116943, 34.00, 36467, 2.70 FROM zonas_urbanas WHERE nombre = 'Independencia'
+UNION ALL
+SELECT zona_urbana_id, 2024, 39274, 34.00, 11144, 3.20 FROM zonas_urbanas WHERE nombre = 'Isla de Maipo'
+UNION ALL
+SELECT zona_urbana_id, 2024, 103157, 37.00, 32776, 3.50 FROM zonas_urbanas WHERE nombre = 'La Cisterna'
+UNION ALL
+SELECT zona_urbana_id, 2024, 374836, 37.00, 114717, 3.10 FROM zonas_urbanas WHERE nombre = 'La Florida'
+UNION ALL
+SELECT zona_urbana_id, 2024, 112022, 36.00, 32766, 3.50 FROM zonas_urbanas WHERE nombre = 'La Granja'
+UNION ALL
+SELECT zona_urbana_id, 2024, 175421, 32.00, 48663, 3.70 FROM zonas_urbanas WHERE nombre = 'La Pintana'
+UNION ALL
+SELECT zona_urbana_id, 2024, 89870, 41.00, 30678, 3.00 FROM zonas_urbanas WHERE nombre = 'La Reina'
+UNION ALL
+SELECT zona_urbana_id, 2024, 145160, 30.00, 33344, 3.40 FROM zonas_urbanas WHERE nombre = 'Lampa'
+UNION ALL
+SELECT zona_urbana_id, 2024, 296134, 40.00, 118966, 2.50 FROM zonas_urbanas WHERE nombre = 'Las Condes'
+UNION ALL
+SELECT zona_urbana_id, 2024, 112620, 33.00, 26657, 3.30 FROM zonas_urbanas WHERE nombre = 'Lo Barnechea'
+UNION ALL
+SELECT zona_urbana_id, 2024, 87295, 36.00, 26262, 3.60 FROM zonas_urbanas WHERE nombre = 'Lo Espejo'
+UNION ALL
+SELECT zona_urbana_id, 2024, 91290, 39.00, 29827, 3.40 FROM zonas_urbanas WHERE nombre = 'Lo Prado'
+UNION ALL
+SELECT zona_urbana_id, 2024, 123800, 38.00, 39771, 3.00 FROM zonas_urbanas WHERE nombre = 'Macul'
+UNION ALL
+SELECT zona_urbana_id, 2024, 503635, 34.00, 160865, 3.20 FROM zonas_urbanas WHERE nombre = 'Maipú'
+UNION ALL
+SELECT zona_urbana_id, 2024, 15352, 36.00, 4887, 2.90 FROM zonas_urbanas WHERE nombre = 'María Pinto'
+UNION ALL
+SELECT zona_urbana_id, 2024, 136325, 36.00, 42924, 3.40 FROM zonas_urbanas WHERE nombre = 'Melipilla'
+UNION ALL
+SELECT zona_urbana_id, 2024, 81243, 33.00, 19467, 3.30 FROM zonas_urbanas WHERE nombre = 'Padre Hurtado'
+UNION ALL
+SELECT zona_urbana_id, 2024, 78828, 35.00, 22844, 3.20 FROM zonas_urbanas WHERE nombre = 'Paine'
+UNION ALL
+SELECT zona_urbana_id, 2024, 96062, 35.00, 30760, 3.40 FROM zonas_urbanas WHERE nombre = 'Pedro Aguirre Cerda'
+UNION ALL
+SELECT zona_urbana_id, 2024, 95402, 35.00, 28490, 3.30 FROM zonas_urbanas WHERE nombre = 'Peñaflor'
+UNION ALL
+SELECT zona_urbana_id, 2024, 236478, 34.00, 70088, 3.20 FROM zonas_urbanas WHERE nombre = 'Peñalolén'
+UNION ALL
+SELECT zona_urbana_id, 2024, 29060, 36.00, 8308, 3.20 FROM zonas_urbanas WHERE nombre = 'Pirque'
+UNION ALL
+SELECT zona_urbana_id, 2024, 143974, 41.00, 83251, 2.20 FROM zonas_urbanas WHERE nombre = 'Providencia'
+UNION ALL
+SELECT zona_urbana_id, 2024, 227820, 33.00, 68307, 3.30 FROM zonas_urbanas WHERE nombre = 'Pudahuel'
+UNION ALL
+SELECT zona_urbana_id, 2024, 568086, 32.00, 165342, 3.40 FROM zonas_urbanas WHERE nombre = 'Puente Alto'
+UNION ALL
+SELECT zona_urbana_id, 2024, 205624, 31.00, 63385, 3.30 FROM zonas_urbanas WHERE nombre = 'Quilicura'
+UNION ALL
+SELECT zona_urbana_id, 2024, 129351, 36.00, 38077, 3.10 FROM zonas_urbanas WHERE nombre = 'Quinta Normal'
+UNION ALL
+SELECT zona_urbana_id, 2024, 154615, 35.00, 52417, 3.30 FROM zonas_urbanas WHERE nombre = 'Recoleta'
+UNION ALL
+SELECT zona_urbana_id, 2024, 145622, 34.00, 41516, 3.30 FROM zonas_urbanas WHERE nombre = 'Renca'
+UNION ALL
+SELECT zona_urbana_id, 2024, 306371, 33.00, 92427, 3.30 FROM zonas_urbanas WHERE nombre = 'San Bernardo'
+UNION ALL
+SELECT zona_urbana_id, 2024, 95602, 37.00, 29566, 3.10 FROM zonas_urbanas WHERE nombre = 'San Joaquín'
+UNION ALL
+SELECT zona_urbana_id, 2024, 17441, 37.00, 8877, 2.80 FROM zonas_urbanas WHERE nombre = 'San José de Maipo'
+UNION ALL
+SELECT zona_urbana_id, 2024, 150829, 36.00, 45422, 2.60 FROM zonas_urbanas WHERE nombre = 'San Miguel'
+UNION ALL
+SELECT zona_urbana_id, 2024, 11108, 39.00, 4606, 2.60 FROM zonas_urbanas WHERE nombre = 'San Pedro'
+UNION ALL
+SELECT zona_urbana_id, 2024, 76002, 36.00, 23493, 3.50 FROM zonas_urbanas WHERE nombre = 'San Ramón'
+UNION ALL
+SELECT zona_urbana_id, 2024, 438856, 33.00, 193628, 2.10 FROM zonas_urbanas WHERE nombre = 'Santiago'
+UNION ALL
+SELECT zona_urbana_id, 2024, 76429, 35.00, 24316, 3.20 FROM zonas_urbanas WHERE nombre = 'Talagante'
+UNION ALL
+SELECT zona_urbana_id, 2024, 19742, 35.00, 7420, 2.80 FROM zonas_urbanas WHERE nombre = 'Tiltil'
+UNION ALL
+SELECT zona_urbana_id, 2024, 86420, 40.00, 29702, 2.90 FROM zonas_urbanas WHERE nombre = 'Vitacura'
+UNION ALL
+SELECT zona_urbana_id, 2024, 241467, 39.00, 88552, 2.60 FROM zonas_urbanas WHERE nombre = 'Ñuñoa';
+
+
 
 -- ==================================================
 -- 5. PROYECTOS URBANOS (GEOMETRÍAS CORREGIDAS)

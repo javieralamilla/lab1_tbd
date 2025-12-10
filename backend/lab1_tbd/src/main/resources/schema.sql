@@ -89,12 +89,13 @@ CREATE TABLE puntos_interes (
 CREATE TABLE datos_demograficos (
                                     dato_demografico_id SERIAL PRIMARY KEY,
                                     zona_urbana_id INTEGER NOT NULL,
+                                    año INTEGER NOT NULL,
                                     poblacion INTEGER NOT NULL CHECK (poblacion >= 0),
                                     edad_promedio DECIMAL(5, 2),
                                     numero_viviendas INTEGER DEFAULT 0,
                                     factor_personas_vivienda DECIMAL(4, 2) DEFAULT 3.0,
                                     FOREIGN KEY (zona_urbana_id) REFERENCES zonas_urbanas(zona_urbana_id) ON DELETE CASCADE,
-                                    UNIQUE (zona_urbana_id)
+                                    UNIQUE (zona_urbana_id, año)
 );
 
 -- ==================================================

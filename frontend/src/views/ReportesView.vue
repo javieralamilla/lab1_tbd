@@ -125,10 +125,28 @@
         <h2>Identificación de Zonas con Escasez de Servicios Hospitalarios</h2>
         <p class="section-subtitle">Top 5 zonas con mayor población pero menor cantidad de hospitales</p>
         
-        <button @click="cargarEscasezHospitales" class="btn btn-primary" :disabled="loadingEscasez">
-          <span v-if="loadingEscasez">Cargando...</span>
-          <span v-else>Actualizar Análisis</span>
-        </button>
+        <div class="escasez-filters">
+          <div class="filter-group">
+            <label for="año-escasez">Año de Análisis:</label>
+            <select
+              id="año-escasez"
+              v-model="añoEscasez"
+              class="form-input"
+            >
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+              <option value="2021">2021</option>
+              <option value="2020">2020</option>
+              <option value="2019">2019</option>
+            </select>
+          </div>
+
+          <button @click="cargarEscasezHospitales" class="btn btn-primary" :disabled="loadingEscasez">
+            <span v-if="loadingEscasez">Cargando...</span>
+            <span v-else>Actualizar Análisis</span>
+          </button>
+        </div>
 
         <div v-if="zonasEscasez.length > 0" class="escasez-results">
           <table class="data-table">
@@ -170,6 +188,7 @@ const datosReporte = ref([])
 const error = ref(null)
 const loadingEscasez = ref(false)
 const zonasEscasez = ref([])
+const añoEscasez = ref(2024)
 
 const filtros = reactive({
   fechaInicio: '',
@@ -244,7 +263,7 @@ const cargarEscasezHospitales = async () => {
   try {
     loadingEscasez.value = true
     error.value = null
-    const data = await reportesService.obtenerZonasEscasezHospitales()
+    const data = await reportesService.obtenerZonasEscasezHospitales(añoEscasez.value)
     zonasEscasez.value = data
   } catch (err) {
     console.error('Error al cargar zonas con escasez de hospitales:', err)
@@ -588,6 +607,17 @@ onMounted(() => {
   color: var(--text-secondary);
   margin-bottom: 1.5rem;
   font-size: 0.95rem;
+}
+
+.escasez-filters {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+.escasez-filters .filter-group {
+  flex: 0 0 200px;
 }
 
 .escasez-results {
