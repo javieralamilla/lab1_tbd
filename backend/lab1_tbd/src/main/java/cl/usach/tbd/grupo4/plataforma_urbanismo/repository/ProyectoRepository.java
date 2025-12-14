@@ -3,6 +3,7 @@ package cl.usach.tbd.grupo4.plataforma_urbanismo.repository;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.model.ProyectoUrbano;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -218,7 +219,11 @@ public class ProyectoRepository {
 
     public void actualizarProyectosRetrasados(Long usuarioId) {
         String sql = "CALL actualizar_proyectos_retrasados(?)";
-        jdbcTemplate.update(sql, usuarioId);
+        jdbcTemplate.execute(sql, (PreparedStatementCallback<Void>) ps -> {
+            ps.setInt(1, usuarioId.intValue());
+            ps.execute();
+            return null;
+        });
     }
 
     public ProyectoUrbano save(ProyectoUrbano proyecto) {
