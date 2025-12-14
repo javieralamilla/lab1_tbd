@@ -1236,14 +1236,14 @@ INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio,
     ('Línea 7 del Metro', 'Nueva línea de metro que conectará Vitacura con Renca', 'Transporte Público', '2024-01-15', '2027-12-31', 'En Curso', 2500000000.00,
      ST_GeomFromText('LINESTRING(-70.736 -33.408, -70.685 -33.425, -70.653 -33.432, -70.634 -33.437, -70.595 -33.415, -70.545 -33.385)', 4326), 2);
 
--- Parque de la Familia (Polígono ajustado en Quinta Normal/Cerrillos)
+-- Parque de la Familia (Poligono ajustado en Quinta Normal/Cerrillos)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Parque de la Familia Cerrillos', 'Parque urbano de 30 hectáreas con áreas deportivas y recreativas', 'Área Verde', '2022-03-01', '2024-10-15', 'Completado', 15000000.00,
+    ('Parque de la Familia Cerrillos', 'Parque urbano de 30 hectareas con areas deportivas y recreativas', 'Area Verde', '2022-03-01', '2024-10-15', 'Completado', 15000000.00,
      ST_GeomFromText('POLYGON((-70.711 -33.433, -70.702 -33.433, -70.701 -33.428, -70.710 -33.428, -70.711 -33.433))', 4326), 1);
 
 -- Mejoramiento Vespucio Sur (Trazado vial)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Mejoramiento Vespucio Sur', 'Ampliación y mejoramiento de Américo Vespucio sector sur', 'Vialidad', '2023-06-01', '2025-12-31', 'En Curso', 89000000.00,
+    ('Mejoramiento Vespucio Sur', 'Ampliacion y mejoramiento de Americo Vespucio sector sur', 'Vialidad', '2023-06-01', '2025-12-31', 'En Curso', 89000000.00,
      ST_GeomFromText('LINESTRING(-70.609 -33.515, -70.600 -33.530, -70.580 -33.550)', 4326), 2);
 
 -- Hospital Digital de La Florida (Ubicación exacta)
@@ -1266,9 +1266,9 @@ INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio,
     ('Renovación Urbana Barrio Yungay', 'Recuperación patrimonial y mejoramiento de espacios públicos', 'Renovación Urbana', '2023-04-01', '2024-08-31', 'Retrasado', 25000000.00,
      ST_GeomFromText('POLYGON((-70.680 -33.445, -70.670 -33.445, -70.670 -33.438, -70.680 -33.438, -70.680 -33.445))', 4326), 4);
 
--- Parque Lineal Mapocho (Trazado río)
+-- Parque Lineal Mapocho (Trazado rio)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Parque Lineal Río Mapocho', 'Parque lineal a lo largo del río Mapocho, fase 1', 'Área Verde', '2025-03-01', '2026-12-31', 'Planeado', 45000000.00,
+    ('Parque Lineal Rio Mapocho', 'Parque lineal a lo largo del rio Mapocho, fase 1', 'Area Verde', '2025-03-01', '2026-12-31', 'Planeado', 45000000.00,
      ST_GeomFromText('LINESTRING(-70.685 -33.425, -70.660 -33.430, -70.635 -33.435)', 4326), 1);
 
 
@@ -1278,15 +1278,38 @@ INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio,
 -- BORRAR DATOS ANTERIORES (Opcional, si estás re-insertando)
 -- DELETE FROM proyectos_zonas WHERE proyecto_urbano_id IS NOT NULL;
 
-INSERT INTO proyectos_zonas (proyecto_urbano_id, zona_urbana_id) VALUES
-                                                                     (1, 4), (1, 2), (1, 1), -- Línea 7
-                                                                     (2, 11), -- Parque Familia
-                                                                     (3, 5), (3, 7), -- Vespucio Sur
-                                                                     (4, 5), -- Hospital
-                                                                     (5, 2), (5, 3), -- Ciclovía
-                                                                     (6, 6), -- Centro Cultural
-                                                                     (7, 1), -- Renovación Yungay
-                                                                     (8, 1), (8, 2), (8, 12); -- Parque Mapocho
+-- Asignación de proyectos a zonas urbanas usando nombres para evitar problemas con IDs auto-generados
+-- Proyecto 1: Línea 7 del Metro (Santiago, Cerrillos, La Cisterna basado en geografía)
+INSERT INTO proyectos_zonas (proyecto_urbano_id, zona_urbana_id)
+SELECT 1, zona_urbana_id FROM zonas_urbanas WHERE nombre IN ('Santiago', 'Cerrillos', 'La Cisterna');
+
+-- Proyecto 2: Parque de la Familia Cerrillos
+INSERT INTO proyectos_zonas (proyecto_urbano_id, zona_urbana_id)
+SELECT 2, zona_urbana_id FROM zonas_urbanas WHERE nombre = 'Cerrillos';
+
+-- Proyecto 3: Mejoramiento Vespucio Sur (Cerro Navia, La Florida según trazado sur)
+INSERT INTO proyectos_zonas (proyecto_urbano_id, zona_urbana_id)
+SELECT 3, zona_urbana_id FROM zonas_urbanas WHERE nombre IN ('La Florida');
+
+-- Proyecto 4: Hospital Digital La Florida
+INSERT INTO proyectos_zonas (proyecto_urbano_id, zona_urbana_id)
+SELECT 4, zona_urbana_id FROM zonas_urbanas WHERE nombre = 'La Florida';
+
+-- Proyecto 5: Ciclovía Av. Providencia (Providencia y Las Condes)
+INSERT INTO proyectos_zonas (proyecto_urbano_id, zona_urbana_id)
+SELECT 5, zona_urbana_id FROM zonas_urbanas WHERE nombre IN ('Providencia', 'Las Condes');
+
+-- Proyecto 6: Centro Cultural Municipal Maipú
+INSERT INTO proyectos_zonas (proyecto_urbano_id, zona_urbana_id)
+SELECT 6, zona_urbana_id FROM zonas_urbanas WHERE nombre = 'Maipú';
+
+-- Proyecto 7: Renovación Urbana Barrio Yungay (Santiago Centro)
+INSERT INTO proyectos_zonas (proyecto_urbano_id, zona_urbana_id)
+SELECT 7, zona_urbana_id FROM zonas_urbanas WHERE nombre = 'Santiago';
+
+-- Proyecto 8: Parque Lineal Río Mapocho (Santiago, Independencia, Recoleta según trazado)
+INSERT INTO proyectos_zonas (proyecto_urbano_id, zona_urbana_id)
+SELECT 8, zona_urbana_id FROM zonas_urbanas WHERE nombre IN ('Santiago', 'Independencia', 'Recoleta');
 
 
 -- REFRESCAR VISTAS MATERIALIZADAS

@@ -102,17 +102,34 @@ public class ZonaUrbanaRepository {
 
     public List<Map<String, Object>> getZonasSinPlanificacionReciente() {
         String sql = """
-            SELECT 
+            SELECT
+                zu.zona_urbana_id,
                 zu.nombre AS zona,
-                COALESCE(TO_CHAR(MAX(pu.fecha_inicio), 'DD-MM-YYYY'), 'Ninguno') AS fecha_ultimo_proyecto
+                zu.tipo_zona,
+                COALESCE(
+                    TO_CHAR(MAX(pu.fecha_inicio), 'DD/MM/YYYY'),
+                    'Ninguno'
+                ) AS ultimo_proyecto,
+                MAX(pu.fecha_inicio) AS fecha_ultimo_proyecto,
+                CASE
+                    WHEN MAX(pu.fecha_inicio) IS NULL THEN 'Sin proyectos'
+                    WHEN MAX(pu.fecha_inicio) < CURRENT_DATE - INTERVAL '2 years' THEN 'Sin planificación reciente'
+                    ELSE 'Con planificación reciente'
+                END AS estado_planificacion,
+                CASE
+                    WHEN MAX(pu.fecha_inicio) IS NOT NULL
+                    THEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, MAX(pu.fecha_inicio)))::INTEGER
+                    ELSE NULL
+                END AS anios_sin_proyecto
             FROM zonas_urbanas zu
             LEFT JOIN proyectos_zonas pz ON zu.zona_urbana_id = pz.zona_urbana_id
             LEFT JOIN proyectos_urbanos pu ON pz.proyecto_urbano_id = pu.proyecto_urbano_id
-                AND pu.fecha_inicio >= CURRENT_DATE - INTERVAL '2 years'
-            GROUP BY zu.zona_urbana_id, zu.nombre
+            GROUP BY zu.zona_urbana_id, zu.nombre, zu.tipo_zona
             HAVING MAX(pu.fecha_inicio) IS NULL
                OR MAX(pu.fecha_inicio) < CURRENT_DATE - INTERVAL '2 years'
-            ORDER BY zu.nombre
+            ORDER BY
+                CASE WHEN MAX(pu.fecha_inicio) IS NULL THEN 1 ELSE 0 END,
+                MAX(pu.fecha_inicio) ASC NULLS FIRST
         """;
         return jdbcTemplate.queryForList(sql);
     }

@@ -17,6 +17,10 @@ const props = defineProps({
   selectedEstado: {
     type: String,
     default: ''
+  },
+  selectedTipoZona: {
+    type: String,
+    default: ''
   }
 });
 
@@ -168,10 +172,12 @@ const addProyectosToMap = () => {
   });
   proyectosLayers.value = [];
 
-  // Filtrar proyectos si hay filtro seleccionado
-  const proyectosToShow = props.selectedEstado
-    ? props.proyectos.filter(p => getEstadoString(p.estado) === props.selectedEstado)
-    : props.proyectos;
+  // Filtrar proyectos solo por estado (el filtro de zona ya se aplicó en el backend)
+  let proyectosToShow = props.proyectos;
+
+  if (props.selectedEstado) {
+    proyectosToShow = proyectosToShow.filter(p => getEstadoString(p.estado) === props.selectedEstado);
+  }
 
   if (proyectosToShow.length === 0) return;
 
