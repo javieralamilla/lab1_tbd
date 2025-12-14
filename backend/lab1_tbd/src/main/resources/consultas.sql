@@ -18,7 +18,7 @@ FROM
     zonas_urbanas zu
     INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
 WHERE 
-    dd.anio = (SELECT MAX(anio) FROM datos_demograficos WHERE zona_urbana_id = zu.zona_urbana_id)
+    dd.año = (SELECT MAX(año) FROM datos_demograficos WHERE zona_urbana_id = zu.zona_urbana_id)
     AND zu.area_km2 IS NOT NULL
     AND zu.area_km2 > 0
 ORDER BY 
@@ -71,9 +71,55 @@ LIMIT 5;
 -- Vista materializada que muestra el conteo de parques, escuelas y hospitales
 -- por cada zona urbana. Debe actualizarse semanalmente.
 -- Nota: Esta vista ya está definida en schema.sql como 'cobertura_infraestructura'
--- Para consultarla:
+-- Para consultarla de la manera mas básica.
+-- 5.1) Ver toda la cobertura de infraestrutura por zona
+SELECT
+	zona_urbana_id,
+	nombre_zona,
+	total_parques,
+	total_escuelas,
+	total_hospitales,
+	total_puntos_interes
+FROM
+	cobertura_infraestructura
+ORDER BY
+	nombre_zona;
 
+-- 5.2) Zonas con mayor cantidad de infraestructura total
+SELECT
+	nombre_zona,
+	total_parques,
+	total_parques,
+	total_hospitales,
+    total_puntos_interes
+FROM 
+    cobertura_infraestructura
+ORDER BY 
+    total_puntos_interes DESC
+LIMIT 10;
 
+-- 5.3)  Zonas con deficit de infraestructura (pocas escuelas u hospitales)
+SELECT 
+    nombre_zona,
+    total_escuelas,
+    total_hospitales,
+    (total_escuelas + total_hospitales) AS servicios_esenciales
+FROM 
+    cobertura_infraestructura
+WHERE 
+    total_escuelas < 3 OR total_hospitales < 1
+ORDER BY 
+    servicios_esenciales ASC;
+
+-- 5.4) Resumen estadistico de cobertura
+SELECT 
+    COUNT(*) AS total_zonas,
+    SUM(total_parques) AS parques_totales,
+    SUM(total_escuelas) AS escuelas_totales,
+    SUM(total_hospitales) AS hospitales_totales,
+    ROUND(AVG(total_puntos_interes), 2) AS promedio_puntos_por_zona
+FROM 
+    cobertura_infraestructura;
 
 -- ==================================================
 -- 6) Simulación de Nuevo Desarrollo Habitacional
@@ -81,21 +127,113 @@ LIMIT 5;
 -- Procedimiento almacenado que simula crecimiento poblacional basado en nuevas viviendas.
 -- Recibe: zona_id, número de nuevas viviendas
 -- Factor: 3 personas por vivienda
--- Nota: Este procedimiento ya está definido en schema.sql
--- Para ejecutarlo:
--- CALL simular_crecimiento_poblacion(1, 100);
+--
+-- El procedimiento 'simular_crecimiento_poblacion' ya esta definido en schema.sql.
+-- Logica del procedimiento:
+--   1. Obtiene el factor de personas por vivienda de la zona (default: 3.0)
+--   2. Calcula incremento = nuevas_viviendas * factor
+--   3. Actualiza poblacion y numero_viviendas en datos_demograficos
+--   4. Si no existe registro para la zona, crea uno nuevo
 
+-- 6.1) Ejecutar simulacion: Agregar 100 viviendas a la zona 1
+CALL simular_crecimiento_poblacion(1, 100);
+
+-- 6.2) Ejecutar simulacion: Agregar 50 viviendas a la zona 5
+CALL simular_crecimiento_poblacion(5, 50);
+
+-- 6.3) Ejecutar simulacion: Agregar 200 viviendas a la zona 10
+CALL simular_crecimiento_poblacion(10, 200);
+
+-- 6.4) Verificar el resultado despues de ejecutar la simulacion
+-- (Consulta para ver los datos demograficos actualizados)
+SELECT 
+    dd.zona_urbana_id,
+    zu.nombre AS nombre_zona,
+    dd.poblacion,
+    dd.numero_viviendas,
+    dd.factor_personas_vivienda,
+    dd.año
+FROM 
+    datos_demograficos dd
+    INNER JOIN zonas_urbanas zu ON dd.zona_urbana_id = zu.zona_urbana_id
+WHERE 
+    dd.zona_urbana_id IN (1, 5, 10)
+ORDER BY 
+    dd.zona_urbana_id, dd.año DESC;
+
+-- 6.5) Ejemplo de uso con zona especifica por nombre
+-- Primero obtener el ID de la zona
+SELECT zona_urbana_id, nombre FROM zonas_urbanas WHERE nombre ILIKE '%providencia%';
+-- Luego ejecutar (reemplazar X por el ID obtenido):
+CALL simular_crecimiento_poblacion(35, 150);
 
 -- ==================================================
 -- 7) Actualización Masiva de Proyectos
 -- ==================================================
 -- Procedimiento almacenado que actualiza proyectos retrasados de un usuario.
 -- Cambia estado a 'Retrasado' para proyectos que pasaron su fecha límite.
--- Nota: Este procedimiento ya está definido en schema.sql
--- Para ejecutarlo:
--- CALL actualizar_proyectos_retrasados(1);
+--
+-- El procedimiento 'actualizar_proyectos_retrasados' ya esta definido en schema.sql.
+-- Logica del procedimiento:
+--   1. Busca proyectos del usuario con estado = 'En Curso'
+--   2. Filtra los que tienen fecha_termino < fecha actual
+--   3. Actualiza su estado a 'Retrasado'
+--   4. Muestra cuantos proyectos fueron actualizados
 
+-- 7.1) Ejecutar actualizacion para el usuario con ID 1
+CALL actualizar_proyectos_retrasados(1);
 
+-- 7.2) Ejecutar actualizacion para el usuario con ID 2
+CALL actualizar_proyectos_retrasados(2);
+
+-- 7.3) Verificar proyectos retrasados despues de la actualizacion
+SELECT 
+    pu.proyecto_urbano_id,
+    pu.nombre AS nombre_proyecto,
+    pu.estado,
+    pu.fecha_inicio,
+    pu.fecha_termino,
+    u.nombre AS nombre_usuario,
+    u.email
+FROM 
+    proyectos_urbanos pu
+    INNER JOIN usuarios u ON pu.usuario_id = u.usuario_id
+WHERE 
+    pu.estado = 'Retrasado'
+ORDER BY 
+    pu.fecha_termino DESC;
+
+-- 7.4) Consulta previa: Ver proyectos que DEBERIAN marcarse como retrasados
+-- (Usar antes de ejecutar el procedimiento para ver que se va a actualizar)
+SELECT 
+    pu.proyecto_urbano_id,
+    pu.nombre AS nombre_proyecto,
+    pu.estado AS estado_actual,
+    pu.fecha_termino,
+    CURRENT_DATE AS fecha_actual,
+    (CURRENT_DATE - pu.fecha_termino) AS dias_de_retraso,
+    u.nombre AS nombre_usuario
+FROM 
+    proyectos_urbanos pu
+    INNER JOIN usuarios u ON pu.usuario_id = u.usuario_id
+WHERE 
+    pu.estado = 'En Curso'
+    AND pu.fecha_termino < CURRENT_DATE
+ORDER BY 
+    dias_de_retraso DESC;
+
+-- 7.5) Resumen de proyectos por estado y usuario
+SELECT 
+    u.nombre AS usuario,
+    pu.estado,
+    COUNT(*) AS cantidad_proyectos
+FROM 
+    proyectos_urbanos pu
+    INNER JOIN usuarios u ON pu.usuario_id = u.usuario_id
+GROUP BY 
+    u.nombre, pu.estado
+ORDER BY 
+    u.nombre, pu.estado;
 -- ==================================================
 -- 8) Listado de Zonas sin Planificación Reciente
 -- ==================================================
@@ -103,7 +241,7 @@ LIMIT 5;
 -- Incluye nombre de zona y fecha del último proyecto o 'Ninguno'.
 
 -- Consulta principal: Zonas sin planificación reciente
--- IMPORTANTE: Usa LEFT JOIN para incluir TODAS las zonas, incluso las que nunca tuvieron proyectos
+-- IMPORTANTE: Se usa LEFT JOIN para incluir TODAS las zonas, incluso las que nunca tuvieron proyectos
 SELECT
     zu.zona_urbana_id,
     zu.nombre AS zona,
