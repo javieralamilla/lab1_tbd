@@ -57,13 +57,74 @@ LIMIT 5;
 -- Encuentra todas las escuelas a menos de 500 metros de proyectos 'En Curso'.
 -- Devuelve nombre de escuela, nombre de proyecto y distancia en metros.
 
-
+SELECT
+    pi_escuela.nombre AS escuela,
+    p.nombre AS proyecto,
+    ROUND(
+        ST_Distance(
+            pi_escuela.coordenadas_punto::geography,
+            p.coordenadas::geography
+        )::numeric,
+        2
+    ) AS distancia_metros
+FROM 
+    puntos_interes pi_escuela
+    INNER JOIN proyectos p
+        ON ST_DWithin(
+            pi_escuela.coordenadas_punto::geography,
+            p.coordenadas::geography,
+            500
+        )
+WHERE
+    pi_escuela.tipo = 'Escuela'
+    AND pi_escuela.activo = TRUE
+    AND p.estado = 'En Curso'
+ORDER BY
+    distancia_metros ASC;
 -- ==================================================
 -- 4) Detección de Zonas en Rápido Crecimiento
 -- ==================================================
 -- Identifica las 3 zonas cuya población creció más del 10% en los últimos 5 años.
 -- Muestra nombre de zona y porcentaje de crecimiento.
 
+WITH poblacion_anios AS (
+    SELECT
+        zu.zona_urbana_id,
+        zu.nombre,
+        dd.anio,
+        dd.poblacion,
+        MAX(dd.anio) OVER (PARTITION BY zu.zona_urbana_id) AS anio_actual
+    FROM
+        zonas_urbanas zu
+        INNER JOIN datos_demograficos dd
+            ON zu.zona_urbana_id = dd.zona_urbana_id
+),
+crecimiento AS (
+    SELECT
+        zona_urbana_id,
+        nombre,
+        MAX(CASE WHEN anio = anio_actual THEN poblacion END) AS poblacion_actual,
+        MAX(CASE WHEN anio = anio_actual - 5 THEN poblacion END) AS poblacion_5_anios
+    FROM
+        poblacion_anios
+    GROUP BY
+        zona_urbana_id, nombre
+)
+SELECT
+    nombre AS zona,
+    ROUND(
+        ((poblacion_actual - poblacion_5_anios)::numeric / poblacion_5_anios) * 100,
+        2
+    ) AS porcentaje_crecimiento
+FROM
+    crecimiento
+WHERE
+    poblacion_5_anios IS NOT NULL
+    AND poblacion_actual > poblacion_5_anios
+    AND ((poblacion_actual - poblacion_5_anios)::numeric / poblacion_5_anios) > 0.10
+ORDER BY
+    porcentaje_crecimiento DESC
+LIMIT 3;
 
 -- ==================================================
 -- 5) Análisis de Cobertura de Infraestructura
