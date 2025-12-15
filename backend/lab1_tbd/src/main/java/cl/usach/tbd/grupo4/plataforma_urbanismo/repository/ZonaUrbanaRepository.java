@@ -257,22 +257,23 @@ public class ZonaUrbanaRepository {
             Integer areaInfluencia) {
 
         try {
-            // 1. Obtener estadísticas actuales del área del proyecto
+
             Map<String, Object> estadisticasActuales = getEstadisticasArea(geojsonArea);
 
-            // 2. Calcular el centro del proyecto
+
             String sqlCentro = """
                 SELECT ST_AsText(ST_Centroid(ST_GeomFromGeoJSON(?))) as centro
             """;
             String centroWKT = jdbcTemplate.queryForObject(sqlCentro, String.class, geojsonArea);
 
-            // 3. Calcular estadísticas del área de influencia (buffer alrededor del proyecto)
+
+            String[] coords = centroWKT.replace("POINT(", "").replace(")", "").split(" ");
             String geojsonBuffer = String.format(
-                "{\"type\":\"Point\",\"coordinates\":[%s]}",
-                centroWKT.replace("POINT(", "").replace(")", "").replace(" ", ",")
+                    "{\"type\":\"Point\",\"coordinates\":[%s,%s]}",
+                    coords[0], coords[1]
             );
 
-            // Población en el área de influencia
+
             String sqlPoblacionInfluencia = """
                 SELECT COALESCE(SUM(dd.poblacion), 0) as poblacion
                 FROM zonas_urbanas zu
@@ -283,117 +284,178 @@ public class ZonaUrbanaRepository {
                       ?
                   )
             """;
-
             Long poblacionInfluencia = jdbcTemplate.queryForObject(
-                sqlPoblacionInfluencia,
-                Long.class,
-                geojsonBuffer,
-                areaInfluencia
+                    sqlPoblacionInfluencia, Long.class, geojsonBuffer, areaInfluencia
             );
 
-            // Escuelas en el área de influencia
             String sqlEscuelasInfluencia = """
-                SELECT COUNT(*) as total
-                FROM puntos_interes
+                SELECT COUNT(*) FROM puntos_interes
                 WHERE tipo = 'Escuela'
-                  AND ST_DWithin(
-                      coordenadas_punto::geography,
-                      ST_GeomFromGeoJSON(?)::geography,
-                      ?
-                  )
+                  AND ST_DWithin(coordenadas_punto::geography, ST_GeomFromGeoJSON(?)::geography, ?)
             """;
-
             Integer escuelasInfluencia = jdbcTemplate.queryForObject(
-                sqlEscuelasInfluencia,
-                Integer.class,
-                geojsonBuffer,
-                areaInfluencia
+                    sqlEscuelasInfluencia, Integer.class, geojsonBuffer, areaInfluencia
             );
 
-            // Hospitales en el área de influencia
+
             String sqlHospitalesInfluencia = """
-                SELECT COUNT(*) as total
-                FROM puntos_interes
+                SELECT COUNT(*) FROM puntos_interes
                 WHERE tipo = 'Hospital'
-                  AND ST_DWithin(
-                      coordenadas_punto::geography,
-                      ST_GeomFromGeoJSON(?)::geography,
-                      ?
-                  )
+                  AND ST_DWithin(coordenadas_punto::geography, ST_GeomFromGeoJSON(?)::geography, ?)
             """;
-
             Integer hospitalesInfluencia = jdbcTemplate.queryForObject(
-                sqlHospitalesInfluencia,
-                Integer.class,
-                geojsonBuffer,
-                areaInfluencia
+                    sqlHospitalesInfluencia, Integer.class, geojsonBuffer, areaInfluencia
             );
 
-            // Proyectos en el área de influencia
+
             String sqlProyectosInfluencia = """
-                SELECT COUNT(*) as total
-                FROM proyectos_urbanos
+                SELECT COUNT(*) FROM proyectos_urbanos
                 WHERE estado IN ('En Curso', 'Planeado')
-                  AND ST_DWithin(
-                      geometria::geography,
-                      ST_GeomFromGeoJSON(?)::geography,
-                      ?
-                  )
+                  AND ST_DWithin(geometria::geography, ST_GeomFromGeoJSON(?)::geography, ?)
             """;
-
             Integer proyectosInfluencia = jdbcTemplate.queryForObject(
-                sqlProyectosInfluencia,
-                Integer.class,
-                geojsonBuffer,
-                areaInfluencia
+                    sqlProyectosInfluencia, Integer.class, geojsonBuffer, areaInfluencia
             );
 
-            // 4. Calcular valores proyectados con el nuevo proyecto
-            long poblacionActual = (Long) estadisticasActuales.get("poblacion_total");
-            int escuelasActuales = (Integer) estadisticasActuales.get("total_escuelas");
-            int hospitalesActuales = (Integer) estadisticasActuales.get("total_hospitales");
-            int proyectosActuales = (Integer) estadisticasActuales.get("proyectos_en_curso");
 
-            // Calcular impacto en población
-            long incrementoPoblacion = poblacionEstimada;
-            if (impactoPoblacion != 0 && poblacionInfluencia != null) {
-                incrementoPoblacion += (long) (poblacionInfluencia * (impactoPoblacion / 100.0));
+            String sqlAreaKm2 = """
+                SELECT ROUND(
+                    ST_Area(ST_Transform(ST_GeomFromGeoJSON(?), 32719))::NUMERIC / 1000000, 4
+                ) as area_km2
+            """;
+            Double areaKm2 = jdbcTemplate.queryForObject(sqlAreaKm2, Double.class, geojsonArea);
+
+            Long incrementoPoblacionReal = 0L;
+            Integer viviendasAgregadas = 0;
+            Long zonaAfectadaId = null;
+            String zonaAfectadaNombre = null;
+
+            if ("RESIDENCIAL".equalsIgnoreCase(tipoProyecto) && poblacionEstimada != null && poblacionEstimada > 0) {
+
+
+                String sqlZonaDelCentro = """
+                    SELECT zu.zona_urbana_id, zu.nombre
+                    FROM zonas_urbanas zu
+                    WHERE ST_Contains(zu.geometria_poligono, ST_GeomFromGeoJSON(?))
+                    LIMIT 1
+                """;
+
+                try {
+                    Map<String, Object> zonaEncontrada = jdbcTemplate.queryForMap(sqlZonaDelCentro, geojsonBuffer);
+                    zonaAfectadaId = ((Number) zonaEncontrada.get("zona_urbana_id")).longValue();
+                    zonaAfectadaNombre = (String) zonaEncontrada.get("nombre");
+
+
+                    viviendasAgregadas = (int) Math.ceil(poblacionEstimada / 3.0);
+
+
+                    String sqlPoblacionAntes = """
+                        SELECT COALESCE(poblacion, 0) FROM datos_demograficos
+                        WHERE zona_urbana_id = ?
+                        ORDER BY año DESC LIMIT 1
+                    """;
+                    Long poblacionAntes = jdbcTemplate.queryForObject(sqlPoblacionAntes, Long.class, zonaAfectadaId);
+                    if (poblacionAntes == null) poblacionAntes = 0L;
+
+
+                    String sqlProcedimiento = "CALL simular_crecimiento_poblacion(?, ?)";
+                    jdbcTemplate.update(sqlProcedimiento, zonaAfectadaId.intValue(), viviendasAgregadas);
+
+
+                    Long poblacionDespues = jdbcTemplate.queryForObject(sqlPoblacionAntes, Long.class, zonaAfectadaId);
+                    if (poblacionDespues == null) poblacionDespues = 0L;
+
+
+                    incrementoPoblacionReal = poblacionDespues - poblacionAntes;
+
+                    System.out.println("=== CONSULTA 6: SIMULACIÓN EJECUTADA ===");
+                    System.out.println("Zona afectada: " + zonaAfectadaNombre + " (ID: " + zonaAfectadaId + ")");
+                    System.out.println("Viviendas agregadas: " + viviendasAgregadas);
+                    System.out.println("Incremento población: " + incrementoPoblacionReal);
+                    System.out.println("=========================================");
+
+                } catch (Exception e) {
+                    System.err.println("No se encontró zona para el centro del proyecto: " + e.getMessage());
+                    // No es error crítico, continuamos sin ejecutar el procedimiento
+                }
             }
 
-            long poblacionProyectada = poblacionActual + incrementoPoblacion;
-            int escuelasProyectadas = escuelasActuales + numEscuelas;
-            int hospitalesProyectados = hospitalesActuales + numHospitales;
-            int proyectosProyectados = proyectosActuales + 1; // El nuevo proyecto
 
-            // 5. Construir respuesta con comparación
-            return Map.of(
-                "actual", Map.of(
-                    "poblacion", poblacionActual,
-                    "escuelas", escuelasActuales,
-                    "hospitales", hospitalesActuales,
-                    "proyectos", proyectosActuales
-                ),
-                "proyectado", Map.of(
-                    "poblacion", poblacionProyectada,
-                    "escuelas", escuelasProyectadas,
-                    "hospitales", hospitalesProyectados,
-                    "proyectos", proyectosProyectados
-                ),
-                "diferencias", Map.of(
-                    "poblacion", incrementoPoblacion,
-                    "escuelas", numEscuelas,
-                    "hospitales", numHospitales,
-                    "proyectos", 1
-                ),
-                "area_km2", estadisticasActuales.get("area_km2"),
-                "area_influencia_m", areaInfluencia,
-                "tipo_proyecto", tipoProyecto,
-                "poblacion_area_influencia", poblacionInfluencia != null ? poblacionInfluencia : 0
-            );
+            Long poblacionActual = poblacionInfluencia != null ? poblacionInfluencia : 0L;
+            Integer escuelasActuales = escuelasInfluencia != null ? escuelasInfluencia : 0;
+            Integer hospitalesActuales = hospitalesInfluencia != null ? hospitalesInfluencia : 0;
+            Integer proyectosActuales = proyectosInfluencia != null ? proyectosInfluencia : 0;
+
+            // Calcular incremento de población
+            Long incrementoPoblacion;
+            if (incrementoPoblacionReal > 0) {
+                // Usar el valor real del procedimiento
+                incrementoPoblacion = incrementoPoblacionReal;
+            } else if (impactoPoblacion != null && impactoPoblacion != 0) {
+                // Usar porcentaje de impacto
+                incrementoPoblacion = Math.round(poblacionActual * (impactoPoblacion / 100.0));
+            } else if (poblacionEstimada != null && poblacionEstimada > 0) {
+                // Usar población estimada directamente
+                incrementoPoblacion = poblacionEstimada.longValue();
+            } else {
+                incrementoPoblacion = 0L;
+            }
+
+            Long poblacionProyectada = poblacionActual + incrementoPoblacion;
+            Integer escuelasProyectadas = escuelasActuales + (numEscuelas != null ? numEscuelas : 0);
+            Integer hospitalesProyectados = hospitalesActuales + (numHospitales != null ? numHospitales : 0);
+
+
+            Map<String, Object> resultado = new java.util.HashMap<>();
+
+            // Estado actual
+            Map<String, Object> actual = new java.util.HashMap<>();
+            actual.put("poblacion", poblacionActual);
+            actual.put("escuelas", escuelasActuales);
+            actual.put("hospitales", hospitalesActuales);
+            actual.put("proyectos", proyectosActuales);
+            resultado.put("actual", actual);
+
+            // Estado proyectado
+            Map<String, Object> proyectado = new java.util.HashMap<>();
+            proyectado.put("poblacion", poblacionProyectada);
+            proyectado.put("escuelas", escuelasProyectadas);
+            proyectado.put("hospitales", hospitalesProyectados);
+            proyectado.put("proyectos", proyectosActuales + 1);
+            resultado.put("proyectado", proyectado);
+
+            // Diferencias
+            Map<String, Object> diferencias = new java.util.HashMap<>();
+            diferencias.put("poblacion", incrementoPoblacion);
+            diferencias.put("escuelas", numEscuelas != null ? numEscuelas : 0);
+            diferencias.put("hospitales", numHospitales != null ? numHospitales : 0);
+            resultado.put("diferencias", diferencias);
+
+            // Metadatos
+            resultado.put("area_km2", areaKm2 != null ? areaKm2 : 0.0);
+            resultado.put("tipo_proyecto", tipoProyecto);
+            resultado.put("area_influencia_m", areaInfluencia);
+
+            // Info de la simulación del procedimiento (Consulta 6)
+            if (zonaAfectadaId != null) {
+                Map<String, Object> simulacionBD = new java.util.HashMap<>();
+                simulacionBD.put("ejecutada", true);
+                simulacionBD.put("zona_id", zonaAfectadaId);
+                simulacionBD.put("zona_nombre", zonaAfectadaNombre);
+                simulacionBD.put("viviendas_agregadas", viviendasAgregadas);
+                simulacionBD.put("incremento_poblacion_real", incrementoPoblacionReal);
+                resultado.put("simulacion_bd", simulacionBD);
+            } else {
+                Map<String, Object> simulacionBD = new java.util.HashMap<>();
+                simulacionBD.put("ejecutada", false);
+                simulacionBD.put("razon", "No es proyecto RESIDENCIAL o no se encontró zona");
+                resultado.put("simulacion_bd", simulacionBD);
+            }
+
+            return resultado;
 
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error al calcular impacto del proyecto: " + e.getMessage());
+            throw new RuntimeException("Error al calcular impacto del proyecto: " + e.getMessage(), e);
         }
     }
 
