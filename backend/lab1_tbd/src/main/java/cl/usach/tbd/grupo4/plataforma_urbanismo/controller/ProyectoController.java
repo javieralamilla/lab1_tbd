@@ -20,7 +20,11 @@ public class ProyectoController {
     private ProyectoService proyectoService;
 
     @GetMapping
-    public ResponseEntity<List<ProyectoUrbano>> obtenerTodos() {
+    public ResponseEntity<List<ProyectoUrbano>> obtenerTodos(
+            @RequestParam(required = false) String tipoZona) {
+        if (tipoZona != null && !tipoZona.isEmpty()) {
+            return ResponseEntity.ok(proyectoService.obtenerPorTipoZona(tipoZona));
+        }
         return ResponseEntity.ok(proyectoService.obtenerTodos());
     }
 
@@ -80,8 +84,10 @@ public class ProyectoController {
     }
 
     @GetMapping("/analisis/resumen-estado-zona")
-    public ResponseEntity<List<Map<String, Object>>> obtenerResumenPorEstadoYZona() {
-        return ResponseEntity.ok(proyectoService.obtenerResumenPorEstadoYZona());
+    public ResponseEntity<List<Map<String, Object>>> obtenerResumenPorEstadoYZona(
+            @RequestParam(required = false) String tipoZona,
+            @RequestParam(required = false) String estado) {
+        return ResponseEntity.ok(proyectoService.obtenerResumenPorEstadoYZona(tipoZona, estado));
     }
 
     @PostMapping("/actualizar-retrasados/{usuarioId}")
@@ -93,5 +99,10 @@ public class ProyectoController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Error al actualizar proyectos: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/analisis/zonas-sin-planificacion")
+    public ResponseEntity<List<Map<String, Object>>> obtenerZonasSinPlanificacion() {
+        return ResponseEntity.ok(proyectoService.obtenerZonasSinPlanificacion());
     }
 }

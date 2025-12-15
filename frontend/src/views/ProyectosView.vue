@@ -5,17 +5,32 @@
         <h1>Proyectos Urbanos</h1>
         <p>Gestión de proyectos de desarrollo de la ciudad</p>
       </div>
-      <button
-        v-if="authStore.isAdmin || authStore.isPlanificador"
-        @click="createProject"
-        class="btn-primary"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-        Nuevo Proyecto
-      </button>
+      <div class="header-actions">
+        <button
+          v-if="authStore.isAdmin || authStore.isPlanificador"
+          @click="createProject"
+          class="btn-primary"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Nuevo Proyecto
+        </button>
+
+        <button
+          v-if="authStore.isAdmin || authStore.isPlanificador"
+          @click="abrirActualizarRetrasadosModal"
+          class="btn-actualizar-retrasados"
+          title="Actualizar estado de proyectos retrasados"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          ⏱️ Actualizar Retrasados
+        </button>
+      </div>
     </div>
 
     <!-- Modal / Panel Nuevo Proyecto -->
@@ -48,6 +63,11 @@
           <div class="form-group">
             <label>Fecha de Inicio</label>
             <input v-model="newProject.fecha_inicio" type="date" />
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Término (Opcional)</label>
+            <input v-model="newProject.fecha_termino" type="date" />
           </div>
 
           <div class="form-group">
@@ -108,6 +128,11 @@
           </div>
 
           <div class="form-group">
+            <label>Fecha de Término (Opcional)</label>
+            <input v-model="editProjectData.fecha_termino" type="date" />
+          </div>
+
+          <div class="form-group">
             <label>Presupuesto (CLP)</label>
             <input v-model.number="editProjectData.presupuesto" type="number" min="0" />
           </div>
@@ -137,6 +162,255 @@
         <div class="modal-footer">
           <button class="btn-guardar" @click="saveEdit" :disabled="editing">Guardar Cambios</button>
           <button class="btn-cancel" @click="cancelEdit" :disabled="editing">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Análisis de Superposición -->
+    <div v-if="showSuperposicionModal" class="modal-overlay">
+      <div class="modal-panel modal-wide">
+        <div class="modal-header">
+          <h3>🔍 Análisis de Superposición de Proyectos</h3>
+          <button class="btn-cerrar" @click="closeSuperposicionModal">✖</button>
+        </div>
+
+        <div class="modal-body">
+          <div v-if="loadingSuperposiciones" class="loading-section">
+            <LoadingSpinner message="Analizando superposiciones..." />
+          </div>
+
+          <div v-else-if="superposiciones.length === 0" class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 6v6l4 2"></path>
+            </svg>
+            <p>No se encontraron proyectos con superposiciones geográficas.</p>
+          </div>
+
+          <div v-else class="superposiciones-list">
+            <div class="superposicion-stats">
+              <div class="stat-card">
+                <div class="stat-value">{{ superposiciones.length }}</div>
+                <div class="stat-label">Superposiciones detectadas</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">{{ formatArea(totalAreaSuperposicion) }}</div>
+                <div class="stat-label">Área total superpuesta</div>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table class="superposiciones-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Proyecto 1</th>
+                    <th>Estado</th>
+                    <th>Proyecto 2</th>
+                    <th>Estado</th>
+                    <th>Área Superposición</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(sup, index) in superposiciones" :key="index" :class="{'critical-overlap': sup.area_superposicion_m2 > 1000}">
+                    <td>{{ index + 1 }}</td>
+                    <td class="proyecto-name">{{ sup.proyecto_1 }}</td>
+                    <td>
+                      <span class="status-badge-small" :class="getStatusClass(sup.estado_proyecto_1)">
+                        {{ sup.estado_proyecto_1 }}
+                      </span>
+                    </td>
+                    <td class="proyecto-name">{{ sup.proyecto_2 }}</td>
+                    <td>
+                      <span class="status-badge-small" :class="getStatusClass(sup.estado_proyecto_2)">
+                        {{ sup.estado_proyecto_2 }}
+                      </span>
+                    </td>
+                    <td class="area-cell">
+                      <strong>{{ formatArea(sup.area_superposicion_m2) }}</strong>
+                      <span v-if="sup.area_superposicion_m2 > 1000" class="warning-badge">⚠️ Crítico</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" @click="closeSuperposicionModal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Zonas Sin Planificación Reciente -->
+    <div v-if="showZonasSinPlanModal" class="modal-overlay">
+      <div class="modal-panel modal-wide">
+        <div class="modal-header">
+          <h3>📍 Zonas Sin Planificación Reciente</h3>
+          <button class="btn-cerrar" @click="closeZonasSinPlanModal">✖</button>
+        </div>
+
+        <div class="modal-body">
+          <div v-if="loadingZonasSinPlan" class="loading-section">
+            <LoadingSpinner message="Analizando zonas..." />
+          </div>
+
+          <div v-else-if="zonasSinPlanificacion.length === 0" class="empty-state">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <p>Todas las zonas tienen proyectos recientes (últimos 2 años).</p>
+          </div>
+
+          <div v-else class="zonas-list">
+            <div class="zonas-stats">
+              <div class="stat-card">
+                <div class="stat-value">{{ zonasSinPlanificacion.length }}</div>
+                <div class="stat-label">Zonas sin planificación</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-value">{{ zonasNuncaTuvieron }}</div>
+                <div class="stat-label">Nunca tuvieron proyectos</div>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table class="zonas-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Zona</th>
+                    <th>Tipo</th>
+                    <th>Último Proyecto</th>
+                    <th>Años Sin Proyecto</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(zona, index) in zonasSinPlanificacion" :key="index" :class="{'nunca-proyecto': zona.ultimo_proyecto === 'Ninguno'}">
+                    <td>{{ index + 1 }}</td>
+                    <td class="zona-name">{{ zona.zona }}</td>
+                    <td>
+                      <span class="tipo-badge">{{ zona.tipo_zona }}</span>
+                    </td>
+                    <td>
+                      <span :class="{'sin-proyecto': zona.ultimo_proyecto === 'Ninguno'}">
+                        {{ zona.ultimo_proyecto }}
+                      </span>
+                    </td>
+                    <td>
+                      <span v-if="zona.anios_sin_proyecto !== null" class="anios-badge">
+                        {{ zona.anios_sin_proyecto }} año{{ zona.anios_sin_proyecto !== 1 ? 's' : '' }}
+                      </span>
+                      <span v-else class="anios-badge nunca">-</span>
+                    </td>
+                    <td>
+                      <span class="estado-badge" :class="zona.estado_planificacion.toLowerCase().replace(/ /g, '-')">
+                        {{ zona.estado_planificacion }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn-cancel" @click="closeZonasSinPlanModal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Actualizar Proyectos Retrasados -->
+    <div v-if="showActualizarRetrasadosModal" class="modal-overlay">
+      <div class="modal-panel modal-medium">
+        <div class="modal-header">
+          <h3>⏱️ Actualizar Proyectos Retrasados</h3>
+          <button class="btn-cerrar" @click="closeActualizarRetrasadosModal">✖</button>
+        </div>
+
+        <div class="modal-body">
+          <div v-if="actualizandoRetrasados" class="loading-section">
+            <LoadingSpinner message="Actualizando proyectos..." />
+          </div>
+
+          <div v-else-if="!resultadoActualizacion" class="confirmacion-section">
+            <div class="icono-advertencia">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <h4>¿Actualizar proyectos retrasados?</h4>
+            <p>Esta acción actualizará el estado de todos tus proyectos "En Curso" que hayan superado su fecha límite, marcándolos como "Retrasado".</p>
+
+            <!-- Contador de proyectos a actualizar -->
+            <div v-if="contarProyectosRetrasados > 0" class="alerta-proyectos">
+              <div class="numero-proyectos">{{ contarProyectosRetrasados }}</div>
+              <p><strong>proyecto{{ contarProyectosRetrasados !== 1 ? 's' : '' }} será{{ contarProyectosRetrasados !== 1 ? 'n' : '' }} actualizado{{ contarProyectosRetrasados !== 1 ? 's' : '' }}</strong></p>
+            </div>
+            <div v-else class="alerta-proyectos sin-proyectos">
+              <p>✅ No hay proyectos retrasados para actualizar</p>
+            </div>
+
+            <div class="info-box">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <div>
+                <strong>Criterios de actualización:</strong>
+                <ul>
+                  <li>Estado actual: "En Curso"</li>
+                  <li>Fecha de término menor a hoy ({{ formatDate(new Date()) }})</li>
+                  <li>Solo tus proyectos</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div v-else class="resultado-section">
+            <div class="icono-exito">
+              <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <h4>✅ Actualización Completada</h4>
+            <p>{{ resultadoActualizacion }}</p>
+            <div class="success-stats">
+              <div class="stat-item">
+                <div class="stat-icon">⚠️</div>
+                <div>
+                  <div class="stat-number">{{ proyectosActualizadosCount }}</div>
+                  <div class="stat-label">Proyectos actualizados</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            v-if="!resultadoActualizacion"
+            class="btn-primary"
+            @click="confirmarActualizarRetrasados"
+            :disabled="actualizandoRetrasados"
+          >
+            Actualizar Proyectos
+          </button>
+          <button
+            class="btn-cancel"
+            @click="closeActualizarRetrasadosModal"
+            :disabled="actualizandoRetrasados"
+          >
+            {{ resultadoActualizacion ? 'Cerrar' : 'Cancelar' }}
+          </button>
         </div>
       </div>
     </div>
@@ -171,6 +445,31 @@
         <option value="Retrasado">Retrasado</option>
         <option value="Cancelado">Cancelado</option>
       </select>
+
+      <select v-model="filterTipoZona" class="filter-select">
+        <option value="">Todos los tipos de zona</option>
+        <option value="Residencial">Residencial</option>
+        <option value="Comercial">Comercial</option>
+        <option value="Industrial">Industrial</option>
+        <option value="Mixto">Mixto</option>
+      </select>
+
+      <button @click="showSuperposicionModal = true" class="btn-analisis">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="6"></circle>
+          <circle cx="12" cy="12" r="2"></circle>
+        </svg>
+        Análisis de Superposición
+      </button>
+
+      <button @click="showZonasSinPlanModal = true" class="btn-analisis">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        Zonas Sin Planificación
+      </button>
     </div>
 
     <!-- Mapa Interactivo de Proyectos -->
@@ -178,6 +477,7 @@
       <MapaProyectos
         :proyectos="proyectos"
         :selected-estado="filterEstado"
+        :selected-tipo-zona="filterTipoZona"
         @proyecto-selected="viewProject"
       />
       <div class="mapa-leyenda">
@@ -234,7 +534,20 @@
               <line x1="8" y1="2" x2="8" y2="6"></line>
               <line x1="3" y1="10" x2="21" y2="10"></line>
             </svg>
-            <span>{{ formatDate(proyecto.fechaInicio || proyecto.fecha_inicio) }}</span>
+            <span><strong>Inicio:</strong> {{ formatDate(proyecto.fechaInicio || proyecto.fecha_inicio) }}</span>
+          </div>
+
+          <div v-if="proyecto.fechaTermino || proyecto.fecha_termino"
+               class="detail-item"
+               :class="{ 'fecha-retrasada': isProyectoRetrasado(proyecto) }">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>
+              <strong>Término:</strong> {{ formatDate(proyecto.fechaTermino || proyecto.fecha_termino) }}
+              <span v-if="isProyectoRetrasado(proyecto)" class="badge-retrasado">⚠️ Retrasado</span>
+            </span>
           </div>
 
           <div class="detail-item">
@@ -282,7 +595,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import ErrorAlert from '@/components/common/ErrorAlert.vue';
@@ -297,6 +610,23 @@ const error = ref(null);
 const proyectos = ref([]);
 const searchQuery = ref('');
 const filterEstado = ref('');
+const filterTipoZona = ref('');
+
+// Análisis de superposición
+const showSuperposicionModal = ref(false);
+const loadingSuperposiciones = ref(false);
+const superposiciones = ref([]);
+
+// Análisis de zonas sin planificación
+const showZonasSinPlanModal = ref(false);
+const loadingZonasSinPlan = ref(false);
+const zonasSinPlanificacion = ref([]);
+
+// Actualizar proyectos retrasados
+const showActualizarRetrasadosModal = ref(false);
+const actualizandoRetrasados = ref(false);
+const resultadoActualizacion = ref(null);
+const proyectosActualizadosCount = ref(0);
 
 // Nuevo proyecto (modal)
 const showCreateModal = ref(false);
@@ -306,6 +636,7 @@ const newProject = ref({
   descripcion: '',
   tipo_proyecto: 'RESIDENCIAL',
   fecha_inicio: '',
+  fecha_termino: '',
   presupuesto: 0
 });
 // Editar proyecto
@@ -317,6 +648,7 @@ const editProjectData = ref({
   descripcion: '',
   tipo_proyecto: 'RESIDENCIAL',
   fecha_inicio: '',
+  fecha_termino: '',
   presupuesto: 0,
   estado: 'Planeado',
   geometria: ''
@@ -357,12 +689,46 @@ const formatCurrency = (amount) => {
     minimumFractionDigits: 0
   }).format(amount);
 };
+
+const isProyectoRetrasado = (proyecto) => {
+  if (proyecto.estado !== 'En Curso') return false;
+
+  const fechaTermino = proyecto.fechaTermino || proyecto.fecha_termino;
+  if (!fechaTermino) return false;
+
+  const fechaTerminoDate = new Date(fechaTermino);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0); // Resetear horas para comparar solo fechas
+
+  return fechaTerminoDate < hoy;
+};
+
+const contarProyectosRetrasados = computed(() => {
+  return proyectos.value.filter(p => isProyectoRetrasado(p)).length;
+});
+
+const formatArea = (area) => {
+  const n = Number(area);
+  if (!n && n !== 0) return '0 m²';
+  return new Intl.NumberFormat('es-CL', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(n) + ' m²';
+};
+
+const totalAreaSuperposicion = computed(() => {
+  return superposiciones.value.reduce((total, sup) => total + (sup.area_superposicion_m2 || 0), 0);
+});
+
+const zonasNuncaTuvieron = computed(() => {
+  return zonasSinPlanificacion.value.filter(z => z.ultimo_proyecto === 'Ninguno').length;
+});
 const loadProyectos = async () => {
   loading.value = true;
   error.value = null;
 
   try {
-    const data = await proyectosService.getAll();
+    const data = await proyectosService.getAll(filterTipoZona.value || null);
     proyectos.value = data;
   } catch (err) {
     error.value = err.message || 'Error al cargar proyectos';
@@ -381,6 +747,7 @@ const editProject = (proyecto) => {
     descripcion: proyecto.descripcion || '',
     tipo_proyecto: proyecto.tipoProyecto || proyecto.tipo_proyecto || 'RESIDENCIAL',
     fecha_inicio: (proyecto.fechaInicio || proyecto.fecha_inicio) ? (proyecto.fechaInicio || proyecto.fecha_inicio).slice(0,10) : '',
+    fecha_termino: (proyecto.fechaTermino || proyecto.fecha_termino) ? (proyecto.fechaTermino || proyecto.fecha_termino).slice(0,10) : '',
     presupuesto: proyecto.presupuesto || 0,
     estado: proyecto.estado || 'Planeado',
     geometria: typeof proyecto.geometria === 'string' ? proyecto.geometria : (proyecto.geometria ? JSON.stringify(proyecto.geometria) : '')
@@ -402,12 +769,20 @@ const saveEdit = async () => {
   error.value = null;
 
   try {
-    // Normalizar fecha
+    // Normalizar fecha de inicio
     let fechaIso = null;
     if (editProjectData.value.fecha_inicio) {
       const d = new Date(editProjectData.value.fecha_inicio);
       if (!isNaN(d.getTime())) fechaIso = d.toISOString().slice(0,10);
       else fechaIso = editProjectData.value.fecha_inicio;
+    }
+
+    // Normalizar fecha de término
+    let fechaTerminoIso = null;
+    if (editProjectData.value.fecha_termino) {
+      const d = new Date(editProjectData.value.fecha_termino);
+      if (!isNaN(d.getTime())) fechaTerminoIso = d.toISOString().slice(0,10);
+      else fechaTerminoIso = editProjectData.value.fecha_termino;
     }
 
     // Geometría: asegurar que sea string
@@ -421,6 +796,7 @@ const saveEdit = async () => {
       descripcion: editProjectData.value.descripcion,
       tipoProyecto: editProjectData.value.tipo_proyecto,
       fechaInicio: fechaIso,
+      fechaTermino: fechaTerminoIso,
       presupuesto: editProjectData.value.presupuesto ? Number(editProjectData.value.presupuesto) : null,
       estado: editProjectData.value.estado,
       geometria: geom
@@ -450,6 +826,7 @@ const createProject = () => {
     descripcion: '',
     tipo_proyecto: 'RESIDENCIAL',
     fecha_inicio: '',
+    fecha_termino: '',
     presupuesto: 0,
     geometria: null
   };
@@ -460,6 +837,136 @@ const createProject = () => {
 const cancelMapDraw = () => {
   showMapDraw.value = false;
 };
+
+// Funciones para análisis de superposición
+const loadSuperposiciones = async () => {
+  loadingSuperposiciones.value = true;
+  try {
+    const data = await proyectosService.getSuperposicion();
+    console.log('[ProyectosView] ============ DIAGNÓSTICO DE SUPERPOSICIONES ============');
+    console.log('[ProyectosView] Total registros recibidos:', data?.length || 0);
+    console.log('[ProyectosView] Datos raw completos:', JSON.stringify(data, null, 2));
+
+    // Mostrar detalles de cada superposición
+    (data || []).forEach((sup, idx) => {
+      console.log(`\n[Superposición ${idx + 1}] ${sup.proyecto_1} <-> ${sup.proyecto_2}`);
+      console.log('  - Tipo geom 1:', sup.tipo_geom_1);
+      console.log('  - Tipo geom 2:', sup.tipo_geom_2);
+      console.log('  - SRID origen 1:', sup.srid_origen_1);
+      console.log('  - SRID origen 2:', sup.srid_origen_2);
+      console.log('  - Área (geog buffer):', sup.area_geog_buffer_m2, 'm²');
+      console.log('  - Área (proj buffer):', sup.area_proj_buffer_m2, 'm²');
+      console.log('  - Área FINAL:', sup.area_superposicion_m2, 'm²');
+      console.log('  - GeoJSON intersección (geog):', sup.inter_geojson_geog_buffer ? 'presente' : 'NULL');
+      console.log('  - GeoJSON intersección (proj):', sup.inter_geojson_proj_buffer ? 'presente' : 'NULL');
+    });
+
+    // Normalizar campo numérico por si viene como string
+    superposiciones.value = (data || []).map(s => ({
+      ...s,
+      area_superposicion_m2: s.area_superposicion_m2 !== null && s.area_superposicion_m2 !== undefined ? Number(s.area_superposicion_m2) : 0,
+      area_geog_buffer_m2: s.area_geog_buffer_m2 !== null && s.area_geog_buffer_m2 !== undefined ? Number(s.area_geog_buffer_m2) : 0,
+      area_proj_buffer_m2: s.area_proj_buffer_m2 !== null && s.area_proj_buffer_m2 !== undefined ? Number(s.area_proj_buffer_m2) : 0
+    }));
+
+    console.log('[ProyectosView] ============================================\n');
+  } catch (err) {
+    console.error('[ProyectosView] ERROR al cargar superposiciones:', err);
+    // No establecer error.value global para no afectar el mapa
+    superposiciones.value = [];
+  } finally {
+    loadingSuperposiciones.value = false;
+  }
+};
+
+const closeSuperposicionModal = () => {
+  showSuperposicionModal.value = false;
+};
+
+// Funciones para análisis de zonas sin planificación
+const loadZonasSinPlanificacion = async () => {
+  loadingZonasSinPlan.value = true;
+  try {
+    const data = await proyectosService.getZonasSinPlanificacion();
+    console.log('[ProyectosView] Zonas sin planificación:', data);
+    zonasSinPlanificacion.value = data || [];
+  } catch (err) {
+    console.error('[ProyectosView] ERROR al cargar zonas sin planificación:', err);
+    // No establecer error.value global para no afectar el mapa
+    zonasSinPlanificacion.value = [];
+  } finally {
+    loadingZonasSinPlan.value = false;
+  }
+};
+
+const closeZonasSinPlanModal = () => {
+  showZonasSinPlanModal.value = false;
+};
+
+// Funciones para actualizar proyectos retrasados
+const abrirActualizarRetrasadosModal = () => {
+  resultadoActualizacion.value = null;
+  proyectosActualizadosCount.value = 0;
+  showActualizarRetrasadosModal.value = true;
+};
+
+const closeActualizarRetrasadosModal = () => {
+  showActualizarRetrasadosModal.value = false;
+  if (resultadoActualizacion.value) {
+    // Si hubo actualización, recargar proyectos
+    loadProyectos();
+  }
+};
+
+const confirmarActualizarRetrasados = async () => {
+  actualizandoRetrasados.value = true;
+
+  try {
+    const usuarioId = authStore.user?.usuario_id || authStore.user?.usuarioId;
+
+    if (!usuarioId) {
+      error.value = 'No se pudo identificar el usuario actual';
+      showActualizarRetrasadosModal.value = false;
+      return;
+    }
+
+    // Contar proyectos antes de actualizar
+    const proyectosAntes = proyectos.value.filter(p =>
+      p.estado === 'En Curso' &&
+      p.fecha_termino &&
+      new Date(p.fecha_termino) < new Date()
+    );
+
+    await proyectosService.actualizarProyectosRetrasados(usuarioId);
+
+    // Establecer resultado
+    proyectosActualizadosCount.value = proyectosAntes.length;
+    resultadoActualizacion.value = proyectosAntes.length > 0
+      ? `Se actualizaron ${proyectosAntes.length} proyecto${proyectosAntes.length !== 1 ? 's' : ''} a estado "Retrasado".`
+      : 'No se encontraron proyectos que requieran actualización.';
+
+  } catch (err) {
+    console.error('[ProyectosView] ERROR al actualizar proyectos retrasados:', err);
+    error.value = err.message || 'Error al actualizar proyectos retrasados';
+    showActualizarRetrasadosModal.value = false;
+  } finally {
+    actualizandoRetrasados.value = false;
+  }
+};
+
+// Watch para cargar superposiciones cuando se abre el modal
+watch(showSuperposicionModal, (newValue) => {
+  if (newValue) {
+    loadSuperposiciones();
+  }
+});
+
+// Watch para cargar zonas sin planificación cuando se abre el modal
+watch(showZonasSinPlanModal, (newValue) => {
+  if (newValue) {
+    loadZonasSinPlanificacion();
+  }
+});
 
 const onAreaDrawn = (geometry) => {
   // geometry es la geometría GeoJSON (objeto)
@@ -502,11 +1009,27 @@ const saveProject = async () => {
       }
     }
 
+    // Normalizar fecha de término
+    let fechaTerminoIso = null;
+    if (newProject.value.fecha_termino) {
+      try {
+        const d = new Date(newProject.value.fecha_termino);
+        if (!isNaN(d.getTime())) {
+          fechaTerminoIso = d.toISOString().slice(0, 10);
+        } else {
+          fechaTerminoIso = newProject.value.fecha_termino;
+        }
+      } catch (e) {
+        fechaTerminoIso = newProject.value.fecha_termino;
+      }
+    }
+
     const payload = {
       nombre: newProject.value.nombre,
       descripcion: newProject.value.descripcion,
       tipoProyecto: newProject.value.tipo_proyecto,
       fechaInicio: fechaIso,
+      fechaTermino: fechaTerminoIso,
       presupuesto: newProject.value.presupuesto ? Number(newProject.value.presupuesto) : null,
       estado: 'Planeado',
       geometria: newProject.value.geometria ? JSON.stringify(newProject.value.geometria) : null,
@@ -545,6 +1068,11 @@ const saveProject = async () => {
 onMounted(() => {
   loadProyectos();
 });
+
+// Recargar proyectos cuando cambia el filtro de tipo de zona
+watch(filterTipoZona, () => {
+  loadProyectos();
+});
 </script>
 
 <style scoped>
@@ -574,6 +1102,12 @@ onMounted(() => {
   font-size: 16px;
   color: var(--text-secondary); /* CAMBIADO */
   margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
 
 .btn-primary {
@@ -920,4 +1454,502 @@ onMounted(() => {
 .modal-footer { display:flex; gap:8px; justify-content:flex-end; margin-top:12px; }
 .btn-guardar { background: var(--accent-primary); color: white; padding: 10px 14px; border-radius: 8px; border:none; cursor:pointer; }
 .btn-cancel { background: transparent; border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 8px; cursor:pointer; }
+
+/* Modal ancho para superposición */
+.modal-wide {
+  width: 90%;
+  max-width: 1000px;
+}
+
+/* Botón de análisis */
+.btn-analisis {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-analisis:hover {
+  background: var(--accent-primary-hover);
+  transform: translateY(-2px);
+}
+
+/* Estadísticas de superposición */
+.superposicion-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Tabla de superposiciones */
+.table-container {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.superposiciones-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-secondary);
+}
+
+.superposiciones-table thead {
+  background: var(--bg-primary);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.superposiciones-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.superposiciones-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.superposiciones-table tbody tr:hover {
+  background: var(--bg-primary);
+}
+
+.superposiciones-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.proyecto-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.area-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.status-badge-small {
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.status-badge-small.planeado {
+  background-color: var(--status-planeado-bg);
+  color: var(--status-planeado-border);
+}
+
+.status-badge-small.en-curso {
+  background-color: var(--status-en-curso-bg);
+  color: var(--status-en-curso-border);
+}
+
+.status-badge-small.completado {
+  background-color: var(--status-completado-bg);
+  color: var(--status-completado-border);
+}
+
+.status-badge-small.retrasado {
+  background-color: var(--status-retrasado-bg);
+  color: var(--status-retrasado-border);
+}
+
+.status-badge-small.cancelado {
+  background-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.warning-badge {
+  padding: 4px 8px;
+  background: var(--status-retrasado-bg);
+  color: var(--status-retrasado-border);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.critical-overlap {
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.critical-overlap:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.loading-section {
+  padding: 40px;
+  text-align: center;
+}
+
+/* Responsive para el modal ancho */
+@media (max-width: 768px) {
+  .modal-wide {
+    width: 95%;
+    max-width: none;
+  }
+
+  .superposicion-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .table-container {
+    font-size: 12px;
+  }
+
+  .superposiciones-table th,
+  .superposiciones-table td {
+    padding: 8px;
+  }
+
+  .btn-analisis {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+}
+
+/* Estilos para modal de zonas sin planificación */
+.zonas-list {
+  width: 100%;
+}
+
+.zonas-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.zonas-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-secondary);
+}
+
+.zonas-table thead {
+  background: var(--bg-primary);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.zonas-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.zonas-table td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.zonas-table tbody tr:hover {
+  background: var(--bg-primary);
+}
+
+.zonas-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.zona-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tipo-badge {
+  padding: 4px 12px;
+  background: var(--status-planeado-bg);
+  color: var(--status-planeado-border);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sin-proyecto {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.anios-badge {
+  padding: 4px 12px;
+  background: var(--status-retrasado-bg);
+  color: var(--status-retrasado-border);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.anios-badge.nunca {
+  background: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.estado-badge {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.estado-badge.sin-proyectos {
+  background: var(--status-retrasado-bg);
+  color: var(--status-retrasado-border);
+}
+
+.estado-badge.sin-planificación-reciente {
+  background: var(--status-en-curso-bg);
+  color: var(--status-en-curso-border);
+}
+
+.estado-badge.con-planificación-reciente {
+  background: var(--status-completado-bg);
+  color: var(--status-completado-border);
+}
+
+.nunca-proyecto {
+  background: rgba(239, 68, 68, 0.03);
+}
+
+.nunca-proyecto:hover {
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* Estilos para modal de actualización de proyectos retrasados */
+.modal-medium {
+  width: 600px;
+  max-width: 90%;
+}
+
+.btn-actualizar-retrasados {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #ef4444 !important;
+  color: white !important;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+.btn-actualizar-retrasados:hover {
+  background: #dc2626 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5);
+}
+
+/* Estilos para indicar fechas retrasadas */
+.fecha-retrasada {
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 6px;
+  padding: 8px 12px !important;
+  border-left: 3px solid #ef4444;
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% {
+    background: rgba(239, 68, 68, 0.1);
+  }
+  50% {
+    background: rgba(239, 68, 68, 0.2);
+  }
+}
+
+.badge-retrasado {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: #ef4444;
+  color: white;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* Alerta de proyectos a actualizar */
+.alerta-proyectos {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.alerta-proyectos.sin-proyectos {
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  border-color: #10b981;
+}
+
+.numero-proyectos {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 60px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.confirmacion-section,
+.resultado-section {
+  text-align: center;
+  padding: 24px 16px;
+}
+
+.icono-advertencia,
+.icono-exito {
+  margin: 0 auto 24px;
+  width: 64px;
+  height: 64px;
+}
+
+.icono-advertencia svg {
+  color: #f59e0b;
+}
+
+.icono-exito svg {
+  color: #10b981;
+}
+
+.confirmacion-section h4,
+.resultado-section h4 {
+  font-size: 24px;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+}
+
+.confirmacion-section p,
+.resultado-section p {
+  font-size: 16px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+}
+
+.info-box {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  text-align: left;
+  margin-top: 16px;
+}
+
+.info-box svg {
+  flex-shrink: 0;
+  color: var(--accent-primary);
+  margin-top: 2px;
+}
+
+.info-box strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.info-box ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-secondary);
+}
+
+.info-box li {
+  margin-bottom: 4px;
+}
+
+.success-stats {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.stat-icon {
+  font-size: 32px;
+}
+
+.stat-number {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--accent-primary);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
 </style>

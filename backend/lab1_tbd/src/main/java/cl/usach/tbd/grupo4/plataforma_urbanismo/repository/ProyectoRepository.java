@@ -3,6 +3,7 @@ package cl.usach.tbd.grupo4.plataforma_urbanismo.repository;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.model.ProyectoUrbano;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
@@ -50,6 +51,19 @@ public class ProyectoRepository {
         return jdbcTemplate.query(sql, proyectoRowMapper);
     }
 
+    public List<ProyectoUrbano> findByTipoZona(String tipoZona) {
+        String sql = "SELECT DISTINCT p.proyecto_urbano_id, p.nombre, p.descripcion, p.tipo_proyecto, " +
+                "p.fecha_inicio, p.fecha_termino, p.estado, p.presupuesto, " +
+                "ST_AsGeoJSON(p.geometria) as geometria_geojson, " +
+                "p.usuario_id, p.fecha_creacion " +
+                "FROM proyectos_urbanos p " +
+                "INNER JOIN proyectos_zonas pz ON p.proyecto_urbano_id = pz.proyecto_urbano_id " +
+                "INNER JOIN zonas_urbanas zu ON pz.zona_urbana_id = zu.zona_urbana_id " +
+                "WHERE zu.tipo_zona = ? " +
+                "ORDER BY p.fecha_creacion DESC";
+        return jdbcTemplate.query(sql, proyectoRowMapper, tipoZona);
+    }
+
     public Optional<ProyectoUrbano> findById(Long id) {
         String sql = "SELECT proyecto_urbano_id, nombre, descripcion, tipo_proyecto, " +
                 "fecha_inicio, fecha_termino, estado, presupuesto, " +
@@ -75,29 +89,99 @@ public class ProyectoRepository {
 
     public List<Map<String, Object>> getSuperposicionProyectos() {
         String sql = """
-            SELECT 
-                p1.nombre AS proyecto_1,
-                p2.nombre AS proyecto_2,
+            WITH params AS (
+                SELECT 10.0 AS buffer_m -- buffer en metros
+            ), preparados AS (
+                SELECT
+                    p.proyecto_urbano_id,
+                    p.nombre,
+                    p.estado,
+                    ST_SRID(p.geometria) AS srid_orig,
+                    ST_IsValid(p.geometria) AS is_valid_orig,
+                    ST_SetSRID(ST_MakeValid(p.geometria), COALESCE(NULLIF(ST_SRID(p.geometria), 0), 4326)) AS geom_valid
+                FROM proyectos_urbanos p
+                WHERE p.geometria IS NOT NULL
+            ), proyectados AS (
+                SELECT
+                    pr.*, GeometryType(pr.geom_valid) AS geom_type,
+                    ST_Transform(pr.geom_valid, 32719) AS geom_proj
+                FROM preparados pr
+            )
+            SELECT
+                s1.nombre AS proyecto_1,
+                s2.nombre AS proyecto_2,
+                s1.estado AS estado_proyecto_1,
+                s2.estado AS estado_proyecto_2,
+                s1.geom_type AS tipo_geom_1,
+                s2.geom_type AS tipo_geom_2,
+                s1.srid_orig AS srid_origen_1,
+                s2.srid_orig AS srid_origen_2,
+                s1.is_valid_orig AS is_valid_orig_1,
+                s2.is_valid_orig AS is_valid_orig_2,
+                -- Intersección usando buffer en geography (buffer métrico en lat/lon)
+                ST_AsGeoJSON(
+                    ST_Intersection(
+                        ST_Transform(ST_Buffer(s1.geom_valid::geography, (SELECT buffer_m FROM params))::geometry, 32719),
+                        ST_Transform(ST_Buffer(s2.geom_valid::geography, (SELECT buffer_m FROM params))::geometry, 32719)
+                    )
+                ) AS inter_geojson_geog_buffer,
+                -- Intersección usando buffer en geometría proyectada (transform -> buffer)
+                ST_AsGeoJSON(
+                    ST_Intersection(
+                        CASE WHEN s1.geom_type ILIKE '%LINESTRING%' THEN ST_Buffer(s1.geom_proj, (SELECT buffer_m FROM params)) ELSE s1.geom_proj END,
+                        CASE WHEN s2.geom_type ILIKE '%LINESTRING%' THEN ST_Buffer(s2.geom_proj, (SELECT buffer_m FROM params)) ELSE s2.geom_proj END
+                    )
+                ) AS inter_geojson_proj_buffer,
+                -- Área extraída de las partes poligonales para cada método
+                ROUND(COALESCE(ST_Area(ST_CollectionExtract(ST_Intersection(
+                    ST_Transform(ST_Buffer(s1.geom_valid::geography, (SELECT buffer_m FROM params))::geometry, 32719),
+                    ST_Transform(ST_Buffer(s2.geom_valid::geography, (SELECT buffer_m FROM params))::geometry, 32719)
+                ), 3)), 0)::NUMERIC, 2) AS area_geog_buffer_m2,
+
+                ROUND(COALESCE(ST_Area(ST_CollectionExtract(ST_Intersection(
+                    CASE WHEN s1.geom_type ILIKE '%LINESTRING%' THEN ST_Buffer(s1.geom_proj, (SELECT buffer_m FROM params)) ELSE s1.geom_proj END,
+                    CASE WHEN s2.geom_type ILIKE '%LINESTRING%' THEN ST_Buffer(s2.geom_proj, (SELECT buffer_m FROM params)) ELSE s2.geom_proj END
+                ), 3)), 0)::NUMERIC, 2) AS area_proj_buffer_m2,
+
+                -- Área final: max(geog, proj) y alias correcto esperado por frontend
                 ROUND(
-                    ST_Area(
-                        ST_Intersection(
-                            ST_Transform(p1.geometria, 32719),
-                            ST_Transform(p2.geometria, 32719)
-                        )
-                    )::NUMERIC, 2
-                ) AS area_superposicion_m2
-            FROM proyectos_urbanos p1
-            INNER JOIN proyectos_urbanos p2 ON p1.proyecto_urbano_id < p2.proyecto_urbano_id
-            WHERE ST_Intersects(p1.geometria, p2.geometria)
-              AND p1.geometria IS NOT NULL
-              AND p2.geometria IS NOT NULL
+                GREATEST(
+                    COALESCE(ST_Area(ST_CollectionExtract(ST_Intersection(
+                        ST_Transform(ST_Buffer(s1.geom_valid::geography, (SELECT buffer_m FROM params))::geometry, 32719),
+                        ST_Transform(ST_Buffer(s2.geom_valid::geography, (SELECT buffer_m FROM params))::geometry, 32719)
+                    ), 3)), 0),
+                    COALESCE(ST_Area(ST_CollectionExtract(ST_Intersection(
+                        CASE WHEN s1.geom_type ILIKE '%LINESTRING%' THEN ST_Buffer(s1.geom_proj, (SELECT buffer_m FROM params)) ELSE s1.geom_proj END,
+                        CASE WHEN s2.geom_type ILIKE '%LINESTRING%' THEN ST_Buffer(s2.geom_proj, (SELECT buffer_m FROM params)) ELSE s2.geom_proj END
+                    ), 3)), 0)
+                )::NUMERIC, 2) AS area_superposicion_m2
+            FROM proyectados s1
+            JOIN proyectados s2 ON s1.proyecto_urbano_id < s2.proyecto_urbano_id
+            WHERE (
+                -- filtrar por proximidad rápida: si las cajas proyectadas se solapan o están muy cerca
+                ST_Intersects(ST_Envelope(s1.geom_proj), ST_Envelope(s2.geom_proj))
+                OR ST_DWithin(s1.geom_proj, s2.geom_proj, (SELECT buffer_m FROM params))
+            )
+            -- IMPORTANTE: excluir pares con área de superposición = 0 (no son superposiciones reales)
+            AND (
+                GREATEST(
+                    COALESCE(ST_Area(ST_CollectionExtract(ST_Intersection(
+                        ST_Transform(ST_Buffer(s1.geom_valid::geography, (SELECT buffer_m FROM params))::geometry, 32719),
+                        ST_Transform(ST_Buffer(s2.geom_valid::geography, (SELECT buffer_m FROM params))::geometry, 32719)
+                    ), 3)), 0),
+                    COALESCE(ST_Area(ST_CollectionExtract(ST_Intersection(
+                        CASE WHEN s1.geom_type ILIKE '%LINESTRING%' THEN ST_Buffer(s1.geom_proj, (SELECT buffer_m FROM params)) ELSE s1.geom_proj END,
+                        CASE WHEN s2.geom_type ILIKE '%LINESTRING%' THEN ST_Buffer(s2.geom_proj, (SELECT buffer_m FROM params)) ELSE s2.geom_proj END
+                    ), 3)), 0)
+                ) > 0
+            )
             ORDER BY area_superposicion_m2 DESC
         """;
         return jdbcTemplate.queryForList(sql);
     }
 
-    public List<Map<String, Object>> getResumenProyectosPorEstadoYZona() {
-        String sql = """
+    public List<Map<String, Object>> getResumenProyectosPorEstadoYZona(String tipoZona, String estado) {
+        StringBuilder sql = new StringBuilder("""
             SELECT 
                 tipo_zona,
                 estado_proyecto,
@@ -105,14 +189,41 @@ public class ProyectoRepository {
                 COALESCE(presupuesto_total, 0) AS presupuesto_total
             FROM resumen_proyectos_estado_zona
             WHERE cantidad_proyectos > 0
-            ORDER BY tipo_zona, estado_proyecto
-        """;
-        return jdbcTemplate.queryForList(sql);
+        """);
+
+        boolean hasFilters = false;
+
+        if (tipoZona != null && !tipoZona.isEmpty() && !tipoZona.equalsIgnoreCase("todos")) {
+            sql.append(" AND tipo_zona = ?");
+            hasFilters = true;
+        }
+
+        if (estado != null && !estado.isEmpty() && !estado.equalsIgnoreCase("todos")) {
+            sql.append(" AND estado_proyecto = ?");
+            hasFilters = true;
+        }
+
+        sql.append(" ORDER BY tipo_zona, estado_proyecto");
+
+        if (!hasFilters) {
+            return jdbcTemplate.queryForList(sql.toString());
+        } else if (tipoZona != null && !tipoZona.isEmpty() && !tipoZona.equalsIgnoreCase("todos")
+                   && estado != null && !estado.isEmpty() && !estado.equalsIgnoreCase("todos")) {
+            return jdbcTemplate.queryForList(sql.toString(), tipoZona, estado);
+        } else if (tipoZona != null && !tipoZona.isEmpty() && !tipoZona.equalsIgnoreCase("todos")) {
+            return jdbcTemplate.queryForList(sql.toString(), tipoZona);
+        } else {
+            return jdbcTemplate.queryForList(sql.toString(), estado);
+        }
     }
 
     public void actualizarProyectosRetrasados(Long usuarioId) {
         String sql = "CALL actualizar_proyectos_retrasados(?)";
-        jdbcTemplate.update(sql, usuarioId);
+        jdbcTemplate.execute(sql, (PreparedStatementCallback<Void>) ps -> {
+            ps.setInt(1, usuarioId.intValue());
+            ps.execute();
+            return null;
+        });
     }
 
     public ProyectoUrbano save(ProyectoUrbano proyecto) {

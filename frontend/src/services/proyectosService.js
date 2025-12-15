@@ -2,10 +2,16 @@ import api from './api';
 
 const proyectosService = {
 
-  async getAll() {
+  async getAll(tipoZona = null) {
     try {
       console.log('[ProyectosService] Obteniendo todos los proyectos...');
-      const response = await api.get('/proyectos');
+
+      let url = '/proyectos';
+      if (tipoZona && tipoZona !== '') {
+        url += `?tipoZona=${encodeURIComponent(tipoZona)}`;
+      }
+
+      const response = await api.get(url);
       console.log('[ProyectosService] Proyectos obtenidos:', response.data?.length || 0);
       return response.data;
     } catch (error) {
@@ -104,12 +110,34 @@ const proyectosService = {
   },
 
 
-  async getResumenEstadoZona() {
+  async getResumenEstadoZona(tipoZona = null, estado = null) {
     try {
-      const response = await api.get('/proyectos/analisis/resumen-estado-zona');
+      const params = new URLSearchParams();
+      if (tipoZona && tipoZona !== '' && tipoZona !== 'todos') {
+        params.append('tipoZona', tipoZona);
+      }
+      if (estado && estado !== '' && estado !== 'todos') {
+        params.append('estado', estado);
+      }
+
+      const queryString = params.toString();
+      const url = queryString
+        ? `/proyectos/analisis/resumen-estado-zona?${queryString}`
+        : '/proyectos/analisis/resumen-estado-zona';
+
+      const response = await api.get(url);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Error al obtener resumen' };
+    }
+  },
+
+  async getZonasSinPlanificacion() {
+    try {
+      const response = await api.get('/proyectos/analisis/zonas-sin-planificacion');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener zonas sin planificación' };
     }
   }
 };
