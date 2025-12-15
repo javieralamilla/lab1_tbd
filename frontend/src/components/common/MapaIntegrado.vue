@@ -106,6 +106,11 @@
             <span class="filtro-color transporte" title="Transporte — 🚆 (Movilidad)" aria-hidden="true"></span>
             Transporte
           </label>
+          <label class="filtro-item">
+            <input type="checkbox" v-model="filtrosPuntos.centroCultural" @change="actualizarPuntos" />
+            <span class="filtro-color centro-cultural" title="Centro Cultural — 🎵 (Cultura)" aria-hidden="true"></span>
+            Centros Culturales
+          </label>
         </div>
       </div>
 
@@ -216,7 +221,8 @@ const filtrosPuntos = ref({
   escuela: true,
   parque: true,
   centroComercial: true,
-  transporte: true
+  transporte: true,
+  centroCultural: true
 });
 
 // Filtros de zonas
@@ -255,7 +261,8 @@ const tipoConfigPuntos = {
   'Escuela': { color: '#3b82f6' },
   'Parque': { color: '#10b981' },
   'Centro Comercial': { color: '#f59e0b' },
-  'Transporte': { color: '#8b5cf6' }
+  'Transporte': { color: '#8b5cf6' },
+  'Centro Cultural': { color: '#ec4899' }
 };
 
 const tipoConfigZonas = {
@@ -363,6 +370,7 @@ const getTipoString = (tipo) => {
       'PARQUE': 'Parque',
       'CENTRO_COMERCIAL': 'Centro Comercial',
       'TRANSPORTE': 'Transporte',
+      'CENTRO_CULTURAL': 'Centro Cultural',
       'RESIDENCIAL': 'Residencial',
       'COMERCIAL': 'Comercial',
       'INDUSTRIAL': 'Industrial',
@@ -507,7 +515,9 @@ const actualizarPuntos = () => {
       tipoStr === 'Escuela' ? filtrosPuntos.value.escuela :
         tipoStr === 'Parque' ? filtrosPuntos.value.parque :
           tipoStr === 'Centro Comercial' ? filtrosPuntos.value.centroComercial :
-            filtrosPuntos.value.transporte;
+            tipoStr === 'Transporte' ? filtrosPuntos.value.transporte :
+              tipoStr === 'Centro Cultural' ? filtrosPuntos.value.centroCultural :
+                false;
 
     if (!mostrarTipo) {
       return;
@@ -862,6 +872,7 @@ onBeforeUnmount(() => {
 .filtro-color.parque { background-color: #10b981; }
 .filtro-color.centro-comercial { background-color: #f59e0b; }
 .filtro-color.transporte { background-color: #8b5cf6; }
+.filtro-color.centro-cultural { background-color: #ec4899; }
 
 /* Colores zonas */
 .filtro-color.zona-residencial { background-color: #3b82f6; }

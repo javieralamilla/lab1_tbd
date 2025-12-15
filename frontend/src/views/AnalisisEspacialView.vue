@@ -26,22 +26,6 @@
     <div class="mapa-container">
       <MapaAnalisisEspacial @error="handleError" />
     </div>
-
-    <!-- Información adicional -->
-    <div class="info-footer">
-      <div class="info-item">
-        <span class="icon">ℹ️</span>
-        <span>Los datos de población corresponden al año actual</span>
-      </div>
-      <div class="info-item">
-        <span class="icon">📊</span>
-        <span>Las estadísticas se calculan en tiempo real desde la base de datos</span>
-      </div>
-      <div class="info-item">
-        <span class="icon">🎯</span>
-        <span>El área se calcula en kilómetros cuadrados (km²)</span>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -120,7 +104,6 @@ const handleError = (message) => {
   background: var(--bg-secondary);
   border-radius: 8px;
   padding: 1rem;
-  margin-bottom: 1rem;
   min-height: 500px;
 }
 

@@ -238,8 +238,8 @@ const getIconForType = (tipo) => {
       'stroke-linecap': 'round',
       'stroke-linejoin': 'round'
     }, [
-      h('path', { d: 'M12 3v3m0 12v3M5.5 5.5l2.1 2.1m8.8 8.8l2.1 2.1m-13 0l2.1-2.1m8.8-8.8l2.1-2.1' }),
-      h('circle', { cx: '12', cy: '12', r: '4' })
+      h('path', { d: 'M12 10v12m-6-6h12M8 10c0-3.3 2.7-6 6-6s6 2.7 6 6-2.7 6-6 6H8z' }),
+      h('path', { d: 'M8 10c0 3.3-2.7 6-6 6' })
     ]),
     'CENTRO_COMERCIAL': () => h('svg', {
       xmlns: 'http://www.w3.org/2000/svg',
@@ -267,8 +267,25 @@ const getIconForType = (tipo) => {
       'stroke-linecap': 'round',
       'stroke-linejoin': 'round'
     }, [
-      h('rect', { width: '16', height: '16', x: '4', y: '3', rx: '2' }),
-      h('path', { d: 'M4 11h16M12 3v8m-4 8h.01M16 19h.01' })
+      h('path', { d: 'M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2' }),
+      h('circle', { cx: '7', cy: '17', r: '2' }),
+      h('path', { d: 'M9 17h6' }),
+      h('circle', { cx: '17', cy: '17', r: '2' })
+    ]),
+    'CENTRO_CULTURAL': () => h('svg', {
+      xmlns: 'http://www.w3.org/2000/svg',
+      width: '24',
+      height: '24',
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': '2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round'
+    }, [
+      h('path', { d: 'M9 18V5l12-2v13' }),
+      h('circle', { cx: '6', cy: '18', r: '3' }),
+      h('circle', { cx: '18', cy: '16', r: '3' })
     ])
   };
   return icons[tipo] || icons['PARQUE'];
@@ -568,6 +585,9 @@ onMounted(() => {
 }
 .point-icon.transporte {
   background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+.point-icon.centro_cultural {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
 }
 
 .point-count {

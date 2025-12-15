@@ -33,50 +33,6 @@
       />
     </div>
 
-    <div v-if="!loading && !error" class="info-section">
-      <div class="info-card">
-        <div class="info-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/>
-            <path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/>
-            <path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>
-          </svg>
-        </div>
-        <div class="info-content">
-          <h3>Capas Superpuestas</h3>
-          <p>Este mapa permite visualizar simultáneamente proyectos urbanos, puntos de interés (hospitales, escuelas, parques, etc.) y zonas urbanas. Usa el panel de control para activar o desactivar las capas que desees ver.</p>
-        </div>
-      </div>
-
-      <div class="info-card">
-        <div class="info-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
-            <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"></path>
-          </svg>
-        </div>
-        <div class="info-content">
-          <h3>Análisis Espacial</h3>
-          <p>Identifica relaciones entre diferentes elementos urbanos. Por ejemplo, visualiza la cercanía de proyectos de vivienda a hospitales, escuelas y zonas comerciales.</p>
-        </div>
-      </div>
-
-      <div class="info-card">
-        <div class="info-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 3v18h18"/>
-            <path d="M18 17V9"/>
-            <path d="M13 17V5"/>
-            <path d="M8 17v-3"/>
-          </svg>
-        </div>
-        <div class="info-content">
-          <h3>Datos Integrados</h3>
-          <p>Visualiza información de densidad poblacional, ubicación de infraestructura crítica y proyectos de desarrollo en un solo lugar para tomar decisiones informadas.</p>
-        </div>
-      </div>
-    </div>
-
     <!-- Modal de detalles del item seleccionado -->
     <div v-if="itemSeleccionado" class="modal-overlay" @click="itemSeleccionado = null">
       <div class="modal-content" @click.stop>

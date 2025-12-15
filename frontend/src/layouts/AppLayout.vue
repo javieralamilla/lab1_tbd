@@ -23,8 +23,16 @@ import Sidebar from '@/components/common/Sidebar.vue';
 .main-content {
   flex: 1;
   overflow-y: auto; /* Permite scroll solo en el contenido */
-  padding: 32px 24px;
+  padding: 32px 24px 48px 24px; /* Padding similar a Simulación de Proyectos */
   box-sizing: border-box;
+  /* Ocultar scrollbar pero mantener funcionalidad */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE y Edge */
+}
+
+/* Ocultar scrollbar en Chrome, Safari y Opera */
+.main-content::-webkit-scrollbar {
+  display: none;
 }
 
 /* Si el sidebar es fijo, desplazamos el contenido principal para evitar solapamiento */

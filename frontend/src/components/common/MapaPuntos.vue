@@ -55,9 +55,8 @@ const tipoConfig = {
   'Parque': {
     color: '#10b981',
     iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-      <path d="M12 2c-1.5 0-2.5 1.5-2.5 3.5S10.5 9 12 9s2.5-1.5 2.5-3.5S13.5 2 12 2z"/>
-      <path d="M8 9c-2 0-3 1.5-3 3.5S6 16 8 16h8c2 0 3-1.5 3-3.5S18 9 16 9"/>
-      <path d="M12 16v6"/>
+      <path d="M12 10v12m-6-6h12M8 10c0-3.3 2.7-6 6-6s6 2.7 6 6-2.7 6-6 6H8z"/>
+      <path d="M8 10c0 3.3-2.7 6-6 6"/>
     </svg>`
   },
   'Centro Comercial': {
@@ -71,21 +70,18 @@ const tipoConfig = {
   'Transporte': {
     color: '#8b5cf6',
     iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-      <path d="M8 6v6M16 6v6"/>
-      <path d="M2 12h19.6"/>
-      <path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H6c-1.1 0-2.1.8-2.4 1.8l-1.4 5c-.1.4-.2.8-.2 1.2 0 .4.1.8.2 1.2.3 1.1.8 2.8.8 2.8h3"/>
-      <circle cx="7" cy="18" r="2"/>
-      <circle cx="17" cy="18" r="2"/>
+      <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/>
+      <circle cx="7" cy="17" r="2"/>
+      <path d="M9 17h6"/>
+      <circle cx="17" cy="17" r="2"/>
     </svg>`
   },
   'Centro Cultural': {
     color: '#ec4899',
     iconSvg: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-      <rect x="3" y="3" width="7" height="9"/>
-      <rect x="14" y="3" width="7" height="5"/>
-      <rect x="14" y="12" width="7" height="9"/>
-      <rect x="3" y="16" width="7" height="5"/>
-      <path d="M3 3L21 3M3 21h18"/>
+      <path d="M9 18V5l12-2v13"/>
+      <circle cx="6" cy="18" r="3"/>
+      <circle cx="18" cy="16" r="3"/>
     </svg>`
   }
 };
