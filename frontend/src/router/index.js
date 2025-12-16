@@ -70,6 +70,12 @@ const routes = [
         meta: { title: 'Simulación de Proyectos' }
       },
       {
+        path: 'cobertura-infraestructura',
+        name: 'CoberturaInfraestructura',
+        component: () => import('@/views/CoberturaView.vue'),
+        meta: { title: 'Cobertura de Infraestructura' }
+      },
+      {
         path: 'reportes',
         name: 'Reportes',
         component: () => import('@/views/ReportesView.vue'),

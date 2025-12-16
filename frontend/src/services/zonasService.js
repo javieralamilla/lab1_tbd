@@ -104,6 +104,15 @@ const zonasService = {
   },
 
 
+  async getCoberturaInfraestructura() {
+    try {
+      const response = await api.get('/zonas/analisis/cobertura-infraestructura');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al obtener cobertura de infraestructura' };
+    }
+  },
+
   async getEstadisticasArea(geojson) {
     try {
       const response = await api.post('/zonas/analisis/area', { geojson });
