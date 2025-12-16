@@ -173,8 +173,11 @@
             <div class="metrica-content">
               <span class="metrica-label">Densidad Población</span>
               <span class="metrica-value">
-                {{ calcularDensidad(resultadoImpacto.proyectado.poblacion, resultadoImpacto.area_km2) }} hab/km²
+                {{ calcularDensidad(resultadoImpacto.proyectado.poblacion, Math.PI * Math.pow(resultadoImpacto.area_influencia_m / 1000, 2)) }} hab/km²
               </span>
+            </div>
+            <div class="metrica-sublabel" style="font-size: 0.7rem; color: var(--text-secondary);">
+              (Calculado sobre área de influencia)
             </div>
           </div>
         </div>
