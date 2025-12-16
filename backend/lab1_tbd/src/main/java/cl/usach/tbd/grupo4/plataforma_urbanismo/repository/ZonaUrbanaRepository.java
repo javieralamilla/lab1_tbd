@@ -87,15 +87,20 @@ public class ZonaUrbanaRepository {
     }
 
     public List<Map<String, Object>> getZonasRapidoCrecimiento() {
-        // Sin datos históricos, retornamos las zonas con mayor población
         String sql = """
             SELECT 
-                zu.nombre AS zona,
-                dd.poblacion AS poblacion_actual
-            FROM zonas_urbanas zu
-            INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
-            ORDER BY dd.poblacion DESC
-            LIMIT 3
+                z.nombre AS zona,
+                d1.poblacion AS poblacion_actual,
+                d2.poblacion AS poblacion_anterior,
+                ROUND(((d1.poblacion - d2.poblacion)::NUMERIC / d2.poblacion) * 100, 2) AS porcentaje_crecimiento
+            FROM zonas_urbanas z
+            JOIN datos_demograficos d1 ON z.zona_urbana_id = d1.zona_urbana_id
+            JOIN datos_demograficos d2 ON z.zona_urbana_id = d2.zona_urbana_id
+            WHERE d1.año = (SELECT MAX(año) FROM datos_demograficos)
+              AND d2.año = d1.año - 5
+              AND d2.poblacion > 0
+              AND ((d1.poblacion - d2.poblacion)::NUMERIC / d2.poblacion) > 0.10
+            ORDER BY porcentaje_crecimiento DESC
         """;
         return jdbcTemplate.queryForList(sql);
     }
@@ -174,13 +179,13 @@ public class ZonaUrbanaRepository {
             SELECT COALESCE(SUM(
                 ROUND(
                     dd.poblacion * 
-                    ST_Area(ST_Transform(ST_Intersection(zu.geometria_poligono, ST_GeomFromGeoJSON(?)), 32719)) / 
+                    ST_Area(ST_Transform(ST_Intersection(zu.geometria_poligono, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326)), 32719)) / 
                     (ST_Area(ST_Transform(zu.geometria_poligono, 32719)) + 0.000001)
                 )
             ), 0) as poblacion_total
             FROM zonas_urbanas zu
             INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
-            WHERE ST_Intersects(zu.geometria_poligono, ST_GeomFromGeoJSON(?))
+            WHERE ST_Intersects(zu.geometria_poligono, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
         """;
 
         // Obtener cantidad de escuelas en el área
@@ -188,7 +193,7 @@ public class ZonaUrbanaRepository {
             SELECT COUNT(*) as total_escuelas
             FROM puntos_interes
             WHERE tipo = 'Escuela'
-              AND ST_Within(coordenadas_punto, ST_GeomFromGeoJSON(?))
+              AND ST_Within(coordenadas_punto, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
         """;
 
         // Obtener cantidad de hospitales en el área
@@ -196,7 +201,7 @@ public class ZonaUrbanaRepository {
             SELECT COUNT(*) as total_hospitales
             FROM puntos_interes
             WHERE tipo = 'Hospital'
-              AND ST_Within(coordenadas_punto, ST_GeomFromGeoJSON(?))
+              AND ST_Within(coordenadas_punto, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
         """;
 
         // Obtener proyectos en curso en el área
@@ -204,14 +209,14 @@ public class ZonaUrbanaRepository {
             SELECT COUNT(*) as total_proyectos
             FROM proyectos_urbanos
             WHERE estado IN ('En Curso', 'Planeado')
-              AND ST_Intersects(geometria, ST_GeomFromGeoJSON(?))
+              AND ST_Intersects(geometria, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
         """;
 
         // Obtener zonas del área por tipo
         String sqlZonasPorTipo = """
             SELECT tipo_zona, COUNT(*) as cantidad
             FROM zonas_urbanas
-            WHERE ST_Intersects(geometria_poligono, ST_GeomFromGeoJSON(?))
+            WHERE ST_Intersects(geometria_poligono, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
             GROUP BY tipo_zona
         """;
 
@@ -219,7 +224,7 @@ public class ZonaUrbanaRepository {
         String sqlAreaTotal = """
             SELECT ROUND(
                 ST_Area(
-                    ST_Transform(ST_GeomFromGeoJSON(?), 32719)
+                    ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326), 32719)
                 )::NUMERIC / 1000000, 2
             ) as area_km2
         """;
@@ -478,8 +483,8 @@ public class ZonaUrbanaRepository {
                 500
             )
             WHERE pi.tipo = 'Escuela'
-              AND pu.estado = 'En Curso'
-              AND pi.activo = TRUE
+                AND pu.estado = 'En Curso'
+                AND pi.activo = TRUE
             ORDER BY distancia_metros
         """;
         return jdbcTemplate.queryForList(sql);
