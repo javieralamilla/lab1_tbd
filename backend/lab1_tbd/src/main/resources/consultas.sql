@@ -225,7 +225,6 @@ ORDER BY
 -- 6.5) Ejemplo de uso con zona especifica por nombre
 -- Primero obtener el ID de la zona
 SELECT zona_urbana_id, nombre FROM zonas_urbanas WHERE nombre ILIKE '%providencia%';
--- Luego ejecutar (reemplazar X por el ID obtenido):
 CALL simular_crecimiento_poblacion(35, 150);
 
 -- ==================================================
@@ -264,8 +263,7 @@ WHERE
 ORDER BY 
     pu.fecha_termino DESC;
 
--- 7.4) Consulta previa: Ver proyectos que DEBERIAN marcarse como retrasados
--- (Usar antes de ejecutar el procedimiento para ver que se va a actualizar)
+-- 7.4) Consulta previa: Ver proyectos que deberian marcarse como retrasados
 SELECT 
     pu.proyecto_urbano_id,
     pu.nombre AS nombre_proyecto,
