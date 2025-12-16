@@ -1,655 +1,536 @@
 <template>
   <div class="reportes-container">
     <div class="reportes-header">
-      <h1>Reportes y Estadísticas</h1>
-      <p class="subtitle">Visualiza y genera reportes del sistema</p>
+      <h1>Reportes y Analytics</h1>
+      <p class="subtitle">Panel integral de inteligencia de negocios y estadísticas urbanas</p>
+    </div>
+
+    <!-- Navegación por Pestañas -->
+    <div class="tabs-nav">
+      <button 
+        v-for="tab in tabs" 
+        :key="tab.id"
+        class="tab-btn" 
+        :class="{ active: currentTab === tab.id }"
+        @click="currentTab = tab.id"
+      >
+        {{ tab.label }}
+      </button>
     </div>
 
     <div class="reportes-content">
-      <!-- Sección de filtros -->
-      <div class="filters-section">
-        <h2>Filtros</h2>
-        <div class="filters-grid">
-          <div class="filter-group">
-            <label for="fecha-inicio">Fecha Inicio:</label>
-            <input
-              id="fecha-inicio"
-              v-model="filtros.fechaInicio"
-              type="date"
-              class="form-input"
-            >
+      
+      <!-- TAB 1: Reporte General (Existente) -->
+      <div v-if="currentTab === 'general'" class="tab-pane fade-in">
+        <div class="filters-section">
+          <h2>Generador de Reportes</h2>
+          <div class="filters-grid">
+            <div class="filter-group">
+              <label>Fecha Inicio:</label>
+              <input v-model="filtros.fechaInicio" type="date" class="form-input">
+            </div>
+            <div class="filter-group">
+              <label>Fecha Fin:</label>
+              <input v-model="filtros.fechaFin" type="date" class="form-input">
+            </div>
+            <div class="filter-group">
+              <label>Tipo:</label>
+              <select v-model="filtros.tipoReporte" class="form-input">
+                <option value="">Todos</option>
+                <option value="proyectos">Proyectos</option>
+                <option value="puntos">Puntos de Interés</option>
+                <option value="zonas">Zonas</option>
+              </select>
+            </div>
           </div>
-
-          <div class="filter-group">
-            <label for="fecha-fin">Fecha Fin:</label>
-            <input
-              id="fecha-fin"
-              v-model="filtros.fechaFin"
-              type="date"
-              class="form-input"
-            >
-          </div>
-
-          <div class="filter-group">
-            <label for="tipo-reporte">Tipo de Reporte:</label>
-            <select
-              id="tipo-reporte"
-              v-model="filtros.tipoReporte"
-              class="form-input"
-            >
-              <option value="">Todos</option>
-              <option value="proyectos">Proyectos</option>
-              <option value="puntos">Puntos de Interés</option>
-              <option value="zonas">Zonas</option>
-            </select>
+          <div class="filter-actions">
+            <button @click="generarReporte" class="btn btn-primary" :disabled="loading">
+              {{ loading ? 'Generando...' : 'Generar Reporte' }}
+            </button>
+            <button @click="limpiarFiltros" class="btn btn-secondary">Limpiar</button>
           </div>
         </div>
 
-        <div class="filter-actions">
-          <button @click="generarReporte" class="btn btn-primary">
-            Generar Reporte
-          </button>
-          <button @click="limpiarFiltros" class="btn btn-secondary">
-            Limpiar Filtros
-          </button>
+        <div v-if="reporteGenerado" class="results-section">
+           <div class="report-summary" v-if="resumen.total >= 0">
+            <div class="summary-header">
+              <h3>Resumen Ejecutivo</h3>
+              <p>Total registros: <strong>{{ resumen.total }}</strong></p>
+            </div>
+            <div class="summary-grid">
+              <div class="summary-block">
+                <h4>Por Estado</h4>
+                <ul>
+                  <li v-for="(count, estado) in resumen.porEstado" :key="estado">{{ estado }}: {{ count }}</li>
+                </ul>
+              </div>
+              <div class="summary-block">
+                <h4>Por Tipo</h4>
+                <ul>
+                  <li v-for="(count, tipo) in resumen.porTipo" :key="tipo">{{ tipo }}: {{ count }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-wrapper">
+             <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Tipo</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in datosReporte" :key="item.id">
+                  <td>{{ item.id }}</td>
+                  <td>{{ item.nombre }}</td>
+                  <td>{{ item.tipo }}</td>
+                  <td>{{ formatearFecha(item.fecha) }}</td>
+                  <td>
+                    <span :class="['badge', `badge-${(item.estado || '').toLowerCase().replace(/ /g, '-')}`]">
+                      {{ item.estado }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="export-section">
+            <button @click="exportarPDF" class="btn btn-success">Exportar PDF</button>
+            <button @click="exportarExcel" class="btn btn-success">Exportar Excel</button>
+          </div>
         </div>
       </div>
 
-
-      <!-- Sección de resultados -->
-      <div v-if="reporteGenerado" class="results-section">
-        <ErrorAlert v-if="error" :message="error" type="error" @close="error = null" />
-        <h2>Resultados del Reporte</h2>
-        <div class="report-summary" v-if="resumen.total >= 0">
-          <p><strong>Total registros:</strong> {{ resumen.total }}</p>
-          <div class="summary-grid">
-            <div class="summary-block">
-              <h4>Por Estado</h4>
-              <ul>
-                <li v-for="(count, estado) in resumen.porEstado" :key="estado">{{ estado }}: {{ count }}</li>
-              </ul>
-            </div>
-            <div class="summary-block">
-              <h4>Por Tipo</h4>
-              <ul>
-                <li v-for="(count, tipo) in resumen.porTipo" :key="tipo">{{ tipo }}: {{ count }}</li>
-              </ul>
-            </div>
+      <!-- TAB 2: Escasez Hospitales (Q2) -->
+      <div v-if="currentTab === 'escasez'" class="tab-pane fade-in">
+        <div class="analytics-card">
+          <div class="card-header">
+            <h2>🏥 Zonas con Escasez de Servicios</h2>
+            <p>Top 5 zonas con alta población y baja cobertura hospitalaria</p>
           </div>
-        </div>
-        <div class="results-table">
-          <p v-if="loading" class="loading-message">Cargando datos...</p>
-          <p v-else-if="!datosReporte.length" class="no-data-message">
-            No hay datos disponibles para los filtros seleccionados
-          </p>
-          <table v-else class="data-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Tipo</th>
-                <th>Fecha</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="item in datosReporte" :key="item.id">
-                <td>{{ item.id }}</td>
-                <td>{{ item.nombre }}</td>
-                <td>{{ item.tipo }}</td>
-                <td>{{ formatearFecha(item.fecha) }}</td>
-                <td>
-                  <span :class="['badge', `badge-${item.estado.toLowerCase()}`]">
-                    {{ item.estado }}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="export-section">
-          <button @click="exportarPDF" class="btn btn-success" :disabled="loading || !reporteGenerado || datosReporte.length === 0">
-            <span v-if="loading">Procesando...</span>
-            <span v-else>Exportar a PDF</span>
-          </button>
-          <button @click="exportarExcel" class="btn btn-success" :disabled="loading || !reporteGenerado || datosReporte.length === 0">
-            <span v-if="loading">Procesando...</span>
-            <span v-else>Exportar a Excel</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Sección de Escasez de Hospitales -->
-      <div class="escasez-hospitales-section">
-        <h2>Identificación de Zonas con Escasez de Servicios Hospitalarios</h2>
-        <p class="section-subtitle">Top 5 zonas con mayor población pero menor cantidad de hospitales</p>
-        
-        <div class="escasez-filters">
-          <div class="filter-group">
-            <label for="año-escasez">Año de Análisis:</label>
-            <select
-              id="año-escasez"
-              v-model="añoEscasez"
-              class="form-input"
-            >
-              <option value="2024">2024</option>
-              <option value="2023">2023</option>
-              <option value="2022">2022</option>
-              <option value="2021">2021</option>
-              <option value="2020">2020</option>
-              <option value="2019">2019</option>
+          
+          <div class="card-controls">
+            <select v-model="añoEscasez" class="form-select">
+              <option v-for="year in [2024, 2023, 2022, 2021, 2020]" :key="year" :value="year">{{ year }}</option>
             </select>
+            <button @click="cargarEscasezHospitales" class="btn btn-primary">Actualizar</button>
           </div>
 
-          <button @click="cargarEscasezHospitales" class="btn btn-primary" :disabled="loadingEscasez">
-            <span v-if="loadingEscasez">Cargando...</span>
-            <span v-else>Actualizar Análisis</span>
-          </button>
-        </div>
-
-        <div v-if="zonasEscasez.length > 0" class="escasez-results">
           <table class="data-table">
             <thead>
               <tr>
                 <th>Zona Urbana</th>
                 <th>Población</th>
-                <th>Cantidad de Hospitales</th>
+                <th>Hospitales</th>
+                <th>Estado</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(zona, index) in zonasEscasez" :key="index">
                 <td>{{ zona.zona }}</td>
-                <td>{{ formatNumber(zona.poblacion) }}</td>
-                <td class="hospital-count">{{ zona.cantidad_hospitales }}</td>
+                <td>{{ formatNumber(zona.poblacion) }} Hab.</td>
+                <td class="text-center"><strong>{{ zona.cantidad_hospitales }}</strong></td>
+                <td><span class="badge badge-error">Crítico</span></td>
               </tr>
+              <tr v-if="!zonasEscasez.length"><td colspan="4" class="text-center">No hay datos disponibles</td></tr>
             </tbody>
           </table>
         </div>
-        
-        <p v-else-if="!loadingEscasez" class="no-data-message">
-          No hay datos disponibles. Haz clic en "Actualizar Análisis" para cargar los datos.
-        </p>
       </div>
+
+      <!-- TAB 3: Proximidad (Q3) -->
+      <div v-if="currentTab === 'proximidad'" class="tab-pane fade-in">
+        <div class="analytics-card">
+          <div class="card-header">
+            <h2>🏫 Proximidad Escuelas - Proyectos</h2>
+            <p>Escuelas a menos de 500m de proyectos en curso</p>
+          </div>
+          
+          <div class="metric-highlight" v-if="escuelasCerca.length">
+            <div class="metric-value">{{ escuelasCerca.length }}</div>
+            <div class="metric-label">Escuelas Impactadas</div>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Escuela</th>
+                <th>Proyecto Cercano</th>
+                <th>Distancia</th>
+                <th>Alerta</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in escuelasCerca" :key="index">
+                <td>{{ item.nombre_escuela }}</td>
+                <td>{{ item.nombre_proyecto }}</td>
+                <td>{{ item.distancia_metros }} m</td>
+                <td>
+                  <span v-if="item.distancia_metros < 100" class="badge badge-error">Muy cerca</span>
+                  <span v-else class="badge badge-warning">Cerca</span>
+                </td>
+              </tr>
+               <tr v-if="!escuelasCerca.length"><td colspan="4" class="text-center">No se encontraron escuelas cerca de proyectos activos</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 4: Crecimiento (Q4) -->
+      <div v-if="currentTab === 'crecimiento'" class="tab-pane fade-in">
+        <div class="analytics-card">
+          <div class="card-header">
+            <h2>📈 Zonas de Rápido Crecimiento</h2>
+            <p>Zonas con crecimiento poblacional > 10% en últimos 5 años</p>
+          </div>
+
+          <div class="growth-grid">
+            <div v-for="(zona, idx) in zonasCrecimiento" :key="idx" class="growth-card">
+              <div class="growth-icon">🚀</div>
+              <h3>{{ zona.zona }}</h3>
+              <div class="growth-stat">
+                <span class="growth-percent">+{{ zona.porcentaje_crecimiento }}%</span>
+                <span class="growth-label">Crecimiento Total</span>
+              </div>
+              <div class="growth-details">
+                <p><strong>Actual:</strong> {{ formatNumber(zona.poblacion_actual) }}</p>
+                <p><strong>Anterior:</strong> {{ formatNumber(zona.poblacion_anterior) }}</p>
+              </div>
+            </div>
+             <div v-if="!zonasCrecimiento.length" class="no-data-msg">No se detectaron zonas con crecimiento acelerado.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: Resumen Proyectos (Q10) -->
+      <div v-if="currentTab === 'resumen'" class="tab-pane fade-in">
+        <div class="analytics-card">
+          <div class="card-header">
+            <h2>📊 Resumen de Proyectos</h2>
+            <p>Matriz de estado de proyectos por tipo de zona</p>
+          </div>
+
+          <div class="card-controls">
+            <select v-model="filtroResumen.tipoZona" class="form-select" @change="cargarResumenProyectos">
+              <option value="todos">Todas las Zonas</option>
+              <option value="Residencial">Residencial</option>
+              <option value="Comercial">Comercial</option>
+              <option value="Industrial">Industrial</option>
+            </select>
+             <select v-model="filtroResumen.estado" class="form-select" @change="cargarResumenProyectos">
+              <option value="todos">Todos los Estados</option>
+              <option value="En Curso">En Curso</option>
+              <option value="Planeado">Planeado</option>
+              <option value="Completado">Completado</option>
+            </select>
+          </div>
+
+          <table class="data-table matrix-table">
+            <thead>
+              <tr>
+                <th>Tipo Zona</th>
+                <th>Estado</th>
+                <th>Cantidad</th>
+                <th>Presupuesto Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(row, index) in resumenProyectos" :key="index">
+                <td class="font-bold">{{ row.tipo_zona }}</td>
+                <td>
+                   <span :class="['badge', `badge-${(row.estado_proyecto || '').toLowerCase().replace(/ /g, '-')}`]">
+                      {{ row.estado_proyecto }}
+                    </span>
+                </td>
+                <td class="text-right">{{ row.cantidad_proyectos }}</td>
+                <td class="text-right">{{ formatCurrency(row.presupuesto_total) }}</td>
+              </tr>
+               <tr v-if="!resumenProyectos.length"><td colspan="4" class="text-center">No hay datos para mostrar</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted, computed, watch } from 'vue'
 import reportesService from '@/services/reportesService'
-import ErrorAlert from '@/components/common/ErrorAlert.vue'
-import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+// Importamos directamente los servicios faltantes para Q3, Q4, Q10
+import puntosInteresService from '@/services/puntosInteresService.js' // Para Q3
+import zonasService from '@/services/zonasService.js'         // Para Q4
+import proyectosService from '@/services/proyectosService.js' // Para Q10
 
-// Estado reactivo
+// Estado General
+const currentTab = ref('general')
 const loading = ref(false)
+const error = ref(null)
+
+// Configuración Tabs
+const tabs = [
+  { id: 'general', label: '📊 General' },
+  { id: 'escasez', label: '🏥 Escasez' },
+  { id: 'proximidad', label: '🏫 Proximidad' },
+  { id: 'crecimiento', label: '📈 Crecimiento' },
+  { id: 'resumen', label: '📋 Resumen' }
+]
+
+// --- Lógica Tab General ---
 const reporteGenerado = ref(false)
 const datosReporte = ref([])
-const error = ref(null)
-const loadingEscasez = ref(false)
+const filtros = reactive({ fechaInicio: '', fechaFin: '', tipoReporte: '' })
+
+// --- Lógica Q2 Escasez ---
 const zonasEscasez = ref([])
 const añoEscasez = ref(2024)
 
-const filtros = reactive({
-  fechaInicio: '',
-  fechaFin: '',
-  tipoReporte: ''
-})
+// --- Lógica Q3 Proximidad ---
+const escuelasCerca = ref([])
 
+// --- Lógica Q4 Crecimiento ---
+const zonasCrecimiento = ref([])
 
-// Métodos
+// --- Lógica Q10 Resumen ---
+const resumenProyectos = ref([])
+const filtroResumen = reactive({ tipoZona: 'todos', estado: 'todos' })
 
+// MÉTODOS DE CARGA
+
+// Cargar Tab General
 const generarReporte = async () => {
   try {
     loading.value = true
-    error.value = null
-    // Marcar como no generado hasta que la carga finalice correctamente
-    reporteGenerado.value = false
-
-    // Llamar al servicio con los filtros
     const data = await reportesService.generarReporte(filtros)
     datosReporte.value = data
-    // Marcar que se generó el reporte solo si la carga fue exitosa
     reporteGenerado.value = true
-
-    if (data.length === 0) {
-      console.info('No se encontraron datos para los filtros seleccionados')
-    }
   } catch (err) {
-    console.error('Error al generar reporte:', err)
-    error.value = err.message || 'Error al generar el reporte. Intente nuevamente.'
-    datosReporte.value = []
-  } finally {
-    loading.value = false
+    console.error(err)
+    alert('Error generando reporte')
+  } finally { loading.value = false }
+}
+
+const limpiarFiltros = () => {
+  filtros.fechaInicio = ''
+  filtros.fechaFin = ''
+  filtros.tipoReporte = ''
+  datosReporte.value = []
+  reporteGenerado.value = false
+}
+
+// Cargar Q2
+const cargarEscasezHospitales = async () => {
+  try {
+    const data = await reportesService.obtenerZonasEscasezHospitales(añoEscasez.value)
+    zonasEscasez.value = data
+  } catch (e) {
+    console.error('Q2 Error', e)
   }
 }
 
-// Conteos y resumen del reporte
+// Cargar Q3
+const cargarProximidad = async () => {
+  try {
+    // Usamos el servicio de puntos de interés directamente
+    if (puntosInteresService.getEscuelasCercanas) {
+       const data = await puntosInteresService.getEscuelasCercanas() 
+       escuelasCerca.value = data
+    } else {
+       console.warn('Servicio getEscuelasCercanas no encontrado en frontend. Pendiente actualización.')
+    }
+  } catch (e) { console.error('Q3 Error', e) }
+}
+
+// Cargar Q4
+const cargarCrecimiento = async () => {
+  try {
+    const data = await zonasService.getZonasRapidoCrecimiento()
+    zonasCrecimiento.value = data
+  } catch (e) { console.error('Q4 Error', e) }
+}
+
+// Cargar Q10
+const cargarResumenProyectos = async () => {
+  try {
+    const data = await proyectosService.getResumenEstadoZona(filtroResumen.tipoZona, filtroResumen.estado)
+    resumenProyectos.value = data
+  } catch (e) { console.error('Q10 Error', e) }
+}
+
+// Watchers para cargar datos al cambiar de tab
+watch(currentTab, (newTab) => {
+  if (newTab === 'escasez') cargarEscasezHospitales()
+  if (newTab === 'proximidad') cargarProximidad()
+  if (newTab === 'crecimiento') cargarCrecimiento()
+  if (newTab === 'resumen') cargarResumenProyectos()
+})
+
+// Computados
 const resumen = computed(() => {
   const total = datosReporte.value.length
   const porEstado = {}
   const porTipo = {}
-
   datosReporte.value.forEach(item => {
     const est = item.estado || 'Desconocido'
     const tip = item.tipo || 'Desconocido'
     porEstado[est] = (porEstado[est] || 0) + 1
     porTipo[tip] = (porTipo[tip] || 0) + 1
   })
-
   return { total, porEstado, porTipo }
 })
 
-const limpiarFiltros = () => {
-  filtros.fechaInicio = ''
-  filtros.fechaFin = ''
-  filtros.tipoReporte = ''
-  reporteGenerado.value = false
-  datosReporte.value = []
-  error.value = null
-}
+// Utilidades
+const formatearFecha = (f) => f ? new Date(f).toLocaleDateString() : '-'
+const formatNumber = (n) => new Intl.NumberFormat('es-CL').format(n)
+const formatCurrency = (amount) => {
+  if (!amount) return '$0';
+  return new Intl.NumberFormat('es-CL', {
+    style: 'currency',
+    currency: 'CLP',
+    minimumFractionDigits: 0
+  }).format(amount);
+};
+const exportarPDF = () => reportesService.exportarPDF(datosReporte.value)
+const exportarExcel = () => reportesService.exportarExcel(datosReporte.value)
 
-const formatearFecha = (fecha) => {
-  if (!fecha) return '-'
-  return new Date(fecha).toLocaleDateString('es-ES')
-}
-
-const formatNumber = (num) => {
-  if (!num && num !== 0) return '-'
-  return new Intl.NumberFormat('es-ES').format(num)
-}
-
-const cargarEscasezHospitales = async () => {
-  try {
-    loadingEscasez.value = true
-    error.value = null
-    const data = await reportesService.obtenerZonasEscasezHospitales(añoEscasez.value)
-    zonasEscasez.value = data
-  } catch (err) {
-    console.error('Error al cargar zonas con escasez de hospitales:', err)
-    error.value = err.message || 'Error al cargar el análisis. Intente nuevamente.'
-    zonasEscasez.value = []
-  } finally {
-    loadingEscasez.value = false
-  }
-}
-
-const exportarPDF = async () => {
-  loading.value = true
-  error.value = null
-  let backendErr = null
-
-  try {
-    const titulo = filtros.tipoReporte
-      ? `Reporte de ${filtros.tipoReporte}`
-      : 'Reporte General'
-
-    // Intentar descarga desde backend primero
-    try {
-      await reportesService.exportarDesdeBackend(filtros, 'pdf')
-      console.log('Reporte PDF descargado desde backend')
-      return
-    } catch (e) {
-      backendErr = e
-      console.warn('Export desde backend falló, intentando generación local:', e)
-    }
-
-    // Si no hay datos locales, informar y mostrar detalle del fallo backend
-    if (!datosReporte.value || datosReporte.value.length === 0) {
-      error.value = backendErr && backendErr.message
-        ? `Error al exportar desde backend: ${backendErr.message}. Además no hay datos locales para generar el PDF.`
-        : 'No hay datos cargados para exportar a PDF.'
-      return
-    }
-
-    // Generar PDF en cliente como fallback
-    try {
-      await reportesService.exportarPDF(datosReporte.value, titulo)
-      console.log('Reporte PDF generado en cliente exitosamente')
-    } catch (clientErr) {
-      console.error('Error generando PDF en cliente:', clientErr)
-      const backendMsg = backendErr && backendErr.message ? `Backend: ${backendErr.message}. ` : ''
-      const clientMsg = clientErr && clientErr.message ? clientErr.message : String(clientErr)
-      error.value = `Error al exportar a PDF. ${backendMsg}Generación local falló: ${clientMsg}`
-    }
-  } catch (err) {
-    console.error('Error inesperado en exportarPDF:', err)
-    error.value = err && err.message ? `Error al exportar a PDF: ${err.message}` : 'Error al exportar a PDF.'
-  } finally {
-    loading.value = false
-  }
-}
-
-const exportarExcel = async () => {
-  loading.value = true
-  error.value = null
-  let backendErr = null
-
-  try {
-    const nombreArchivo = filtros.tipoReporte
-      ? `reporte_${filtros.tipoReporte}`
-      : 'reporte_general'
-
-    // Intentar descargar desde backend primero
-    try {
-      await reportesService.exportarDesdeBackend(filtros, 'xlsx')
-      console.log('Reporte Excel descargado desde backend')
-      return
-    } catch (e) {
-      backendErr = e
-      console.warn('Export desde backend falló, intentando generación local:', e)
-    }
-
-    if (!datosReporte.value || datosReporte.value.length === 0) {
-      error.value = backendErr && backendErr.message
-        ? `Error al exportar desde backend: ${backendErr.message}. Además no hay datos locales para generar el Excel.`
-        : 'No hay datos cargados para exportar a Excel.'
-      return
-    }
-
-    try {
-      await reportesService.exportarExcel(datosReporte.value, nombreArchivo)
-      console.log('Reporte Excel generado en cliente exitosamente')
-    } catch (clientErr) {
-      console.error('Error generando Excel en cliente:', clientErr)
-      const backendMsg = backendErr && backendErr.message ? `Backend: ${backendErr.message}. ` : ''
-      const clientMsg = clientErr && clientErr.message ? clientErr.message : String(clientErr)
-      error.value = `Error al exportar a Excel. ${backendMsg}Generación local falló: ${clientMsg}`
-    }
-  } catch (err) {
-    console.error('Error inesperado en exportarExcel:', err)
-    error.value = err && err.message ? `Error al exportar a Excel: ${err.message}` : 'Error al exportar a Excel.'
-  } finally {
-    loading.value = false
-  }
-}
-
-// Lifecycle
+// Init
 onMounted(() => {
-  cargarEscasezHospitales()
+  // Carga inicial si estamos en tab por defecto
+  if (currentTab.value === 'escasez') cargarEscasezHospitales()
 })
 </script>
 
 <style scoped>
 .reportes-container {
-  padding: 2rem;
+  padding: 24px;
   max-width: 1400px;
   margin: 0 auto;
-  background-color: var(--bg-primary);
   min-height: 100vh;
-}
-
-.reportes-header {
-  margin-bottom: 2rem;
+  background: var(--bg-primary);
 }
 
 .reportes-header h1 {
+  font-size: 2rem;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
+.subtitle { color: var(--text-secondary); }
 
-.subtitle {
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-}
-
-.reportes-content {
+/* Tabs */
+.tabs-nav {
   display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.report-summary { padding: 12px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 8px; }
-.summary-grid { display:flex; gap:16px; margin-top:8px; }
-.summary-block h4 { margin:0 0 6px 0; font-size:14px; }
-.summary-block ul { margin:0; padding-left: 18px; color: var(--text-secondary); }
-
-/* Filtros */
-.filters-section {
-  background: var(--bg-secondary);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border-color);
-}
-
-.filters-section h2 {
-  color: var(--text-primary);
-  margin-bottom: 1rem;
-  font-size: 1.3rem;
-}
-
-.filters-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.filter-group label {
-  margin-bottom: 0.5rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.form-input {
-  padding: 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.3s;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--accent-primary);
-}
-
-.filter-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-
-/* Resultados */
-.results-section {
-  background: var(--bg-secondary);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--border-color);
-}
-
-.results-section h2 {
-  color: var(--text-primary);
-  margin-bottom: 1rem;
-  font-size: 1.3rem;
-}
-
-.results-table {
-  margin-bottom: 1.5rem;
-  overflow-x: auto;
-}
-
-.loading-message,
-.no-data-message {
-  text-align: center;
-  padding: 2rem;
-  color: var(--text-secondary);
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: var(--bg-primary);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.data-table th,
-.data-table td {
-  padding: 1rem;
-  text-align: left;
+  gap: 10px;
+  margin-top: 24px;
+  margin-bottom: 24px;
   border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+  padding-bottom: 2px;
 }
 
-.data-table th {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.data-table td {
-  color: var(--text-secondary);
-}
-
-.data-table tbody tr:hover {
-  background: rgba(99, 102, 241, 0.1);
-}
-
-.badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 500;
-}
-
-.badge-activo {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-  border: 1px solid #10b981;
-}
-
-.badge-en.proceso {
-  background: rgba(245, 158, 11, 0.2);
-  color: #f59e0b;
-  border: 1px solid #f59e0b;
-}
-
-.badge-completado {
-  background: rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
-  border: 1px solid #3b82f6;
-}
-
-.export-section {
-  display: flex;
-  gap: 1rem;
-}
-
-/* Botones */
-.btn {
-  padding: 0.75rem 1.5rem;
+.tab-btn {
+  padding: 10px 20px;
+  background: transparent;
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-primary {
-  background: var(--accent-primary);
-  color: white;
-}
-
-.btn-primary:hover {
-  background: var(--accent-primary-hover);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.4);
-}
-
-.btn-secondary {
-  background: var(--border-color);
-  color: var(--text-primary);
-}
-
-.btn-secondary:hover {
-  background: var(--text-secondary);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(148, 163, 184, 0.3);
-}
-
-.btn-success {
-  background: #10b981;
-  color: white;
-}
-
-.btn-success:hover {
-  background: #059669;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
-}
-
-/* Escasez de Hospitales Section */
-.escasez-hospitales-section {
-  background: var(--card-background);
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-top: 2rem;
-}
-
-.escasez-hospitales-section h2 {
-  margin-bottom: 0.5rem;
-  color: var(--text-primary);
-  font-size: 1.5rem;
-}
-
-.section-subtitle {
-  color: var(--text-secondary);
-  margin-bottom: 1.5rem;
-  font-size: 0.95rem;
-}
-
-.escasez-filters {
-  display: flex;
-  gap: 1rem;
-  align-items: flex-end;
-  margin-bottom: 1.5rem;
-}
-
-.escasez-filters .filter-group {
-  flex: 0 0 200px;
-}
-
-.escasez-results {
-  margin-top: 1.5rem;
-}
-
-.hospital-count {
   font-weight: 600;
-  color: var(--accent-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.tab-btn:hover { color: var(--accent-primary); background: var(--bg-secondary); border-radius: 8px 8px 0 0; }
+.tab-btn.active { color: var(--accent-primary); border-bottom-color: var(--accent-primary); }
+
+/* Cards & Sections */
+.analytics-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.card-header h2 { margin: 0 0 8px 0; color: var(--text-primary); }
+.card-header p { margin: 0 0 24px 0; color: var(--text-secondary); font-size: 0.9em; }
+
+.card-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+/* Tables */
+.data-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.data-table th { text-align: left; padding: 12px; background: var(--bg-primary); border-bottom: 2px solid var(--border-color); color: var(--text-secondary); font-size: 0.85rem; text-transform: uppercase; }
+.data-table td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+.data-table tr:hover { background: rgba(0,0,0,0.02); }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.font-bold { font-weight: 600; }
+
+/* Badges */
+.badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+.badge-planeado { background: #e0f2fe; color: #0284c7; }
+.badge-en-curso { background: #fef3c7; color: #d97706; }
+.badge-completado { background: #dcfce7; color: #16a34a; }
+.badge-retrasado, .badge-error { background: #fee2e2; color: #dc2626; }
+.badge-cancelado { background: #f3f4f6; color: #4b5563; }
+.badge-warning { background: #ffedd5; color: #c2410c; }
+
+/* Growth Grid (Q4) */
+.growth-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.growth-card { 
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; text-align: center; 
+}
+.growth-icon { font-size: 2rem; margin-bottom: 10px; }
+.growth-stat { margin: 15px 0; }
+.growth-percent { display: block; font-size: 2rem; font-weight: 800; color: #16a34a; }
+.growth-label { font-size: 0.8rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 1px; }
+.growth-details { font-size: 0.9rem; color: var(--text-secondary); border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 10px; }
+
+/* Metric Highlight */
+.metric-highlight {
+  display: inline-block;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
   text-align: center;
 }
+.metric-value { font-size: 1.5rem; font-weight: bold; color: var(--accent-primary); }
+.metric-label { font-size: 0.8rem; color: var(--text-secondary); }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .reportes-container {
-    padding: 1rem;
-  }
+/* Filters Section (Tab General) */
+.filters-section { background: var(--bg-secondary); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 1px solid var(--border-color); }
+.filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.filter-group { display: flex; flex-direction: column; gap: 6px; }
+.form-input, .form-select { padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-primary); color: var(--text-primary); }
+.filter-actions { display: flex; gap: 10px; }
+.btn { padding: 10px 20px; border-radius: 6px; font-weight: 500; cursor: pointer; border: none; }
+.btn-primary { background: var(--accent-primary); color: white; }
+.btn-secondary { background: var(--border-color); color: var(--text-primary); }
+.btn-success { background: #16a34a; color: white; }
 
-  .filters-grid {
-    grid-template-columns: 1fr;
-  }
+/* Summary (Tab General) */
+.report-summary { margin-bottom: 20px; background: var(--bg-secondary); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); }
+.summary-grid { display: flex; gap: 40px; }
+.summary-block ul { padding-left: 20px; margin: 0; color: var(--text-secondary); }
 
+/* Animations */
+.fade-in { animation: fadeIn 0.3s ease-in-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-  .filter-actions,
-  .export-section {
-    flex-direction: column;
-  }
-
-  .btn {
-    width: 100%;
-  }
-}
 </style>
 
 
