@@ -6,9 +6,9 @@ const proyectosService = {
     try {
       console.log('[ProyectosService] Obteniendo todos los proyectos...');
 
-      let url = '/proyectos';
+      let url = '/proyectos?size=-1';
       if (tipoZona && tipoZona !== '') {
-        url += `?tipoZona=${encodeURIComponent(tipoZona)}`;
+        url += `&tipoZona=${encodeURIComponent(tipoZona)}`;
       }
 
       const response = await api.get(url);

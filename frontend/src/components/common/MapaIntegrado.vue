@@ -612,7 +612,7 @@ const actualizarZonas = () => {
         <h4>${zona.nombre}</h4>
         <p><strong>Tipo:</strong> ${tipoStr}</p>
         ${zona.area ? `<p><strong>Área:</strong> ${zona.area.toFixed(2)} km²</p>` : ''}
-        ${zona.poblacion_estimada_2025 ? `<p><strong>Población:</strong> ${zona.poblacion_estimada_2025.toLocaleString()}</p>` : ''}
+        ${zona.poblacion_estimada_2026 ? `<p><strong>Población:</strong> ${zona.poblacion_estimada_2026.toLocaleString()}</p>` : ''}
       </div>
     `);
 

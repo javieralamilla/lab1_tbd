@@ -3,6 +3,10 @@ package cl.usach.tbd.grupo4.plataforma_urbanismo.controller;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.model.PuntoInteres;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.service.PuntoInteresService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +24,29 @@ public class PuntoInteresController {
     private PuntoInteresService puntoInteresService;
 
     @GetMapping
-    public ResponseEntity<List<PuntoInteres>> obtenerTodos() {
-        return ResponseEntity.ok(puntoInteresService.obtenerTodos());
+    public ResponseEntity<?> obtenerTodos(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "punto_interes_id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+        
+        // Si size es -1, retornar todos sin paginación
+        if (size == -1) {
+            return ResponseEntity.ok(puntoInteresService.obtenerTodos());
+        }
+        
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+        Page<PuntoInteres> puntosPage = puntoInteresService.obtenerTodosPaginado(pageable);
+        
+        Map<String, Object> response = Map.of(
+            "content", puntosPage.getContent(),
+            "currentPage", puntosPage.getNumber(),
+            "totalItems", puntosPage.getTotalElements(),
+            "totalPages", puntosPage.getTotalPages()
+        );
+        
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

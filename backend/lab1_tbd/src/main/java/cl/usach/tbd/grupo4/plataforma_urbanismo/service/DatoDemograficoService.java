@@ -2,6 +2,9 @@ package cl.usach.tbd.grupo4.plataforma_urbanismo.service;
 
 import cl.usach.tbd.grupo4.plataforma_urbanismo.model.DatoDemografico;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.repository.DatoDemograficoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,17 @@ public class DatoDemograficoService {
 
     public List<DatoDemografico> obtenerTodos() {
         return datoDemograficoRepository.findWithZonaInfo();
+    }
+
+    public Page<DatoDemografico> obtenerTodosPaginado(Pageable pageable) {
+        List<DatoDemografico> todosLosDatos = datoDemograficoRepository.findWithZonaInfo();
+        
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), todosLosDatos.size());
+        
+        List<DatoDemografico> pageContent = todosLosDatos.subList(start, end);
+        
+        return new PageImpl<>(pageContent, pageable, todosLosDatos.size());
     }
 
     public Optional<DatoDemografico> obtenerPorId(Long id) {

@@ -3,6 +3,9 @@ package cl.usach.tbd.grupo4.plataforma_urbanismo.service;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.model.PuntoInteres;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.repository.PuntoInteresRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +20,17 @@ public class PuntoInteresService {
 
     public List<PuntoInteres> obtenerTodos() {
         return puntoInteresRepository.findAll();
+    }
+
+    public Page<PuntoInteres> obtenerTodosPaginado(Pageable pageable) {
+        List<PuntoInteres> todosLosPuntos = puntoInteresRepository.findAll();
+        
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), todosLosPuntos.size());
+        
+        List<PuntoInteres> pageContent = todosLosPuntos.subList(start, end);
+        
+        return new PageImpl<>(pageContent, pageable, todosLosPuntos.size());
     }
 
     public Optional<PuntoInteres> obtenerPorId(Long id) {

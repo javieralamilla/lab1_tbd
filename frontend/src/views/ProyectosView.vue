@@ -930,19 +930,13 @@ const confirmarActualizarRetrasados = async () => {
       return;
     }
 
-    // Contar proyectos antes de actualizar
-    const proyectosAntes = proyectos.value.filter(p =>
-      p.estado === 'En Curso' &&
-      p.fecha_termino &&
-      new Date(p.fecha_termino) < new Date()
-    );
-
-    await proyectosService.actualizarProyectosRetrasados(usuarioId);
+    const response = await proyectosService.actualizarProyectosRetrasados(usuarioId);
+    const cantidad = response.cantidad || 0;
 
     // Establecer resultado
-    proyectosActualizadosCount.value = proyectosAntes.length;
-    resultadoActualizacion.value = proyectosAntes.length > 0
-      ? `Se actualizaron ${proyectosAntes.length} proyecto${proyectosAntes.length !== 1 ? 's' : ''} a estado "Retrasado".`
+    proyectosActualizadosCount.value = cantidad;
+    resultadoActualizacion.value = cantidad > 0
+      ? `Se actualizaron ${cantidad} proyecto${cantidad !== 1 ? 's' : ''} a estado "Retrasado".`
       : 'No se encontraron proyectos que requieran actualización.';
 
   } catch (err) {

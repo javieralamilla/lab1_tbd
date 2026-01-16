@@ -4,6 +4,9 @@ import cl.usach.tbd.grupo4.plataforma_urbanismo.model.ProyectoUrbano;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.repository.ProyectoRepository;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.repository.ZonaUrbanaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +24,17 @@ public class ProyectoService {
 
     public List<ProyectoUrbano> obtenerTodos() {
         return proyectoRepository.findAll();
+    }
+
+    public Page<ProyectoUrbano> obtenerTodosPaginado(Pageable pageable) {
+        List<ProyectoUrbano> todosLosProyectos = proyectoRepository.findAll();
+        
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), todosLosProyectos.size());
+        
+        List<ProyectoUrbano> pageContent = todosLosProyectos.subList(start, end);
+        
+        return new PageImpl<>(pageContent, pageable, todosLosProyectos.size());
     }
 
     public List<ProyectoUrbano> obtenerPorTipoZona(String tipoZona) {
@@ -62,8 +76,8 @@ public class ProyectoService {
         return proyectoRepository.getResumenProyectosPorEstadoYZona(tipoZona, estado);
     }
 
-    public void actualizarProyectosRetrasados(Long usuarioId) {
-        proyectoRepository.actualizarProyectosRetrasados(usuarioId);
+    public int actualizarProyectosRetrasados(Long usuarioId) {
+        return proyectoRepository.actualizarProyectosRetrasados(usuarioId);
     }
 
     public List<Map<String, Object>> obtenerZonasSinPlanificacion() {

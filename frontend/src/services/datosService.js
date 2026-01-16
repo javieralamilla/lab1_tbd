@@ -4,10 +4,10 @@ const datosService = {
   // Obtener todos los datos demográficos (con filtro opcional de zona)
   async getAll(zonaId = null) {
     try {
-      let url = '/datos-demograficos';
+      let url = '/datos-demograficos?size=-1';
       
       if (zonaId) {
-        url += `?zonaId=${zonaId}`;
+        url += `&zonaId=${zonaId}`;
       }
       
       const response = await api.get(url);

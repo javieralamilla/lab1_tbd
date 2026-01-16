@@ -3,6 +3,10 @@ package cl.usach.tbd.grupo4.plataforma_urbanismo.controller;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.model.ProyectoUrbano;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.service.ProyectoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +24,35 @@ public class ProyectoController {
     private ProyectoService proyectoService;
 
     @GetMapping
-    public ResponseEntity<List<ProyectoUrbano>> obtenerTodos(
-            @RequestParam(required = false) String tipoZona) {
+    public ResponseEntity<?> obtenerTodos(
+            @RequestParam(required = false) String tipoZona,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "proyecto_urbano_id") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction) {
+        
+        // Filtro por tipoZona sin paginación
         if (tipoZona != null && !tipoZona.isEmpty()) {
             return ResponseEntity.ok(proyectoService.obtenerPorTipoZona(tipoZona));
         }
-        return ResponseEntity.ok(proyectoService.obtenerTodos());
+        
+        // Si size es -1, retornar todos sin paginación
+        if (size == -1) {
+            return ResponseEntity.ok(proyectoService.obtenerTodos());
+        }
+        
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+        Page<ProyectoUrbano> proyectosPage = proyectoService.obtenerTodosPaginado(pageable);
+        
+        Map<String, Object> response = Map.of(
+            "content", proyectosPage.getContent(),
+            "currentPage", proyectosPage.getNumber(),
+            "totalItems", proyectosPage.getTotalElements(),
+            "totalPages", proyectosPage.getTotalPages()
+        );
+        
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
@@ -93,8 +120,11 @@ public class ProyectoController {
     @PostMapping("/actualizar-retrasados/{usuarioId}")
     public ResponseEntity<?> actualizarProyectosRetrasados(@PathVariable Long usuarioId) {
         try {
-            proyectoService.actualizarProyectosRetrasados(usuarioId);
-            return ResponseEntity.ok("Proyectos actualizados correctamente");
+            int actualizados = proyectoService.actualizarProyectosRetrasados(usuarioId);
+            return ResponseEntity.ok(Map.of(
+                "mensaje", "Proyectos actualizados correctamente",
+                "cantidad", actualizados
+            ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("Error al actualizar proyectos: " + e.getMessage());

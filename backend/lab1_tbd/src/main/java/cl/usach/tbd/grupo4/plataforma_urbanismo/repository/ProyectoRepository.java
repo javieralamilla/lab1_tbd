@@ -217,13 +217,15 @@ public class ProyectoRepository {
         }
     }
 
-    public void actualizarProyectosRetrasados(Long usuarioId) {
-        String sql = "CALL actualizar_proyectos_retrasados(?)";
-        jdbcTemplate.execute(sql, (PreparedStatementCallback<Void>) ps -> {
-            ps.setInt(1, usuarioId.intValue());
-            ps.execute();
-            return null;
-        });
+    public int actualizarProyectosRetrasados(Long usuarioId) {
+        String sql = """    
+            UPDATE proyectos_urbanos
+            SET estado = 'Retrasado',
+                usuario_id = ?
+            WHERE estado = 'En Curso'
+            AND fecha_termino < CURRENT_DATE
+        """;
+        return jdbcTemplate.update(sql, usuarioId);
     }
 
     public ProyectoUrbano save(ProyectoUrbano proyecto) {

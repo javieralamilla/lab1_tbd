@@ -3,6 +3,10 @@ package cl.usach.tbd.grupo4.plataforma_urbanismo.controller;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.model.ZonaUrbana;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.service.ZonaUrbanaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +24,29 @@ public class ZonaUrbanaController {
     private ZonaUrbanaService zonaUrbanaService;
 
     @GetMapping
-    public ResponseEntity<List<ZonaUrbana>> obtenerTodas() {
-        return ResponseEntity.ok(zonaUrbanaService.obtenerTodas());
+    public ResponseEntity<?> obtenerTodas(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "zona_urbana_id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction) {
+        
+        // Si size es -1, retornar todos sin paginación (para compatibilidad con frontend actual)
+        if (size == -1) {
+            return ResponseEntity.ok(zonaUrbanaService.obtenerTodas());
+        }
+        
+        Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+        Page<ZonaUrbana> zonasPage = zonaUrbanaService.obtenerTodasPaginado(pageable);
+        
+        Map<String, Object> response = Map.of(
+            "content", zonasPage.getContent(),
+            "currentPage", zonasPage.getNumber(),
+            "totalItems", zonasPage.getTotalElements(),
+            "totalPages", zonasPage.getTotalPages()
+        );
+        
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

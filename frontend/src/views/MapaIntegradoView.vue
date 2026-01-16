@@ -97,9 +97,9 @@
               <span class="label">Área:</span>
               <span>{{ itemSeleccionado.data.area.toFixed(2) }} km²</span>
             </div>
-            <div class="detail-row" v-if="itemSeleccionado.data.poblacion_estimada_2025">
-              <span class="label">Población (2025):</span>
-              <span>{{ itemSeleccionado.data.poblacion_estimada_2025.toLocaleString() }}</span>
+            <div class="detail-row" v-if="itemSeleccionado.data.poblacion_estimada_2026">
+              <span class="label">Población (2026):</span>
+              <span>{{ itemSeleccionado.data.poblacion_estimada_2026.toLocaleString() }}</span>
             </div>
             <div class="detail-row" v-if="itemSeleccionado.data.densidad_poblacional">
               <span class="label">Densidad:</span>
