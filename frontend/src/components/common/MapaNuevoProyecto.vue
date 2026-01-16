@@ -4,7 +4,7 @@
 
     <div class="panel-draw">
       <div class="header">
-          <h3>🗺️ Seleccionar ubicación del nuevo proyecto</h3>
+          <h3>Seleccionar ubicación del nuevo proyecto</h3>
           <button class="btn-cancel" @click="cancel">✖</button>
       </div>
       <p class="help">Usa las herramientas de dibujo (rectángulo/polígono) para marcar el área del proyecto.</p>

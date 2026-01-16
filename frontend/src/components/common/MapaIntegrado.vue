@@ -18,11 +18,11 @@
         <h4>Leyenda y guía de colores</h4>
         <p class="legend-intro">Los colores y emojis representan el estado de los proyectos. Esta guía explica su significado y por qué ayudan a la usabilidad (visibilidad, consistencia y reconocimiento).</p>
         <ul class="legend-list">
-          <li><span class="legend-emoji">📋</span> <strong>Planeado</strong> — Proyecto en etapa de planificación. Color azul: sugiere neutralidad y preparación.</li>
+          <li><span class="legend-emoji"></span> <strong>Planeado</strong> — Proyecto en etapa de planificación. Color azul: sugiere neutralidad y preparación.</li>
           <li><span class="legend-emoji">🚧</span> <strong>En Curso</strong> — Proyecto en ejecución. Naranja: visibilidad y atención inmediata.</li>
-          <li><span class="legend-emoji">✅</span> <strong>Completado</strong> — Proyecto finalizado. Verde: asociado a éxito y disponibilidad.</li>
-          <li><span class="legend-emoji">⚠️</span> <strong>Retrasado</strong> — Atención requerida. Rojo con patrón: color y patrón para usuarios daltónicos.</li>
-          <li><span class="legend-emoji">❌</span> <strong>Cancelado</strong> — Proyecto cancelado. Gris oscuro con patrón: reduce prominencia pero se identifica claramente.</li>
+          <li><span class="legend-emoji"></span> <strong>Completado</strong> — Proyecto finalizado. Verde: asociado a éxito y disponibilidad.</li>
+          <li><span class="legend-emoji"></span> <strong>Retrasado</strong> — Atención requerida. Rojo con patrón: color y patrón para usuarios daltónicos.</li>
+          <li><span class="legend-emoji"></span> <strong>Cancelado</strong> — Proyecto cancelado. Gris oscuro con patrón: reduce prominencia pero se identifica claramente.</li>
         </ul>
         <p class="legend-note"><strong>Heurísticas abordadas:</strong> Visibilidad del estado del sistema; Correspondencia con el mundo real; Prevención de errores; Reconocimiento sobre recuerdo; Consistencia y estándares.</p>
       </div>
@@ -42,27 +42,27 @@
         <div v-if="capasActivas.proyectos" class="capa-filtros">
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosProyectos.planeado" @change="actualizarProyectos" />
-            <span class="filtro-color planeado" title="Planeado — 📋 (Preparación)" aria-hidden="true"></span>
+            <span class="filtro-color planeado" title="Planeado (Preparación)" aria-hidden="true"></span>
             Planeado
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosProyectos.enCurso" @change="actualizarProyectos" />
-            <span class="filtro-color en-curso" title="En Curso — 🚧 (Ejecución)" aria-hidden="true"></span>
+            <span class="filtro-color en-curso" title="En Curso (Ejecución)" aria-hidden="true"></span>
             En Curso
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosProyectos.completado" @change="actualizarProyectos" />
-            <span class="filtro-color completado" title="Completado — ✅ (Finalizado)" aria-hidden="true"></span>
+            <span class="filtro-color completado" title="Completado (Finalizado)" aria-hidden="true"></span>
             Completado
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosProyectos.retrasado" @change="actualizarProyectos" />
-            <span class="filtro-color retrasado" title="Retrasado — ⚠️ (Atención)" aria-hidden="true"></span>
+            <span class="filtro-color retrasado" title="Retrasado (Atención)" aria-hidden="true"></span>
             Retrasado
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosProyectos.cancelado" @change="actualizarProyectos" />
-            <span class="filtro-color cancelado" title="Cancelado — ❌ (Cancelado)" aria-hidden="true"></span>
+            <span class="filtro-color cancelado" title="Cancelado (Cancelado)" aria-hidden="true"></span>
             Cancelado
           </label>
         </div>
@@ -83,32 +83,32 @@
         <div v-if="capasActivas.puntos" class="capa-filtros">
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosPuntos.hospital" @change="actualizarPuntos" />
-            <span class="filtro-color hospital" title="Hospital — ❤️ (Salud)" aria-hidden="true"></span>
+            <span class="filtro-color hospital" title="Hospital (Salud)" aria-hidden="true"></span>
             Hospitales
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosPuntos.escuela" @change="actualizarPuntos" />
-            <span class="filtro-color escuela" title="Escuela — 📚 (Educación)" aria-hidden="true"></span>
+            <span class="filtro-color escuela" title="Escuela (Educación)" aria-hidden="true"></span>
             Escuelas
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosPuntos.parque" @change="actualizarPuntos" />
-            <span class="filtro-color parque" title="Parque — 🌳 (Recreación)" aria-hidden="true"></span>
+            <span class="filtro-color parque" title="Parque (Recreación)" aria-hidden="true"></span>
             Parques
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosPuntos.centroComercial" @change="actualizarPuntos" />
-            <span class="filtro-color centro-comercial" title="Centro Comercial — 🛍️ (Comercio)" aria-hidden="true"></span>
+            <span class="filtro-color centro-comercial" title="Centro Comercial (Comercio)" aria-hidden="true"></span>
             Centros Comerciales
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosPuntos.transporte" @change="actualizarPuntos" />
-            <span class="filtro-color transporte" title="Transporte — 🚆 (Movilidad)" aria-hidden="true"></span>
+            <span class="filtro-color transporte" title="Transporte (Movilidad)" aria-hidden="true"></span>
             Transporte
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosPuntos.centroCultural" @change="actualizarPuntos" />
-            <span class="filtro-color centro-cultural" title="Centro Cultural — 🎵 (Cultura)" aria-hidden="true"></span>
+            <span class="filtro-color centro-cultural" title="Centro Cultural (Cultura)" aria-hidden="true"></span>
             Centros Culturales
           </label>
         </div>
@@ -129,22 +129,22 @@
         <div v-if="capasActivas.zonas" class="capa-filtros">
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosZonas.residencial" @change="actualizarZonas" />
-            <span class="filtro-color zona-residencial" title="Residencial — 🏠 (Vivienda)" aria-hidden="true"></span>
+            <span class="filtro-color zona-residencial" title="Residencial (Vivienda)" aria-hidden="true"></span>
             Residencial
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosZonas.comercial" @change="actualizarZonas" />
-            <span class="filtro-color zona-comercial" title="Comercial — 🏬 (Comercio)" aria-hidden="true"></span>
+            <span class="filtro-color zona-comercial" title="Comercial (Comercio)" aria-hidden="true"></span>
             Comercial
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosZonas.industrial" @change="actualizarZonas" />
-            <span class="filtro-color zona-industrial" title="Industrial — 🏭 (Industria)" aria-hidden="true"></span>
+            <span class="filtro-color zona-industrial" title="Industrial (Industria)" aria-hidden="true"></span>
             Industrial
           </label>
           <label class="filtro-item">
             <input type="checkbox" v-model="filtrosZonas.mixto" @change="actualizarZonas" />
-            <span class="filtro-color zona-mixto" title="Mixto — ⚖️ (Usos mixtos)" aria-hidden="true"></span>
+            <span class="filtro-color zona-mixto" title="Mixto (Usos mixtos)" aria-hidden="true"></span>
             Mixto
           </label>
         </div>

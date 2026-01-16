@@ -2,14 +2,14 @@
   <div class="cobertura-container">
     <div class="header">
       <div>
-        <h1>🏢 Cobertura de Infraestructura</h1>
+        <h1>Cobertura de Infraestructura</h1>
         <p class="subtitle">
           Análisis semanal de equipamiento urbano (Hospitales, Escuelas, Parques) por zona.
         </p>
       </div>
       <button @click="refrescarDatos" class="btn-refresh" :disabled="loadingRefresco">
-        <span v-if="loadingRefresco">⏳ Actualizando...</span>
-        <span v-else>🔄 Actualizar Vista Materializada</span>
+        <span v-if="loadingRefresco">Actualizando...</span>
+        <span v-else>Actualizar Vista Materializada</span>
       </button>
     </div>
 
@@ -28,9 +28,9 @@
             <tr>
               <th>ID Zona</th>
               <th>Zona Urbana</th>
-              <th class="text-center">🌳 Parques</th>
-              <th class="text-center">🏫 Escuelas</th>
-              <th class="text-center">🏥 Hospitales</th>
+              <th class="text-center">Parques</th>
+              <th class="text-center">Escuelas</th>
+              <th class="text-center">Hospitales</th>
               <th class="text-center">Total Puntos</th>
             </tr>
           </thead>

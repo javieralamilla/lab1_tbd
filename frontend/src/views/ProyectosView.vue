@@ -170,7 +170,7 @@
     <div v-if="showSuperposicionModal" class="modal-overlay">
       <div class="modal-panel modal-wide">
         <div class="modal-header">
-          <h3>🔍 Análisis de Superposición de Proyectos</h3>
+          <h3>Análisis de Superposición de Proyectos</h3>
           <button class="btn-cerrar" @click="closeSuperposicionModal">✖</button>
         </div>
 
@@ -228,7 +228,7 @@
                     </td>
                     <td class="area-cell">
                       <strong>{{ formatArea(sup.area_superposicion_m2) }}</strong>
-                      <span v-if="sup.area_superposicion_m2 > 1000" class="warning-badge">⚠️ Crítico</span>
+                      <span v-if="sup.area_superposicion_m2 > 1000" class="warning-badge">Crítico</span>
                     </td>
                   </tr>
                 </tbody>
@@ -247,7 +247,7 @@
     <div v-if="showZonasSinPlanModal" class="modal-overlay">
       <div class="modal-panel modal-wide">
         <div class="modal-header">
-          <h3>📍 Zonas Sin Planificación Reciente</h3>
+          <h3>Zonas Sin Planificación Reciente</h3>
           <button class="btn-cerrar" @click="closeZonasSinPlanModal">✖</button>
         </div>
 
@@ -354,7 +354,7 @@
               <p><strong>proyecto{{ contarProyectosRetrasados !== 1 ? 's' : '' }} será{{ contarProyectosRetrasados !== 1 ? 'n' : '' }} actualizado{{ contarProyectosRetrasados !== 1 ? 's' : '' }}</strong></p>
             </div>
             <div v-else class="alerta-proyectos sin-proyectos">
-              <p>✅ No hay proyectos retrasados para actualizar</p>
+              <p>No hay proyectos retrasados para actualizar</p>
             </div>
 
             <div class="info-box">
@@ -381,11 +381,11 @@
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
               </svg>
             </div>
-            <h4>✅ Actualización Completada</h4>
+            <h4>Actualización Completada</h4>
             <p>{{ resultadoActualizacion }}</p>
             <div class="success-stats">
               <div class="stat-item">
-                <div class="stat-icon">⚠️</div>
+                <div class="stat-icon"></div>
                 <div>
                   <div class="stat-number">{{ proyectosActualizadosCount }}</div>
                   <div class="stat-label">Proyectos actualizados</div>
@@ -483,7 +483,7 @@
       <div class="mapa-leyenda">
         <h4>Estados de Proyectos</h4>
         <div class="leyenda-item planeado">
-          <span class="leyenda-color">📋</span>
+          <span class="leyenda-color"></span>
           <label>Planeado</label>
         </div>
         <div class="leyenda-item en-curso">
@@ -491,15 +491,15 @@
           <label>En Curso</label>
         </div>
         <div class="leyenda-item completado">
-          <span class="leyenda-color">✅</span>
+          <span class="leyenda-color"></span>
           <label>Completado</label>
         </div>
         <div class="leyenda-item retrasado">
-          <span class="leyenda-color">⚠️</span>
+          <span class="leyenda-color"></span>
           <label>Retrasado</label>
         </div>
         <div class="leyenda-item cancelado">
-          <span class="leyenda-color">❌</span>
+          <span class="leyenda-color"></span>
           <label>Cancelado</label>
         </div>
 
@@ -546,7 +546,7 @@
             </svg>
             <span>
               <strong>Término:</strong> {{ formatDate(proyecto.fechaTermino || proyecto.fecha_termino) }}
-              <span v-if="isProyectoRetrasado(proyecto)" class="badge-retrasado">⚠️ Retrasado</span>
+              <span v-if="isProyectoRetrasado(proyecto)" class="badge-retrasado">Retrasado</span>
             </span>
           </div>
 

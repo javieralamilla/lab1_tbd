@@ -102,7 +102,7 @@
 
           <div class="export-section">
             <button @click="exportarPDF" class="btn btn-success">Exportar PDF</button>
-            <button @click="exportarExcel" class="btn btn-success">Exportar Excel</button>
+            <button @click="exportarExcel" class="btn btn-success" style="margin-left: 10px;">Exportar Excel</button>
           </div>
         </div>
       </div>
@@ -111,7 +111,7 @@
       <div v-if="currentTab === 'escasez'" class="tab-pane fade-in">
         <div class="analytics-card">
           <div class="card-header">
-            <h2>🏥 Zonas con Escasez de Servicios</h2>
+            <h2>Zonas con Escasez de Servicios</h2>
             <p>Top 5 zonas con alta población y baja cobertura hospitalaria</p>
           </div>
           
@@ -148,7 +148,7 @@
       <div v-if="currentTab === 'proximidad'" class="tab-pane fade-in">
         <div class="analytics-card">
           <div class="card-header">
-            <h2>🏫 Proximidad Escuelas - Proyectos</h2>
+            <h2>Proximidad Escuelas - Proyectos</h2>
             <p>Escuelas a menos de 500m de proyectos en curso</p>
           </div>
           
@@ -186,13 +186,12 @@
       <div v-if="currentTab === 'crecimiento'" class="tab-pane fade-in">
         <div class="analytics-card">
           <div class="card-header">
-            <h2>📈 Zonas de Rápido Crecimiento</h2>
+            <h2>Zonas de Rápido Crecimiento</h2>
             <p>Zonas con crecimiento poblacional > 10% en últimos 5 años</p>
           </div>
 
           <div class="growth-grid">
             <div v-for="(zona, idx) in zonasCrecimiento" :key="idx" class="growth-card">
-              <div class="growth-icon">🚀</div>
               <h3>{{ zona.zona }}</h3>
               <div class="growth-stat">
                 <span class="growth-percent">+{{ zona.porcentaje_crecimiento }}%</span>
@@ -212,7 +211,7 @@
       <div v-if="currentTab === 'resumen'" class="tab-pane fade-in">
         <div class="analytics-card">
           <div class="card-header">
-            <h2>📊 Resumen de Proyectos</h2>
+            <h2>Resumen de Proyectos</h2>
             <p>Matriz de estado de proyectos por tipo de zona</p>
           </div>
 
@@ -276,11 +275,11 @@ const error = ref(null)
 
 // Configuración Tabs
 const tabs = [
-  { id: 'general', label: '📊 General' },
-  { id: 'escasez', label: '🏥 Escasez' },
-  { id: 'proximidad', label: '🏫 Proximidad' },
-  { id: 'crecimiento', label: '📈 Crecimiento' },
-  { id: 'resumen', label: '📋 Resumen' }
+  { id: 'general', label: 'General' },
+  { id: 'escasez', label: 'Escasez' },
+  { id: 'proximidad', label: 'Proximidad' },
+  { id: 'crecimiento', label: 'Crecimiento' },
+  { id: 'resumen', label: 'Resumen' }
 ]
 
 // --- Lógica Tab General ---

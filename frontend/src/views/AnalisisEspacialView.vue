@@ -1,7 +1,7 @@
 <template>
   <div class="analisis-espacial-view">
     <div class="header">
-      <h1>🔍 Análisis Espacial</h1>
+      <h1>Análisis Espacial</h1>
       <p class="descripcion">
         Seleccione un área en el mapa para obtener estadísticas resumidas de población,
         infraestructura y proyectos en curso.
@@ -10,7 +10,7 @@
 
     <!-- Instrucciones -->
     <div class="instrucciones-card">
-      <h3>📋 Instrucciones:</h3>
+      <h3>Instrucciones:</h3>
       <ol>
         <li>Use las herramientas de dibujo en la esquina superior derecha del mapa</li>
         <li>Dibuje un polígono, rectángulo o círculo sobre el área que desea analizar</li>

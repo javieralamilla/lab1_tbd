@@ -1,7 +1,7 @@
 <template>
   <div class="simulacion-proyectos-view">
     <div class="header">
-      <h1>🏗️ Simulación de Proyectos</h1>
+      <h1>Simulación de Proyectos</h1>
       <p class="descripcion">
         Diseñe nuevas zonas de desarrollo o infraestructura en el mapa y visualice su impacto
         potencial en los datos demográficos y servicios del área circundante.
@@ -10,7 +10,7 @@
 
     <!-- Instrucciones -->
     <div class="instrucciones-card">
-      <h3>📋 Cómo usar la simulación:</h3>
+      <h3>Cómo usar la simulación:</h3>
       <ol>
         <li>Haga clic en "Iniciar Simulación" para comenzar</li>
         <li>Use las herramientas de dibujo para trazar el área del nuevo proyecto</li>
@@ -24,7 +24,7 @@
     <!-- Error/Success Alerts -->
     <ErrorAlert v-if="error" :message="error" @close="error = null" />
     <div v-if="success" class="success-alert">
-      <span>✅ {{ success }}</span>
+      <span>{{ success }}</span>
       <button @click="success = null">×</button>
     </div>
 
@@ -36,7 +36,6 @@
     <!-- Información adicional -->
     <div class="info-footer">
       <div class="info-card">
-        <div class="info-icon">💡</div>
         <div class="info-content">
           <h4>Tipos de Proyectos</h4>
           <ul>
@@ -52,7 +51,6 @@
       </div>
 
       <div class="info-card">
-        <div class="info-icon">📊</div>
         <div class="info-content">
           <h4>Métricas Calculadas</h4>
           <ul>
@@ -65,7 +63,6 @@
       </div>
 
       <div class="info-card">
-        <div class="info-icon">🎯</div>
         <div class="info-content">
           <h4>Área de Influencia</h4>
           <p>

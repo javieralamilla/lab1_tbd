@@ -36,7 +36,7 @@ const estadoConfig = {
     color: '#3b82f6',
     fillColor: '#3b82f6',
     fillOpacity: 0.5,
-    icon: '📋'
+    icon: ''
   },
   'En Curso': {
     color: '#f59e0b',
@@ -48,19 +48,19 @@ const estadoConfig = {
     color: '#10b981',
     fillColor: '#10b981',
     fillOpacity: 0.5,
-    icon: '✅'
+    icon: ''
   },
   'Retrasado': {
     color: '#ef4444',
     fillColor: '#ef4444',
     fillOpacity: 0.5,
-    icon: '⚠️'
+    icon: ''
   },
   'Cancelado': {
     color: '#6b7280',
     fillColor: '#6b7280',
     fillOpacity: 0.3,
-    icon: '❌'
+    icon: ''
   }
 };
 

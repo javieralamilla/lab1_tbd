@@ -38,8 +38,8 @@
       <div class="modal-content" @click.stop>
         <div class="modal-header">
           <h2>
-            <span v-if="itemSeleccionado.tipo === 'proyecto'">📋 Proyecto</span>
-            <span v-else-if="itemSeleccionado.tipo === 'punto'">📍 Punto de Interés</span>
+            <span v-if="itemSeleccionado.tipo === 'proyecto'">Proyecto</span>
+            <span v-else-if="itemSeleccionado.tipo === 'punto'">Punto de Interés</span>
             <span v-else>🏘️ Zona Urbana</span>
           </h2>
           <button class="btn-close" @click="itemSeleccionado = null">

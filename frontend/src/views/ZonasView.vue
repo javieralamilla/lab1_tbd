@@ -5,8 +5,10 @@
         <h1>Zonas Urbanas</h1>
         <p>Gestión de zonas geográficas de la ciudad</p>
       </div>
+      
+      <!-- Botón solo visible si tiene permiso de crear -->
       <button
-        v-if="authStore.isAdmin || authStore.isPlanificador"
+        v-if="permissions.canCreate"
         @click="showCreateModal = true"
         class="btn-primary"
       >
@@ -16,6 +18,16 @@
         </svg>
         Nueva Zona
       </button>
+    </div>
+
+    <!-- Mensaje para usuarios con solo lectura -->
+    <div v-if="permissions.isReadOnly" class="alert alert-info">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="16" x2="12" y2="12"></line>
+        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+      </svg>
+      Solo tienes permisos de lectura en este módulo
     </div>
 
     <LoadingSpinner v-if="loading" message="Cargando zonas..." />
@@ -130,8 +142,10 @@
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
               </button>
+              
+              <!-- Botón editar - Solo si tiene permiso de actualizar -->
               <button
-                v-if="authStore.isAdmin || authStore.isPlanificador"
+                v-if="permissions.canUpdate"
                 @click="editZona(zona)"
                 class="btn-icon btn-edit"
                 title="Editar"
@@ -140,8 +154,10 @@
                   <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
                 </svg>
               </button>
+              
+              <!-- Botón eliminar - Solo si tiene permiso de eliminar -->
               <button
-                v-if="authStore.isAdmin"
+                v-if="permissions.canDelete"
                 @click="deleteZona(zona)"
                 class="btn-icon btn-delete"
                 title="Eliminar"
@@ -209,13 +225,17 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { usePermissions } from '@/composables/usePermissions';
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue';
 import ErrorAlert from '@/components/common/ErrorAlert.vue';
 import MapaZonas from '@/components/common/MapaZonas.vue';
 import zonasService from '@/services/zonasService';
 
-// ... (el resto de tu <script setup> es idéntico y correcto)
+// Permisos y autenticación
 const authStore = useAuthStore();
+const { permissions, user } = usePermissions('zonas');
+
+// ... (el resto de tu <script setup> es idéntico y correcto)
 const loading = ref(true);
 const error = ref(null);
 const zonas = ref([]);
@@ -915,6 +935,27 @@ onMounted(() => {
 
 .btn-secondary:hover {
   background-color: var(--border-color);
+}
+
+/* Alert de solo lectura */
+.alert {
+  padding: 14px 18px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.alert-info {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
+.alert svg {
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {

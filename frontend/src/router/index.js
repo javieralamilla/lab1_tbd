@@ -31,25 +31,37 @@ const routes = [
         path: 'zonas',
         name: 'Zonas',
         component: () => import('@/views/ZonasView.vue'),
-        meta: { title: 'Zonas Urbanas' }
+        meta: { 
+          title: 'Zonas Urbanas',
+          roles: ['administrador', 'planificador', 'autoridad_municipal']
+        }
       },
       {
         path: 'proyectos',
         name: 'Proyectos',
         component: () => import('@/views/ProyectosView.vue'),
-        meta: { title: 'Proyectos Urbanos' }
+        meta: { 
+          title: 'Proyectos Urbanos',
+          roles: ['administrador', 'planificador', 'autoridad_municipal']
+        }
       },
       {
         path: 'puntos-interes',
         name: 'PuntosInteres',
         component: () => import('@/views/PuntosInteresView.vue'),
-        meta: { title: 'Puntos de Interés' }
+        meta: { 
+          title: 'Puntos de Interés',
+          roles: ['administrador', 'planificador', 'autoridad_municipal']
+        }
       },
       {
         path: 'datos-demograficos',
         name: 'DatosDemograficos',
         component: () => import('@/views/DatosView.vue'),
-        meta: { title: 'Datos Demográficos' }
+        meta: { 
+          title: 'Datos Demográficos',
+          roles: ['administrador', 'planificador', 'autoridad_municipal']
+        }
       },
       {
         path: 'mapa-integrado',
@@ -61,19 +73,28 @@ const routes = [
         path: 'analisis-espacial',
         name: 'AnalisisEspacial',
         component: () => import('@/views/AnalisisEspacialView.vue'),
-        meta: { title: 'Análisis Espacial' }
+        meta: { 
+          title: 'Análisis Espacial',
+          roles: ['administrador', 'planificador', 'autoridad_municipal']
+        }
       },
       {
         path: 'simulacion-proyectos',
         name: 'SimulacionProyectos',
         component: () => import('@/views/SimulacionProyectosView.vue'),
-        meta: { title: 'Simulación de Proyectos' }
+        meta: { 
+          title: 'Simulación de Proyectos',
+          roles: ['administrador', 'planificador', 'autoridad_municipal']
+        }
       },
       {
         path: 'cobertura-infraestructura',
         name: 'CoberturaInfraestructura',
         component: () => import('@/views/CoberturaView.vue'),
-        meta: { title: 'Cobertura de Infraestructura' }
+        meta: { 
+          title: 'Cobertura de Infraestructura',
+          roles: ['administrador', 'planificador', 'autoridad_municipal']
+        }
       },
       {
         path: 'reportes',
@@ -81,7 +102,7 @@ const routes = [
         component: () => import('@/views/ReportesView.vue'),
         meta: {
           title: 'Reportes',
-          roles: ['administrador', 'planificador'] // La lógica de roles sigue funcionando
+          roles: ['administrador', 'planificador', 'autoridad_municipal']
         }
       }
     ]

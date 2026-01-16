@@ -21,7 +21,7 @@
         </div>
 
         <div class="stat-card">
-          <div class="stat-icon">🏫</div>
+          <div class="stat-icon"></div>
           <div class="stat-content">
             <div class="stat-label">Escuelas</div>
             <div class="stat-value">{{ estadisticas.total_escuelas }}</div>
@@ -29,7 +29,7 @@
         </div>
 
         <div class="stat-card">
-          <div class="stat-icon">🏥</div>
+          <div class="stat-icon"></div>
           <div class="stat-content">
             <div class="stat-label">Hospitales</div>
             <div class="stat-value">{{ estadisticas.total_hospitales }}</div>

@@ -5,18 +5,18 @@
     <!-- Panel de control de simulación -->
     <div class="panel-simulacion">
       <div class="simulacion-header">
-        <h3>🏗️ Simulación de Proyectos</h3>
+        <h3>Simulación de Proyectos</h3>
         <button v-if="!modoSimulacion" @click="iniciarSimulacion" class="btn-iniciar">
           ✏️ Iniciar Simulación
         </button>
         <button v-else @click="cancelarSimulacion" class="btn-cancelar">
-          ❌ Cancelar
+          Cancelar
         </button>
       </div>
 
       <!-- Formulario de simulación -->
       <div v-if="modoSimulacion && areaSimulada" class="formulario-simulacion">
-        <h4>📋 Configurar Proyecto</h4>
+        <h4>Configurar Proyecto</h4>
 
         <div class="form-group">
           <label>Tipo de Proyecto:</label>
@@ -24,8 +24,8 @@
             <option value="RESIDENCIAL">🏘️ Residencial</option>
             <option value="COMERCIAL">🏬 Comercial</option>
             <option value="INDUSTRIAL">🏭 Industrial</option>
-            <option value="EDUCATIVO">🏫 Educativo</option>
-            <option value="SALUD">🏥 Salud</option>
+            <option value="EDUCATIVO">Educativo</option>
+            <option value="SALUD">Salud</option>
             <option value="RECREATIVO">🎡 Recreativo</option>
             <option value="TRANSPORTE">🚇 Transporte</option>
           </select>
@@ -88,7 +88,7 @@
 
         <div class="form-actions">
           <button @click="calcularImpacto" class="btn-calcular" :disabled="loading">
-            📊 Calcular Impacto
+            Calcular Impacto
           </button>
           <button @click="guardarSimulacion" class="btn-guardar" :disabled="!resultadoImpacto || loading">
             💾 Guardar Simulación
@@ -98,7 +98,7 @@
 
       <!-- Resultados del impacto -->
       <div v-if="resultadoImpacto" class="resultados-impacto">
-        <h4>📈 Impacto Proyectado</h4>
+        <h4>Impacto Proyectado</h4>
 
         <div class="comparacion-grid">
           <div class="comparacion-card">
@@ -162,14 +162,14 @@
             </div>
           </div>
           <div class="metrica-card">
-            <div class="metrica-icon">🎯</div>
+            <div class="metrica-icon"></div>
             <div class="metrica-content">
               <span class="metrica-label">Área de Influencia</span>
               <span class="metrica-value">{{ simulacion.areaInfluencia }} m</span>
             </div>
           </div>
           <div class="metrica-card">
-            <div class="metrica-icon">📊</div>
+            <div class="metrica-icon"></div>
             <div class="metrica-content">
               <span class="metrica-label">Densidad Población</span>
               <span class="metrica-value">
@@ -447,7 +447,7 @@ const getIconoTipo = (tipo) => {
     'RECREATIVO': '🎡',
     'TRANSPORTE': '🚇'
   };
-  return iconos[tipo] || '🏗️';
+  return iconos[tipo] || '';
 };
 
 onMounted(() => {
