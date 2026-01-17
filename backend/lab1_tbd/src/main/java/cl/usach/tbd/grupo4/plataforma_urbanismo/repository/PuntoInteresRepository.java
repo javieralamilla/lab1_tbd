@@ -87,7 +87,7 @@ public class PuntoInteresRepository {
               )
             ORDER BY distancia_metros
         """;
-        // CAMBIO: Se pasa el valor del enum 'Tipo.ESCUELA'
+        // Se pasa el valor del enum 'Tipo.ESCUELA'
         return jdbcTemplate.queryForList(sql, PuntoInteres.Tipo.ESCUELA.getValor());
     }
 

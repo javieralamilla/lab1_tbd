@@ -31,7 +31,7 @@ const routes = [
         path: 'zonas',
         name: 'Zonas',
         component: () => import('@/views/ZonasView.vue'),
-        meta: { 
+        meta: {
           title: 'Zonas Urbanas',
           roles: ['administrador', 'planificador', 'autoridad_municipal']
         }
@@ -40,7 +40,7 @@ const routes = [
         path: 'proyectos',
         name: 'Proyectos',
         component: () => import('@/views/ProyectosView.vue'),
-        meta: { 
+        meta: {
           title: 'Proyectos Urbanos',
           roles: ['administrador', 'planificador', 'autoridad_municipal']
         }
@@ -49,7 +49,7 @@ const routes = [
         path: 'puntos-interes',
         name: 'PuntosInteres',
         component: () => import('@/views/PuntosInteresView.vue'),
-        meta: { 
+        meta: {
           title: 'Puntos de Interés',
           roles: ['administrador', 'planificador', 'autoridad_municipal']
         }
@@ -58,7 +58,7 @@ const routes = [
         path: 'datos-demograficos',
         name: 'DatosDemograficos',
         component: () => import('@/views/DatosView.vue'),
-        meta: { 
+        meta: {
           title: 'Datos Demográficos',
           roles: ['administrador', 'planificador', 'autoridad_municipal']
         }
@@ -73,8 +73,17 @@ const routes = [
         path: 'analisis-espacial',
         name: 'AnalisisEspacial',
         component: () => import('@/views/AnalisisEspacialView.vue'),
-        meta: { 
+        meta: {
           title: 'Análisis Espacial',
+          roles: ['administrador', 'planificador', 'autoridad_municipal']
+        }
+      },
+      {
+        path: 'proximidad-escuelas',
+        name: 'ProximidadEscuelas',
+        component: () => import('@/views/ProximidadEscuelasView.vue'),
+        meta: {
+          title: 'Proximidad de Escuelas',
           roles: ['administrador', 'planificador', 'autoridad_municipal']
         }
       },
@@ -82,7 +91,7 @@ const routes = [
         path: 'simulacion-proyectos',
         name: 'SimulacionProyectos',
         component: () => import('@/views/SimulacionProyectosView.vue'),
-        meta: { 
+        meta: {
           title: 'Simulación de Proyectos',
           roles: ['administrador', 'planificador', 'autoridad_municipal']
         }
@@ -91,7 +100,7 @@ const routes = [
         path: 'cobertura-infraestructura',
         name: 'CoberturaInfraestructura',
         component: () => import('@/views/CoberturaView.vue'),
-        meta: { 
+        meta: {
           title: 'Cobertura de Infraestructura',
           roles: ['administrador', 'planificador', 'autoridad_municipal']
         }
