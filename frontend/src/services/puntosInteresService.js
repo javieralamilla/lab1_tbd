@@ -5,7 +5,7 @@ const puntosInteresService = {
   async getAll() {
     try {
       console.log('[PuntosInteresService] Obteniendo todos los puntos de interés...');
-      const response = await api.get('/puntos-interes');
+      const response = await api.get('/puntos-interes?size=-1');
       console.log('[PuntosInteresService] Puntos obtenidos:', response.data?.length || 0);
       return response.data;
     } catch (error) {

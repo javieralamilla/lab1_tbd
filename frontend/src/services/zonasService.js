@@ -5,7 +5,7 @@ const zonasService = {
   async getAll() {
     try {
       console.log('[ZonasService] Obteniendo todas las zonas urbanas...');
-      const response = await api.get('/zonas');
+      const response = await api.get('/zonas?size=-1');
       console.log('[ZonasService] Zonas obtenidas:', response.data?.length || 0);
       return response.data;
     } catch (error) {
@@ -134,6 +134,15 @@ const zonasService = {
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Error al obtener estadísticas del área' };
+    }
+  },
+
+  async refrescarVistas() {
+    try {
+      const response = await api.post('/zonas/admin/refrescar-vistas');
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Error al refrescar vistas materializadas' };
     }
   }
 };

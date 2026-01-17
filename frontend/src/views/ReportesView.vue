@@ -309,6 +309,7 @@
           <div class="card-header">
             <h2>Resumen de Proyectos</h2>
             <p>Matriz de estado de proyectos por tipo de zona</p>
+            <button @click="refrescarVistas" class="btn-refresh" :disabled="loadingRefresco">{{ loadingRefresco ? 'Actualizando...' : 'Actualizar Vista Materializada' }}</button>
           </div>
 
           <div class="card-controls">
@@ -400,6 +401,7 @@ const zonasCrecimiento = ref([])
 // --- Lógica Q10 Resumen ---
 const resumenProyectos = ref([])
 const filtroResumen = reactive({ tipoZona: 'todos', estado: 'todos' })
+const loadingRefresco = ref(false)
 
 // MÉTODOS DE CARGA
 
@@ -489,6 +491,21 @@ const cargarResumenProyectos = async () => {
     const data = await proyectosService.getResumenEstadoZona(filtroResumen.tipoZona, filtroResumen.estado)
     resumenProyectos.value = data
   } catch (e) { console.error('Q10 Error', e) }
+}
+
+// Refrescar vistas materializadas
+const refrescarVistas = async () => {
+  loadingRefresco.value = true
+  try {
+    await zonasService.refrescarVistas()
+    await cargarResumenProyectos()
+    alert('Vistas actualizadas correctamente')
+  } catch (e) {
+    console.error('Error al refrescar vistas:', e)
+    alert('Error al actualizar vistas materializadas')
+  } finally {
+    loadingRefresco.value = false
+  }
 }
 
 // Watchers para cargar datos al cambiar de tab

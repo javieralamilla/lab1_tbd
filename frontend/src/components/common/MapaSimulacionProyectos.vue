@@ -90,7 +90,7 @@
           <button @click="calcularImpacto" class="btn-calcular" :disabled="loading">
             Calcular Impacto
           </button>
-          <button @click="guardarSimulacion" class="btn-guardar" :disabled="!resultadoImpacto || loading">
+          <button @click="mostrarModalGuardar" class="btn-guardar" :disabled="!resultadoImpacto || loading">
             💾 Guardar Simulación
           </button>
         </div>
@@ -198,6 +198,41 @@
       </div>
     </div>
 
+    <!-- Modal para guardar simulación -->
+    <div v-if="showGuardarModal" class="modal-overlay" @click.self="showGuardarModal = false">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>💾 Guardar Simulación</h3>
+          <button @click="showGuardarModal = false" class="btn-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <p>Selecciona cómo deseas guardar esta simulación:</p>
+          <div class="opciones-guardar">
+            <button @click="guardarComoProyecto" class="btn-opcion-guardar" :disabled="guardando">
+              <div class="opcion-icon">📋</div>
+              <div class="opcion-info">
+                <h4>Guardar como Proyecto</h4>
+                <p>Crea un nuevo proyecto en el sistema con los parámetros de la simulación</p>
+              </div>
+            </button>
+            <button @click="guardarComoDatoDemografico" class="btn-opcion-guardar" :disabled="guardando">
+              <div class="opcion-icon">📊</div>
+              <div class="opcion-info">
+                <h4>Guardar como Dato Demográfico</h4>
+                <p>Registra el impacto poblacional proyectado como dato demográfico</p>
+              </div>
+            </button>
+          </div>
+          <div class="modal-actions">
+            <button @click="guardarSimulacion" class="btn-guardar-local" :disabled="guardando">
+              💾 Solo guardar localmente
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     <!-- Indicador de carga -->
     <div v-if="loading" class="loading-overlay">
       <div class="spinner"></div>
@@ -216,8 +251,10 @@ import 'leaflet-draw';
 import 'leaflet-draw/dist/leaflet.draw.css';
 
 import api from '@/services/api';
+import { useAuthStore } from '@/stores/auth';
 
 const emit = defineEmits(['error', 'success']);
+const authStore = useAuthStore();
 
 const mapContainer = ref(null);
 let map = null;
@@ -230,6 +267,8 @@ const areaSimulada = ref(null);
 const loading = ref(false);
 const resultadoImpacto = ref(null);
 const simulacionesGuardadas = ref([]);
+const showGuardarModal = ref(false);
+const guardando = ref(false);
 
 const simulacion = ref({
   tipoProyecto: 'RESIDENCIAL',
@@ -407,7 +446,100 @@ const guardarSimulacion = () => {
   // Guardar en localStorage
   localStorage.setItem('simulaciones', JSON.stringify(simulacionesGuardadas.value));
 
-  emit('success', 'Simulación guardada exitosamente');
+  showGuardarModal.value = false;
+  emit('success', 'Simulación guardada localmente');
+};
+
+const mostrarModalGuardar = () => {
+  if (!resultadoImpacto.value) {
+    emit('error', 'Debes calcular el impacto antes de guardar');
+    return;
+  }
+  showGuardarModal.value = true;
+};
+
+const guardarComoProyecto = async () => {
+  try {
+    guardando.value = true;
+
+    // Obtener ID del usuario actual
+    const usuarioId = authStore.user?.usuario_id || authStore.user?.usuarioId;
+    
+    if (!usuarioId) {
+      emit('error', 'Debes iniciar sesión para crear proyectos');
+      guardando.value = false;
+      return;
+    }
+
+    // Preparar datos del proyecto basados en la simulación
+    const geojson = areaSimulada.value.toGeoJSON();
+    
+    const proyectoData = {
+      nombre: `Proyecto Simulado - ${simulacion.value.tipoProyecto}`,
+      descripcion: `Proyecto generado desde simulación. Impacto población: ${formatDiferencia(resultadoImpacto.value.diferencias.poblacion)}`,
+      tipoProyecto: simulacion.value.tipoProyecto,
+      presupuesto: 0, // Se puede ajustar según necesidad
+      estado: 'PLANIFICADO',
+      fechaInicio: new Date().toISOString().split('T')[0],
+      fechaFinEstimada: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // +1 año
+      geometria: JSON.stringify(geojson.geometry),
+      usuarioId: usuarioId,
+      usuario_id: usuarioId,
+      // Incluir parámetros adicionales según tipo
+      poblacionEstimada: simulacion.value.poblacionEstimada || null,
+      numEscuelas: simulacion.value.numEscuelas || null,
+      numHospitales: simulacion.value.numHospitales || null
+    };
+
+    // Llamar al servicio de proyectos
+    const proyectosService = await import('@/services/proyectosService');
+    await proyectosService.default.create(proyectoData);
+
+    // También guardar localmente
+    guardarSimulacion();
+    
+    showGuardarModal.value = false;
+    emit('success', '¡Proyecto creado exitosamente desde la simulación!');
+
+  } catch (error) {
+    console.error('Error al guardar proyecto:', error);
+    emit('error', 'Error al crear el proyecto: ' + (error.response?.data?.mensaje || error.message));
+  } finally {
+    guardando.value = false;
+  }
+};
+
+const guardarComoDatoDemografico = async () => {
+  try {
+    guardando.value = true;
+
+    // Preparar datos demográficos basados en el impacto proyectado
+    const datoData = {
+      nombre_zona: `Zona Simulación ${simulacion.value.tipoProyecto}`,
+      año: new Date().getFullYear() + 1, // Año siguiente como proyección
+      poblacion: resultadoImpacto.value.proyectado.poblacion,
+      escuelas: resultadoImpacto.value.proyectado.escuelas,
+      hospitales: resultadoImpacto.value.proyectado.hospitales,
+      centros_culturales: resultadoImpacto.value.proyectado.centros_culturales,
+      descripcion: `Dato demográfico proyectado desde simulación ${simulacion.value.tipoProyecto}. Impacto: ${formatDiferencia(resultadoImpacto.value.diferencias.poblacion)} habitantes`
+    };
+
+    // Llamar al servicio de datos demográficos
+    const datosService = await import('@/services/datosService');
+    await datosService.default.create(datoData);
+
+    // También guardar localmente
+    guardarSimulacion();
+    
+    showGuardarModal.value = false;
+    emit('success', '¡Dato demográfico registrado exitosamente!');
+
+  } catch (error) {
+    console.error('Error al guardar dato demográfico:', error);
+    emit('error', 'Error al registrar dato demográfico: ' + (error.response?.data?.mensaje || error.message));
+  } finally {
+    guardando.value = false;
+  }
 };
 
 const eliminarSimulacion = (index) => {
@@ -880,6 +1012,187 @@ onBeforeUnmount(() => {
 
   .panel-simulacion {
     max-height: 350px;
+  }
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: var(--bg-primary);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s, transform 0.2s;
+}
+
+.btn-close:hover {
+  color: var(--text-primary);
+  transform: scale(1.1);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-body > p {
+  margin: 0 0 1.5rem 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.opciones-guardar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.btn-opcion-guardar {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.btn-opcion-guardar:hover:not(:disabled) {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+  transform: translateX(4px);
+}
+
+.btn-opcion-guardar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.opcion-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.opcion-info {
+  flex: 1;
+}
+
+.opcion-info h4 {
+  margin: 0 0 0.3rem 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.opcion-info p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.modal-actions {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: center;
+}
+
+.btn-guardar-local {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.btn-guardar-local:hover:not(:disabled) {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.btn-guardar-local:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .modal-header h3 {
+    font-size: 1.2rem;
+  }
+
+  .opcion-icon {
+    font-size: 2rem;
+  }
+
+  .opcion-info h4 {
+    font-size: 1rem;
+  }
+
+  .opcion-info p {
+    font-size: 0.8rem;
   }
 }
 </style>

@@ -1243,7 +1243,7 @@ INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio,
 
 -- Mejoramiento Vespucio Sur (Trazado vial)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Mejoramiento Vespucio Sur', 'Ampliacion y mejoramiento de Americo Vespucio sector sur', 'Vialidad', '2023-06-01', '2025-12-31', 'En Curso', 89000000.00,
+    ('Mejoramiento Vespucio Sur', 'Ampliacion y mejoramiento de Americo Vespucio sector sur', 'Vialidad', '2023-06-01', '2026-12-31', 'En Curso', 89000000.00,
      ST_GeomFromText('LINESTRING(-70.609 -33.515, -70.600 -33.530, -70.580 -33.550)', 4326), 2);
 
 -- Hospital Digital de La Florida (Ubicación exacta)
@@ -1253,12 +1253,12 @@ INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio,
 
 -- Ciclovía Providencia (Trazado eje Andrés Bello/Providencia)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Ciclovía Av. Providencia', 'Red de ciclovías protegidas desde Providencia hasta Las Condes', 'Movilidad Sostenible', '2025-01-15', '2025-12-31', 'Planeado', 8500000.00,
+    ('Ciclovía Av. Providencia', 'Red de ciclovías protegidas desde Providencia hasta Las Condes', 'Movilidad Sostenible', '2026-01-15', '2026-12-31', 'Planeado', 8500000.00,
      ST_GeomFromText('LINESTRING(-70.634 -33.437, -70.615 -33.428, -70.603 -33.418)', 4326), 2);
 
 -- Centro Cultural Maipú (Polígono ajustado)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Centro Cultural Municipal Maipú', 'Centro cultural con biblioteca, teatro y espacios comunitarios', 'Equipamiento Cultural', '2024-03-01', '2025-09-30', 'En Curso', 12000000.00,
+    ('Centro Cultural Municipal Maipú', 'Centro cultural con biblioteca, teatro y espacios comunitarios', 'Equipamiento Cultural', '2024-03-01', '2026-09-30', 'En Curso', 12000000.00,
      ST_GeomFromText('POLYGON((-70.758 -33.511, -70.756 -33.511, -70.756 -33.509, -70.758 -33.509, -70.758 -33.511))', 4326), 3);
 
 -- Renovación Barrio Yungay (Polígono zona típica)
@@ -1268,7 +1268,7 @@ INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio,
 
 -- Parque Lineal Mapocho (Trazado rio)
 INSERT INTO proyectos_urbanos (nombre, descripcion, tipo_proyecto, fecha_inicio, fecha_termino, estado, presupuesto, geometria, usuario_id) VALUES
-    ('Parque Lineal Rio Mapocho', 'Parque lineal a lo largo del rio Mapocho, fase 1', 'Area Verde', '2025-03-01', '2026-12-31', 'Planeado', 45000000.00,
+    ('Parque Lineal Rio Mapocho', 'Parque lineal a lo largo del rio Mapocho, fase 1', 'Area Verde', '2026-03-01', '2027-12-31', 'Planeado', 45000000.00,
      ST_GeomFromText('LINESTRING(-70.685 -33.425, -70.660 -33.430, -70.635 -33.435)', 4326), 1);
 
 

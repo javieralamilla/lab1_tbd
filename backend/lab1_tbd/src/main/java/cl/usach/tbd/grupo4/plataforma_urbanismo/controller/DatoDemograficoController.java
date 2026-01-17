@@ -2,11 +2,16 @@ package cl.usach.tbd.grupo4.plataforma_urbanismo.controller;
 
 import cl.usach.tbd.grupo4.plataforma_urbanismo.model.DatoDemografico;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.service.DatoDemograficoService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/datos-demograficos")
@@ -20,21 +25,37 @@ public class DatoDemograficoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DatoDemografico>> obtenerTodos(
-            @RequestParam(required = false) Long zonaId
+    public ResponseEntity<?> obtenerTodos(
+            @RequestParam(required = false) Long zonaId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "dato_demografico_id") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
     ) {
         try {
-            List<DatoDemografico> datos;
-
+            // Si hay filtro por zona, retornar sin paginación
             if (zonaId != null) {
-                // Buscar por zona
-                datos = datoDemograficoService.obtenerPorZona(zonaId);
-            } else {
-                // Obtener todos
-                datos = datoDemograficoService.obtenerTodos();
+                List<DatoDemografico> datos = datoDemograficoService.obtenerPorZona(zonaId);
+                return ResponseEntity.ok(datos);
             }
-
-            return ResponseEntity.ok(datos);
+            
+            // Si size es -1, retornar todos sin paginación
+            if (size == -1) {
+                return ResponseEntity.ok(datoDemograficoService.obtenerTodos());
+            }
+            
+            Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+            Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
+            Page<DatoDemografico> datosPage = datoDemograficoService.obtenerTodosPaginado(pageable);
+            
+            Map<String, Object> response = Map.of(
+                "content", datosPage.getContent(),
+                "currentPage", datosPage.getNumber(),
+                "totalItems", datosPage.getTotalElements(),
+                "totalPages", datosPage.getTotalPages()
+            );
+            
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

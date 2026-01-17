@@ -3,6 +3,9 @@ package cl.usach.tbd.grupo4.plataforma_urbanismo.service;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.model.ZonaUrbana;
 import cl.usach.tbd.grupo4.plataforma_urbanismo.repository.ZonaUrbanaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +20,17 @@ public class ZonaUrbanaService {
 
     public List<ZonaUrbana> obtenerTodas() {
         return zonaUrbanaRepository.findAll();
+    }
+
+    public Page<ZonaUrbana> obtenerTodasPaginado(Pageable pageable) {
+        List<ZonaUrbana> todasLasZonas = zonaUrbanaRepository.findAll();
+        
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), todasLasZonas.size());
+        
+        List<ZonaUrbana> pageContent = todasLasZonas.subList(start, end);
+        
+        return new PageImpl<>(pageContent, pageable, todasLasZonas.size());
     }
 
     public Optional<ZonaUrbana> obtenerPorId(Long id) {
