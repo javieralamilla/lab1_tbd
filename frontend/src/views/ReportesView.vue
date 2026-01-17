@@ -1,16 +1,16 @@
 <template>
   <div class="reportes-container">
     <div class="reportes-header">
-      <h1>Reportes y Analytics</h1>
+      <h1>Reportes</h1>
       <p class="subtitle">Panel integral de inteligencia de negocios y estadísticas urbanas</p>
     </div>
 
     <!-- Navegación por Pestañas -->
     <div class="tabs-nav">
-      <button 
-        v-for="tab in tabs" 
+      <button
+        v-for="tab in tabs"
         :key="tab.id"
-        class="tab-btn" 
+        class="tab-btn"
         :class="{ active: currentTab === tab.id }"
         @click="currentTab = tab.id"
       >
@@ -19,7 +19,7 @@
     </div>
 
     <div class="reportes-content">
-      
+
       <!-- TAB 1: Reporte General (Existente) -->
       <div v-if="currentTab === 'general'" class="tab-pane fade-in">
         <div class="filters-section">
@@ -107,6 +107,102 @@
         </div>
       </div>
 
+      <!-- TAB 1.5: Densidad Poblacional (Q1) -->
+      <div v-if="currentTab === 'densidad'" class="tab-pane fade-in">
+        <div class="analytics-card">
+          <div class="card-header">
+            <h2>Densidad Poblacional</h2>
+            <p>Análisis de densidad poblacional por zona urbana</p>
+          </div>
+
+          <div v-if="error" class="error-banner" style="background-color: #fee; border: 1px solid #fcc; padding: 12px; margin: 12px 0; border-radius: 4px; color: #c33;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 8px;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>{{ error }}</span>
+          </div>
+
+          <div v-if="loading" class="loading-message" style="text-align: center; padding: 20px;">
+            Cargando datos de densidad...
+          </div>
+
+          <div class="info-banner">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>Esta tabla muestra la densidad poblacional calculada para cada zona urbana según su área y población.</span>
+          </div>
+
+          <div class="metric-highlight" v-if="zonasDensidad.length">
+            <div class="metric-row">
+              <div class="metric-item">
+                <div class="metric-value">{{ zonasDensidad.length }}</div>
+                <div class="metric-label">Zonas Analizadas</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-value">{{ formatNumber(Math.max(...zonasDensidad.map(z => z.densidad_poblacion_km2 || 0))) }}</div>
+                <div class="metric-label">Densidad Máxima (hab/km²)</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-value">{{ formatNumber(Math.round(zonasDensidad.reduce((sum, z) => sum + (z.densidad_poblacion_km2 || 0), 0) / zonasDensidad.length)) }}</div>
+                <div class="metric-label">Densidad Promedio (hab/km²)</div>
+              </div>
+            </div>
+          </div>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Zona Urbana</th>
+                <th>Población</th>
+                <th>Área Real (km²)</th>
+                <th>Densidad (hab/km²)</th>
+                <th>Clasificación</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="loading">
+                <td colspan="5" class="text-center" style="padding: 30px;">
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <div style="width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <span>Cargando datos de densidad...</span>
+                  </div>
+                </td>
+              </tr>
+              <tr v-else-if="!zonasDensidad.length">
+                <td colspan="5" class="text-center" style="padding: 30px; color: #666;">
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <strong>No hay datos de densidad disponibles</strong>
+                    <p style="margin: 0; font-size: 14px;">Verifica que existan zonas urbanas con datos demográficos en la base de datos.</p>
+                  </div>
+                </td>
+              </tr>
+              <tr v-else v-for="(zona, index) in zonasDensidad" :key="index">
+                <td class="font-bold">{{ zona.zona }}</td>
+                <td class="text-right">{{ formatNumber(zona.poblacion) }}</td>
+                <td class="text-right">{{ zona.area_real_km2 }} km²</td>
+                <td class="text-right font-bold">{{ formatNumber(zona.densidad_poblacion_km2) }}</td>
+                <td>
+                  <span v-if="zona.densidad_poblacion_km2 >= 10000" class="badge badge-error">Muy Alta</span>
+                  <span v-else-if="zona.densidad_poblacion_km2 >= 5000" class="badge badge-warning">Alta</span>
+                  <span v-else-if="zona.densidad_poblacion_km2 >= 1000" class="badge badge-info">Media</span>
+                  <span v-else class="badge badge-success">Baja</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- TAB 2: Escasez Hospitales (Q2) -->
       <div v-if="currentTab === 'escasez'" class="tab-pane fade-in">
         <div class="analytics-card">
@@ -114,7 +210,7 @@
             <h2>Zonas con Escasez de Servicios</h2>
             <p>Top 5 zonas con alta población y baja cobertura hospitalaria</p>
           </div>
-          
+
           <div class="card-controls">
             <select v-model="añoEscasez" class="form-select">
               <option v-for="year in [2024, 2023, 2022, 2021, 2020]" :key="year" :value="year">{{ year }}</option>
@@ -151,7 +247,7 @@
             <h2>Proximidad Escuelas - Proyectos</h2>
             <p>Escuelas a menos de 500m de proyectos en curso</p>
           </div>
-          
+
           <div class="metric-highlight" v-if="escuelasCerca.length">
             <div class="metric-value">{{ escuelasCerca.length }}</div>
             <div class="metric-label">Escuelas Impactadas</div>
@@ -276,6 +372,7 @@ const error = ref(null)
 // Configuración Tabs
 const tabs = [
   { id: 'general', label: 'General' },
+  { id: 'densidad', label: 'Densidad' },
   { id: 'escasez', label: 'Escasez' },
   { id: 'proximidad', label: 'Proximidad' },
   { id: 'crecimiento', label: 'Crecimiento' },
@@ -286,6 +383,9 @@ const tabs = [
 const reporteGenerado = ref(false)
 const datosReporte = ref([])
 const filtros = reactive({ fechaInicio: '', fechaFin: '', tipoReporte: '' })
+
+// --- Lógica Q1 Densidad ---
+const zonasDensidad = ref([])
 
 // --- Lógica Q2 Escasez ---
 const zonasEscasez = ref([])
@@ -324,6 +424,34 @@ const limpiarFiltros = () => {
   reporteGenerado.value = false
 }
 
+// Cargar Q1 Densidad
+const cargarDensidadPoblacion = async () => {
+  try {
+    loading.value = true
+    error.value = null
+    console.log('[ReportesView] Cargando densidad poblacional...')
+    const data = await zonasService.getDensidadPoblacion()
+    console.log('[ReportesView] Datos de densidad recibidos:', data)
+
+    if (!data || data.length === 0) {
+      console.warn('[ReportesView] No se recibieron datos de densidad')
+      error.value = 'No hay datos de densidad disponibles'
+    }
+
+    zonasDensidad.value = data || []
+  } catch (e) {
+    console.error('[ReportesView] Error completo al cargar densidad:', e)
+    console.error('[ReportesView] Mensaje de error:', e.message)
+    if (e.response) {
+      console.error('[ReportesView] Respuesta del servidor:', e.response)
+    }
+    error.value = 'Error al cargar datos de densidad: ' + (e.message || 'Error desconocido')
+    zonasDensidad.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
 // Cargar Q2
 const cargarEscasezHospitales = async () => {
   try {
@@ -339,7 +467,7 @@ const cargarProximidad = async () => {
   try {
     // Usamos el servicio de puntos de interés directamente
     if (puntosInteresService.getEscuelasCercanas) {
-       const data = await puntosInteresService.getEscuelasCercanas() 
+       const data = await puntosInteresService.getEscuelasCercanas()
        escuelasCerca.value = data
     } else {
        console.warn('Servicio getEscuelasCercanas no encontrado en frontend. Pendiente actualización.')
@@ -365,6 +493,7 @@ const cargarResumenProyectos = async () => {
 
 // Watchers para cargar datos al cambiar de tab
 watch(currentTab, (newTab) => {
+  if (newTab === 'densidad') cargarDensidadPoblacion()
   if (newTab === 'escasez') cargarEscasezHospitales()
   if (newTab === 'proximidad') cargarProximidad()
   if (newTab === 'crecimiento') cargarCrecimiento()
@@ -401,8 +530,12 @@ const exportarExcel = () => reportesService.exportarExcel(datosReporte.value)
 
 // Init
 onMounted(() => {
-  // Carga inicial si estamos en tab por defecto
+  // Carga inicial según el tab actual
+  if (currentTab.value === 'densidad') cargarDensidadPoblacion()
   if (currentTab.value === 'escasez') cargarEscasezHospitales()
+  if (currentTab.value === 'proximidad') cargarProximidad()
+  if (currentTab.value === 'crecimiento') cargarCrecimiento()
+  if (currentTab.value === 'resumen') cargarResumenProyectos()
 })
 </script>
 
@@ -487,9 +620,9 @@ onMounted(() => {
 
 /* Growth Grid (Q4) */
 .growth-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-.growth-card { 
+.growth-card {
   background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-  border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; text-align: center; 
+  border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; text-align: center;
 }
 .growth-icon { font-size: 2rem; margin-bottom: 10px; }
 .growth-stat { margin: 15px 0; }
@@ -499,16 +632,45 @@ onMounted(() => {
 
 /* Metric Highlight */
 .metric-highlight {
-  display: inline-block;
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
-  padding: 10px 20px;
+  padding: 20px;
   border-radius: 8px;
   margin-bottom: 20px;
-  text-align: center;
 }
-.metric-value { font-size: 1.5rem; font-weight: bold; color: var(--accent-primary); }
-.metric-label { font-size: 0.8rem; color: var(--text-secondary); }
+.metric-row {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.metric-item {
+  text-align: center;
+  flex: 1;
+  min-width: 150px;
+}
+.metric-value { font-size: 1.8rem; font-weight: bold; color: var(--accent-primary); }
+.metric-label { font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px; }
+
+/* Info Banner */
+.info-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #dbeafe;
+  color: #1e40af;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+.info-banner svg {
+  flex-shrink: 0;
+}
+
+/* Badges adicionales para densidad */
+.badge-info { background: #dbeafe; color: #1e40af; }
+.badge-success { background: #dcfce7; color: #16a34a; }
 
 /* Filters Section (Tab General) */
 .filters-section { background: var(--bg-secondary); padding: 20px; border-radius: 12px; margin-bottom: 24px; border: 1px solid var(--border-color); }
@@ -529,6 +691,11 @@ onMounted(() => {
 /* Animations */
 .fade-in { animation: fadeIn 0.3s ease-in-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
 </style>
 

@@ -57,53 +57,102 @@ public class ZonaUrbanaRepository {
     }
 
     public List<Map<String, Object>> getDensidadPoblacion() {
+
         String sql = """
                     SELECT
                         zu.nombre AS zona,
                         dd.poblacion,
-                        zu.area_km2,
-                        ROUND(dd.poblacion::NUMERIC / NULLIF(zu.area_km2, 0), 2) AS densidad_poblacion_km2
+                        ROUND(
+                            CAST(ST_Area(zu.geometria_poligono::geography) / 1000000 AS NUMERIC),
+                            2
+                        ) AS area_real_km2,
+                        ROUND(
+                            CAST(
+                                dd.poblacion::NUMERIC / 
+                                NULLIF(ST_Area(zu.geometria_poligono::geography) / 1000000, 0)
+                            AS NUMERIC),
+                            2
+                        ) AS densidad_poblacion_km2
                     FROM zonas_urbanas zu
                     INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
-                    WHERE zu.area_km2 > 0
+                    WHERE zu.geometria_poligono IS NOT NULL
+                      AND ST_Area(zu.geometria_poligono::geography) > 0
                       AND dd.año = (SELECT MAX(año) FROM datos_demograficos)
                     ORDER BY densidad_poblacion_km2 DESC
                 """;
-        return jdbcTemplate.queryForList(sql);
+
+        try {
+            System.out.println("[ZonaUrbanaRepository] Ejecutando consulta de densidad poblacional con ST_Area...");
+            List<Map<String, Object>> resultado = jdbcTemplate.queryForList(sql);
+            System.out.println("[ZonaUrbanaRepository] Consulta exitosa. Registros obtenidos: " + resultado.size());
+
+            // Log de los primeros resultados para debug
+            if (!resultado.isEmpty()) {
+                System.out.println("[ZonaUrbanaRepository] Primer resultado: " + resultado.get(0));
+            }
+
+            return resultado;
+        } catch (Exception e) {
+            System.err.println("[ZonaUrbanaRepository] Error en consulta de densidad con ST_Area: " + e.getMessage());
+            System.err.println("[ZonaUrbanaRepository] Intentando consulta alternativa con area_km2...");
+
+            // Fallback: usar area_km2 si ST_Area falla
+            try {
+                String sqlFallback = """
+                        SELECT
+                            zu.nombre AS zona,
+                            dd.poblacion,
+                            COALESCE(zu.area_km2, 0) AS area_real_km2,
+                            CASE 
+                                WHEN zu.area_km2 IS NULL OR zu.area_km2 = 0 THEN 0
+                                ELSE ROUND((dd.poblacion::NUMERIC / zu.area_km2), 2)
+                            END AS densidad_poblacion_km2
+                        FROM zonas_urbanas zu
+                        INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
+                        WHERE zu.area_km2 IS NOT NULL AND zu.area_km2 > 0
+                          AND dd.año = (SELECT MAX(año) FROM datos_demograficos)
+                        ORDER BY densidad_poblacion_km2 DESC
+                    """;
+
+                List<Map<String, Object>> resultadoFallback = jdbcTemplate.queryForList(sqlFallback);
+                System.out.println("[ZonaUrbanaRepository] Consulta alternativa exitosa. Registros: " + resultadoFallback.size());
+                return resultadoFallback;
+            } catch (Exception e2) {
+                System.err.println("[ZonaUrbanaRepository] Error en consulta alternativa: " + e2.getMessage());
+                e2.printStackTrace();
+                throw new RuntimeException("Error al obtener densidad poblacional: " + e2.getMessage(), e2);
+            }
+        }
     }
 
     public List<Map<String, Object>> getZonasEscasezHospitales() {
-        String sql = """
-                    SELECT
-                        zu.nombre AS zona,
-                        dd.poblacion,
-                        COALESCE(ci.total_hospitales, 0) AS cantidad_hospitales
-                    FROM zonas_urbanas zu
-                    INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
-                    LEFT JOIN cobertura_infraestructura ci ON zu.zona_urbana_id = ci.zona_urbana_id
-                    WHERE dd.año = (SELECT MAX(año) FROM datos_demograficos)
-                    ORDER BY dd.poblacion DESC, cantidad_hospitales ASC
-                    LIMIT 5
-                """;
+        String sql = "SELECT " +
+                "zu.nombre AS zona, " +
+                "dd.poblacion, " +
+                "COALESCE(ci.total_hospitales, 0) AS cantidad_hospitales " +
+                "FROM zonas_urbanas zu " +
+                "INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id " +
+                "LEFT JOIN cobertura_infraestructura ci ON zu.zona_urbana_id = ci.zona_urbana_id " +
+                "WHERE dd.\"año\" = (SELECT MAX(\"año\") FROM datos_demograficos) " +
+                "ORDER BY dd.poblacion DESC, cantidad_hospitales ASC " +
+                "LIMIT 5";
         return jdbcTemplate.queryForList(sql);
     }
 
     public List<Map<String, Object>> getZonasRapidoCrecimiento() {
-        String sql = """
-                    SELECT
-                        z.nombre AS zona,
-                        d1.poblacion AS poblacion_actual,
-                        d2.poblacion AS poblacion_anterior,
-                        ROUND(((d1.poblacion - d2.poblacion)::NUMERIC / d2.poblacion) * 100, 2) AS porcentaje_crecimiento
-                    FROM zonas_urbanas z
-                    JOIN datos_demograficos d1 ON z.zona_urbana_id = d1.zona_urbana_id
-                    JOIN datos_demograficos d2 ON z.zona_urbana_id = d2.zona_urbana_id
-                    WHERE d1.año = (SELECT MAX(año) FROM datos_demograficos)
-                      AND d2.año = d1.año - 5
-                      AND d2.poblacion > 0
-                      AND ((d1.poblacion - d2.poblacion)::NUMERIC / d2.poblacion) > 0.10
-                    ORDER BY porcentaje_crecimiento DESC
-                """;
+        String sql = "SELECT " +
+                "z.nombre AS zona, " +
+                "d1.poblacion AS poblacion_actual, " +
+                "d2.poblacion AS poblacion_anterior, " +
+                "ROUND(((d1.poblacion - d2.poblacion)::NUMERIC / d2.poblacion) * 100, 2) AS porcentaje_crecimiento " +
+                "FROM zonas_urbanas z " +
+                "JOIN datos_demograficos d1 ON z.zona_urbana_id = d1.zona_urbana_id " +
+                "JOIN datos_demograficos d2 ON z.zona_urbana_id = d2.zona_urbana_id " +
+                "WHERE d1.\"año\" = (SELECT MAX(\"año\") FROM datos_demograficos) " +
+                "AND d2.\"año\" = d1.\"año\" - 5 " +
+                "AND d2.poblacion > 0 " +
+                "AND ((d1.poblacion - d2.poblacion)::NUMERIC / d2.poblacion) > 0.10 " +
+                "ORDER BY porcentaje_crecimiento DESC";
         return jdbcTemplate.queryForList(sql);
     }
 
@@ -178,60 +227,48 @@ public class ZonaUrbanaRepository {
     // coordenadas
     public Map<String, Object> getEstadisticasArea(String geojsonArea) {
         // Obtener población total en el área (proporcional al área de intersección)
-        String sqlPoblacion = """
-                    SELECT COALESCE(SUM(
-                        ROUND(
-                            dd.poblacion *
-                            ST_Area(ST_Transform(ST_Intersection(zu.geometria_poligono, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326)), 32719)) /
-                            (ST_Area(ST_Transform(zu.geometria_poligono, 32719)) + 0.000001)
-                        )
-                    ), 0) as poblacion_total
-                    FROM zonas_urbanas zu
-                    INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
-                    WHERE dd.año = (SELECT MAX(año) FROM datos_demograficos)
-                      AND ST_Intersects(zu.geometria_poligono, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
-                """;
+        String sqlPoblacion = "SELECT COALESCE(SUM(" +
+                "ROUND(" +
+                "dd.poblacion * " +
+                "ST_Area(ST_Transform(ST_Intersection(zu.geometria_poligono, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326)), 32719)) / " +
+                "(ST_Area(ST_Transform(zu.geometria_poligono, 32719)) + 0.000001)" +
+                ")" +
+                "), 0) as poblacion_total " +
+                "FROM zonas_urbanas zu " +
+                "INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id " +
+                "WHERE dd.\"año\" = (SELECT MAX(\"año\") FROM datos_demograficos) " +
+                "AND ST_Intersects(zu.geometria_poligono, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))";
 
         // Obtener cantidad de escuelas en el área
-        String sqlEscuelas = """
-                    SELECT COUNT(*) as total_escuelas
-                    FROM puntos_interes
-                    WHERE tipo = 'Escuela'
-                      AND ST_Within(coordenadas_punto, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
-                """;
+        String sqlEscuelas = "SELECT COUNT(*) as total_escuelas " +
+                "FROM puntos_interes " +
+                "WHERE tipo = 'Escuela' " +
+                "AND ST_Within(coordenadas_punto, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))";
 
         // Obtener cantidad de hospitales en el área
-        String sqlHospitales = """
-                    SELECT COUNT(*) as total_hospitales
-                    FROM puntos_interes
-                    WHERE tipo = 'Hospital'
-                      AND ST_Within(coordenadas_punto, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
-                """;
+        String sqlHospitales = "SELECT COUNT(*) as total_hospitales " +
+                "FROM puntos_interes " +
+                "WHERE tipo = 'Hospital' " +
+                "AND ST_Within(coordenadas_punto, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))";
 
         // Obtener proyectos en curso en el área
-        String sqlProyectos = """
-                    SELECT COUNT(*) as total_proyectos
-                    FROM proyectos_urbanos
-                    WHERE estado IN ('En Curso', 'Planeado')
-                      AND ST_Intersects(geometria, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
-                """;
+        String sqlProyectos = "SELECT COUNT(*) as total_proyectos " +
+                "FROM proyectos_urbanos " +
+                "WHERE estado IN ('En Curso', 'Planeado') " +
+                "AND ST_Intersects(geometria, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))";
 
         // Obtener zonas del área por tipo
-        String sqlZonasPorTipo = """
-                    SELECT tipo_zona, COUNT(*) as cantidad
-                    FROM zonas_urbanas
-                    WHERE ST_Intersects(geometria_poligono, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326))
-                    GROUP BY tipo_zona
-                """;
+        String sqlZonasPorTipo = "SELECT tipo_zona, COUNT(*) as cantidad " +
+                "FROM zonas_urbanas " +
+                "WHERE ST_Intersects(geometria_poligono, ST_SetSRID(ST_GeomFromGeoJSON(?), 4326)) " +
+                "GROUP BY tipo_zona";
 
         // Obtener área total en km2
-        String sqlAreaTotal = """
-                    SELECT ROUND(
-                        ST_Area(
-                            ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326), 32719)
-                        )::NUMERIC / 1000000, 2
-                    ) as area_km2
-                """;
+        String sqlAreaTotal = "SELECT ROUND(" +
+                "ST_Area(" +
+                "ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326), 32719)" +
+                ")::NUMERIC / 1000000, 2" +
+                ") as area_km2";
 
         try {
             Long poblacion = jdbcTemplate.queryForObject(sqlPoblacion, Long.class, geojsonArea, geojsonArea);
@@ -278,28 +315,26 @@ public class ZonaUrbanaRepository {
                     "{\"type\":\"Point\",\"coordinates\":[%s,%s]}",
                     coords[0], coords[1]);
 
-            String sqlPoblacionInfluencia = """
-                        SELECT COALESCE(SUM(
-                            ROUND(
-                                dd.poblacion * (
-                                    ST_Area(
-                                        ST_Intersection(
-                                            ST_Transform(zu.geometria_poligono, 32719),
-                                            ST_Buffer(ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326), 32719), ?)
-                                        )
-                                    ) / NULLIF(ST_Area(ST_Transform(zu.geometria_poligono, 32719)), 0)
-                                )
-                            )
-                        ), 0) as poblacion
-                        FROM zonas_urbanas zu
-                        INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
-                        WHERE dd.año = (SELECT MAX(año) FROM datos_demograficos)
-                          AND ST_DWithin(
-                              zu.geometria_poligono::geography,
-                              ST_SetSRID(ST_GeomFromGeoJSON(?), 4326)::geography,
-                              ?
-                          )
-                    """;
+            String sqlPoblacionInfluencia = "SELECT COALESCE(SUM(" +
+                    "ROUND(" +
+                    "dd.poblacion * (" +
+                    "ST_Area(" +
+                    "ST_Intersection(" +
+                    "ST_Transform(zu.geometria_poligono, 32719)," +
+                    "ST_Buffer(ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326), 32719), ?)" +
+                    ")" +
+                    ") / NULLIF(ST_Area(ST_Transform(zu.geometria_poligono, 32719)), 0)" +
+                    ")" +
+                    ")" +
+                    "), 0) as poblacion " +
+                    "FROM zonas_urbanas zu " +
+                    "INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id " +
+                    "WHERE dd.\"año\" = (SELECT MAX(\"año\") FROM datos_demograficos) " +
+                    "AND ST_DWithin(" +
+                    "zu.geometria_poligono::geography," +
+                    "ST_SetSRID(ST_GeomFromGeoJSON(?), 4326)::geography," +
+                    "?" +
+                    ")";
             Long poblacionInfluencia = jdbcTemplate.queryForObject(
                     sqlPoblacionInfluencia, Long.class, geojsonBuffer, areaInfluencia, geojsonBuffer, areaInfluencia);
 

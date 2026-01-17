@@ -510,7 +510,7 @@ public class ReporteService {
                     AND pi.tipo = 'Hospital' 
                     AND pi.activo = TRUE
             WHERE 
-                dd.año = ?
+                dd."año" = ?
                 AND dd.poblacion > 1000
             GROUP BY 
                 z.zona_urbana_id, z.nombre, dd.poblacion

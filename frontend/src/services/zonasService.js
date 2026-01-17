@@ -66,10 +66,25 @@ const zonasService = {
 
   async getDensidadPoblacion() {
     try {
+      console.log('[ZonasService] Obteniendo densidad poblacional...');
       const response = await api.get('/zonas/analisis/densidad-poblacion');
+      console.log('[ZonasService] Densidad obtenida:', response.data?.length || 0, 'zonas');
       return response.data;
     } catch (error) {
-      throw error.response?.data || { message: 'Error al obtener densidad' };
+      console.error('[ZonasService] Error obteniendo densidad:', error);
+      if (error.response?.status === 401) {
+        throw new Error('No autorizado. Por favor, inicia sesión nuevamente.');
+      }
+      if (error.response?.status === 403) {
+        throw new Error('Acceso denegado. No tienes permisos para ver la densidad.');
+      }
+      if (error.response?.status === 500) {
+        throw new Error('Error en el servidor al calcular densidad. Verifica los datos demográficos.');
+      }
+      if (error.code === 'ECONNREFUSED' || error.code === 'ERR_NETWORK') {
+        throw new Error('No se puede conectar al servidor. Verifica que el backend esté corriendo.');
+      }
+      throw error.response?.data || new Error('Error al obtener densidad');
     }
   },
 

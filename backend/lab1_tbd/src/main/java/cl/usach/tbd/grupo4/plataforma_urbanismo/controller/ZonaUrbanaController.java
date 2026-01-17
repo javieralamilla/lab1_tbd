@@ -70,8 +70,17 @@ public class ZonaUrbanaController {
     // Endpoints para consultas específicas
 
     @GetMapping("/analisis/densidad-poblacion")
-    public ResponseEntity<List<Map<String, Object>>> obtenerDensidadPoblacion() {
-        return ResponseEntity.ok(zonaUrbanaService.obtenerDensidadPoblacion());
+    public ResponseEntity<?> obtenerDensidadPoblacion() {
+        try {
+            List<Map<String, Object>> resultado = zonaUrbanaService.obtenerDensidadPoblacion();
+            System.out.println("[ZonaUrbanaController] Densidad - Resultado obtenido: " + resultado.size() + " registros");
+            return ResponseEntity.ok(resultado);
+        } catch (Exception e) {
+            System.err.println("[ZonaUrbanaController] Error al obtener densidad poblacional: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al calcular densidad: " + e.getMessage());
+        }
     }
 
     @GetMapping("/analisis/escasez-hospitales")

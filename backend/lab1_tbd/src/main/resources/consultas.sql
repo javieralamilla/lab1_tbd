@@ -5,24 +5,28 @@
 -- de datos urbanos y demográficos de la plataforma.
 
 -- ==================================================
--- 1) Cálculo de Densidad de Población
+-- 1) Cálculo de Densidad de Población (Enfoque Espacial)
 -- ==================================================
--- Calcula la densidad de población (habitantes/km²) para cada zona urbana.
--- Devuelve el nombre de la zona y su densidad, ordenado de mayor a menor.
+-- Calcula la densidad real de población (habitantes/km²) utilizando ST_Area(geometria::geography)
+-- para obtener la superficie real de la zona urbana desde la geometría.
+-- Devuelve el nombre de la zona, población, área real calculada y densidad, ordenado de mayor a menor.
 SELECT
     zu.nombre AS zona,
     dd.poblacion,
-    zu.area_km2,
-    ROUND(dd.poblacion / NULLIF(zu.area_km2, 0), 2) AS densidad_poblacional
-FROM 
+    ROUND((ST_Area(zu.geometria_poligono::geography) / 1000000)::NUMERIC, 2) AS area_real_km2,
+    ROUND(
+        dd.poblacion::NUMERIC /
+        NULLIF((ST_Area(zu.geometria_poligono::geography) / 1000000), 0),
+        2
+    ) AS densidad_poblacional_real
+FROM
     zonas_urbanas zu
     INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
 WHERE 
     dd.año = (SELECT MAX(año) FROM datos_demograficos WHERE zona_urbana_id = zu.zona_urbana_id)
-    AND zu.area_km2 IS NOT NULL
-    AND zu.area_km2 > 0
-ORDER BY 
-    densidad_poblacional DESC;
+    AND ST_Area(zu.geometria_poligono::geography) > 0
+ORDER BY
+    densidad_poblacional_real DESC;
 
 
 -- ==================================================
@@ -518,3 +522,126 @@ ORDER BY
 
 -- Para refrescar la vista materializada concurrentemente:
 -- REFRESH MATERIALIZED VIEW CONCURRENTLY resumen_proyectos_estado_zona;
+
+
+-- ==================================================
+-- CONSULTA ADICIONAL: COMPARACIÓN DE DENSIDAD REAL vs ÁREA ALMACENADA
+-- ==================================================
+-- Esta consulta compara la densidad calculada usando el campo area_km2 almacenado
+-- con la densidad real calculada usando ST_Area(geometria::geography).
+-- Útil para validar la precisión de los datos almacenados y detectar discrepancias.
+
+SELECT
+    zu.nombre AS zona,
+    dd.poblacion,
+    -- Área almacenada en la tabla
+    zu.area_km2 AS area_almacenada_km2,
+    -- Área real calculada desde la geometría (en km²)
+    ROUND((ST_Area(zu.geometria_poligono::geography) / 1000000)::NUMERIC, 2) AS area_real_km2,
+    -- Diferencia entre área almacenada y real
+    ROUND((zu.area_km2 - (ST_Area(zu.geometria_poligono::geography) / 1000000))::NUMERIC, 2) AS diferencia_km2,
+    -- Porcentaje de diferencia
+    ROUND(
+        (ABS(zu.area_km2 - (ST_Area(zu.geometria_poligono::geography) / 1000000)) /
+        NULLIF((ST_Area(zu.geometria_poligono::geography) / 1000000), 0) * 100)::NUMERIC,
+        2
+    ) AS porcentaje_diferencia,
+    -- Densidad calculada con área almacenada
+    ROUND(dd.poblacion::NUMERIC / NULLIF(zu.area_km2, 0), 2) AS densidad_con_area_almacenada,
+    -- Densidad real calculada con ST_Area (ENFOQUE ESPACIAL)
+    ROUND(
+        dd.poblacion::NUMERIC /
+        NULLIF((ST_Area(zu.geometria_poligono::geography) / 1000000), 0),
+        2
+    ) AS densidad_poblacional_real
+FROM
+    zonas_urbanas zu
+    INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
+WHERE
+    dd.año = (SELECT MAX(año) FROM datos_demograficos WHERE zona_urbana_id = zu.zona_urbana_id)
+    AND ST_Area(zu.geometria_poligono::geography) > 0
+ORDER BY
+    porcentaje_diferencia DESC;
+
+
+-- ==================================================
+-- ESTADÍSTICAS DE DENSIDAD POBLACIONAL POR TIPO DE ZONA
+-- ==================================================
+-- Calcula estadísticas de densidad (mínima, máxima, promedio) agrupadas por tipo de zona,
+-- utilizando el área real calculada con ST_Area(geometria::geography).
+
+SELECT
+    zu.tipo_zona,
+    COUNT(*) AS cantidad_zonas,
+    ROUND(AVG(dd.poblacion)::NUMERIC, 0) AS poblacion_promedio,
+    ROUND(
+        AVG(ST_Area(zu.geometria_poligono::geography) / 1000000)::NUMERIC,
+        2
+    ) AS area_promedio_km2,
+    ROUND(
+        MIN(dd.poblacion::NUMERIC / NULLIF((ST_Area(zu.geometria_poligono::geography) / 1000000), 0)),
+        2
+    ) AS densidad_minima,
+    ROUND(
+        MAX(dd.poblacion::NUMERIC / NULLIF((ST_Area(zu.geometria_poligono::geography) / 1000000), 0)),
+        2
+    ) AS densidad_maxima,
+    ROUND(
+        AVG(dd.poblacion::NUMERIC / NULLIF((ST_Area(zu.geometria_poligono::geography) / 1000000), 0)),
+        2
+    ) AS densidad_promedio
+FROM
+    zonas_urbanas zu
+    INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
+WHERE
+    dd.año = (SELECT MAX(año) FROM datos_demograficos)
+    AND ST_Area(zu.geometria_poligono::geography) > 0
+GROUP BY
+    zu.tipo_zona
+ORDER BY
+    densidad_promedio DESC;
+
+
+-- ==================================================
+-- RANKING DE ZONAS POR DENSIDAD REAL CON CLASIFICACIÓN
+-- ==================================================
+-- Lista las zonas clasificadas por nivel de densidad (Baja, Media, Alta, Muy Alta)
+-- basándose en el cálculo real del área usando ST_Area.
+
+WITH densidades AS (
+    SELECT
+        zu.zona_urbana_id,
+        zu.nombre AS zona,
+        zu.tipo_zona,
+        dd.poblacion,
+        ROUND((ST_Area(zu.geometria_poligono::geography) / 1000000)::NUMERIC, 2) AS area_real_km2,
+        ROUND(
+            dd.poblacion::NUMERIC /
+            NULLIF((ST_Area(zu.geometria_poligono::geography) / 1000000), 0),
+            2
+        ) AS densidad_real
+    FROM
+        zonas_urbanas zu
+        INNER JOIN datos_demograficos dd ON zu.zona_urbana_id = dd.zona_urbana_id
+    WHERE
+        dd.año = (SELECT MAX(año) FROM datos_demograficos)
+        AND ST_Area(zu.geometria_poligono::geography) > 0
+)
+SELECT
+    zona,
+    tipo_zona,
+    poblacion,
+    area_real_km2,
+    densidad_real,
+    CASE
+        WHEN densidad_real < 1000 THEN 'Baja'
+        WHEN densidad_real >= 1000 AND densidad_real < 5000 THEN 'Media'
+        WHEN densidad_real >= 5000 AND densidad_real < 10000 THEN 'Alta'
+        ELSE 'Muy Alta'
+    END AS clasificacion_densidad,
+    RANK() OVER (ORDER BY densidad_real DESC) AS ranking
+FROM
+    densidades
+ORDER BY
+    ranking;
+
