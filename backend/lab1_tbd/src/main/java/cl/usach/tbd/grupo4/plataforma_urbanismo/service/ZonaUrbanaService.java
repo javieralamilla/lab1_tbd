@@ -113,7 +113,7 @@ public class ZonaUrbanaService {
     }
 
     // Refrescar vistas materializadas
-    public void refrescarVistasMatererializadas() {
+    public void refrescarVistasMaterializadas() {
         zonaUrbanaRepository.refrescarCoberturaInfraestructura();
         zonaUrbanaRepository.refrescarResumenProyectos();
     }

@@ -149,9 +149,9 @@ public class ZonaUrbanaController {
 
     // Endpoint para refrescar vistas materializadas
     @PostMapping("/admin/refrescar-vistas")
-    public ResponseEntity<String> refrescarVistasMatererializadas() {
+    public ResponseEntity<String> refrescarVistasMaterializadas() {
         try {
-            zonaUrbanaService.refrescarVistasMatererializadas();
+            zonaUrbanaService.refrescarVistasMaterializadas();
             return ResponseEntity.ok("Vistas materializadas refrescadas exitosamente");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
