@@ -523,6 +523,62 @@ public class ZonaUrbanaRepository {
         return jdbcTemplate.queryForList(sql);
     }
 
+    // 4. Cobertura de Servicios - Porcentaje de zona cubierta por buffer 1km de hospitales
+    public List<Map<String, Object>> getCoberturaHospitales() {
+        String sql = """
+            WITH buffers_hospitales AS (
+                -- Crear buffer de 1km alrededor de cada hospital y unirlos
+                SELECT ST_Union(
+                    ST_Buffer(pi.coordenadas_punto::geography, 1000)::geometry
+                ) AS buffer_unificado
+                FROM puntos_interes pi
+                WHERE pi.tipo = 'Hospital'
+                  AND pi.activo = TRUE
+            )
+            SELECT
+                zu.zona_urbana_id,
+                zu.nombre AS zona,
+                zu.tipo_zona,
+                -- Área total de la zona en km²
+                ROUND(
+                    (ST_Area(zu.geometria_poligono::geography) / 1000000)::NUMERIC,
+                    4
+                ) AS area_total_km2,
+                -- Área cubierta por hospitales en km²
+                ROUND(
+                    COALESCE(
+                        ST_Area(
+                            ST_Intersection(
+                                zu.geometria_poligono::geography::geometry,
+                                bh.buffer_unificado
+                            )::geography
+                        ) / 1000000,
+                        0
+                    )::NUMERIC,
+                    4
+                ) AS area_cubierta_km2,
+                -- Porcentaje de cobertura
+                ROUND(
+                    COALESCE(
+                        (ST_Area(
+                            ST_Intersection(
+                                zu.geometria_poligono::geography::geometry,
+                                bh.buffer_unificado
+                            )::geography
+                        ) / NULLIF(ST_Area(zu.geometria_poligono::geography), 0)) * 100,
+                        0
+                    )::NUMERIC,
+                    2
+                ) AS porcentaje_cobertura
+            FROM zonas_urbanas zu
+            CROSS JOIN buffers_hospitales bh
+            WHERE zu.geometria_poligono IS NOT NULL
+              AND ST_Area(zu.geometria_poligono::geography) > 0
+            ORDER BY porcentaje_cobertura DESC
+        """;
+        return jdbcTemplate.queryForList(sql);
+    }
+
     // 9. Análisis de Superposición de Proyectos
     public List<Map<String, Object>> getProyectosSuperpuestos() {
         String sql = """

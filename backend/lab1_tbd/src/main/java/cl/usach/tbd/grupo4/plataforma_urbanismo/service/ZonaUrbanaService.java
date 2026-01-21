@@ -24,12 +24,12 @@ public class ZonaUrbanaService {
 
     public Page<ZonaUrbana> obtenerTodasPaginado(Pageable pageable) {
         List<ZonaUrbana> todasLasZonas = zonaUrbanaRepository.findAll();
-        
+
         int start = (int) pageable.getOffset();
         int end = Math.min((start + pageable.getPageSize()), todasLasZonas.size());
-        
+
         List<ZonaUrbana> pageContent = todasLasZonas.subList(start, end);
-        
+
         return new PageImpl<>(pageContent, pageable, todasLasZonas.size());
     }
 
@@ -87,9 +87,8 @@ public class ZonaUrbanaService {
             Double impactoPoblacion,
             Integer areaInfluencia) {
         return zonaUrbanaRepository.calcularImpactoProyecto(
-            geojsonArea, tipoProyecto, poblacionEstimada, numEscuelas,
-            numHospitales, impactoPoblacion, areaInfluencia
-        );
+                geojsonArea, tipoProyecto, poblacionEstimada, numEscuelas,
+                numHospitales, impactoPoblacion, areaInfluencia);
     }
 
     // 3. Análisis de Proximidad a Proyectos
@@ -100,6 +99,12 @@ public class ZonaUrbanaService {
     // 9. Análisis de Superposición de Proyectos
     public List<Map<String, Object>> obtenerProyectosSuperpuestos() {
         return zonaUrbanaRepository.getProyectosSuperpuestos();
+    }
+
+    // 4. Cobertura de Servicios - Porcentaje de zona cubierta por buffer 1km de
+    // hospitales
+    public List<Map<String, Object>> obtenerCoberturaHospitales() {
+        return zonaUrbanaRepository.getCoberturaHospitales();
     }
 
     // 5. Análisis de Cobertura de Infraestructura

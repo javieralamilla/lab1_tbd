@@ -29,23 +29,23 @@ public class ZonaUrbanaController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "zona_urbana_id") String sortBy,
             @RequestParam(defaultValue = "asc") String direction) {
-        
-        // Si size es -1, retornar todos sin paginación (para compatibilidad con frontend actual)
+
+        // Si size es -1, retornar todos sin paginación (para compatibilidad con
+        // frontend actual)
         if (size == -1) {
             return ResponseEntity.ok(zonaUrbanaService.obtenerTodas());
         }
-        
+
         Sort.Direction sortDirection = direction.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, sortBy));
         Page<ZonaUrbana> zonasPage = zonaUrbanaService.obtenerTodasPaginado(pageable);
-        
+
         Map<String, Object> response = Map.of(
-            "content", zonasPage.getContent(),
-            "currentPage", zonasPage.getNumber(),
-            "totalItems", zonasPage.getTotalElements(),
-            "totalPages", zonasPage.getTotalPages()
-        );
-        
+                "content", zonasPage.getContent(),
+                "currentPage", zonasPage.getNumber(),
+                "totalItems", zonasPage.getTotalElements(),
+                "totalPages", zonasPage.getTotalPages());
+
         return ResponseEntity.ok(response);
     }
 
@@ -98,7 +98,8 @@ public class ZonaUrbanaController {
     public ResponseEntity<?> obtenerDensidadPoblacion() {
         try {
             List<Map<String, Object>> resultado = zonaUrbanaService.obtenerDensidadPoblacion();
-            System.out.println("[ZonaUrbanaController] Densidad - Resultado obtenido: " + resultado.size() + " registros");
+            System.out.println(
+                    "[ZonaUrbanaController] Densidad - Resultado obtenido: " + resultado.size() + " registros");
             return ResponseEntity.ok(resultado);
         } catch (Exception e) {
             System.err.println("[ZonaUrbanaController] Error al obtener densidad poblacional: " + e.getMessage());
@@ -127,6 +128,12 @@ public class ZonaUrbanaController {
     @GetMapping("/analisis/escuelas-cerca-proyectos")
     public ResponseEntity<List<Map<String, Object>>> obtenerEscuelasCercaProyectos() {
         return ResponseEntity.ok(zonaUrbanaService.obtenerEscuelasCercaProyectos());
+    }
+
+    // 4. Cobertura de Servicios - Porcentaje cubierto por buffer 1km de hospitales
+    @GetMapping("/analisis/cobertura-hospitales")
+    public ResponseEntity<List<Map<String, Object>>> obtenerCoberturaHospitales() {
+        return ResponseEntity.ok(zonaUrbanaService.obtenerCoberturaHospitales());
     }
 
     // 5. Análisis de Cobertura de Infraestructura
@@ -189,20 +196,24 @@ public class ZonaUrbanaController {
 
             String tipoProyecto = (String) request.get("tipoProyecto");
             Integer poblacionEstimada = request.get("poblacionEstimada") != null
-                ? ((Number) request.get("poblacionEstimada")).intValue() : 0;
+                    ? ((Number) request.get("poblacionEstimada")).intValue()
+                    : 0;
             Integer numEscuelas = request.get("numEscuelas") != null
-                ? ((Number) request.get("numEscuelas")).intValue() : 0;
+                    ? ((Number) request.get("numEscuelas")).intValue()
+                    : 0;
             Integer numHospitales = request.get("numHospitales") != null
-                ? ((Number) request.get("numHospitales")).intValue() : 0;
+                    ? ((Number) request.get("numHospitales")).intValue()
+                    : 0;
             Double impactoPoblacion = request.get("impactoPoblacion") != null
-                ? ((Number) request.get("impactoPoblacion")).doubleValue() : 0.0;
+                    ? ((Number) request.get("impactoPoblacion")).doubleValue()
+                    : 0.0;
             Integer areaInfluencia = request.get("areaInfluencia") != null
-                ? ((Number) request.get("areaInfluencia")).intValue() : 1000;
+                    ? ((Number) request.get("areaInfluencia")).intValue()
+                    : 1000;
 
             Map<String, Object> impacto = zonaUrbanaService.calcularImpactoProyecto(
-                geojsonArea, tipoProyecto, poblacionEstimada, numEscuelas,
-                numHospitales, impactoPoblacion, areaInfluencia
-            );
+                    geojsonArea, tipoProyecto, poblacionEstimada, numEscuelas,
+                    numHospitales, impactoPoblacion, areaInfluencia);
 
             return ResponseEntity.ok(impacto);
         } catch (Exception e) {

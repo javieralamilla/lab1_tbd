@@ -119,6 +119,19 @@ const zonasService = {
   },
 
 
+  // 4. Cobertura de Servicios - Porcentaje cubierto por buffer 1km de hospitales
+  async getCoberturaHospitales() {
+    try {
+      console.log('[ZonasService] Obteniendo cobertura de hospitales (buffer 1km)...');
+      const response = await api.get('/zonas/analisis/cobertura-hospitales');
+      console.log('[ZonasService] Cobertura hospitales obtenida:', response.data?.length || 0, 'zonas');
+      return response.data;
+    } catch (error) {
+      console.error('[ZonasService] Error obteniendo cobertura hospitales:', error);
+      throw error.response?.data || { message: 'Error al obtener cobertura de hospitales' };
+    }
+  },
+
   async getCoberturaInfraestructura() {
     try {
       const response = await api.get('/zonas/analisis/cobertura-infraestructura');

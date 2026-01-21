@@ -85,8 +85,71 @@ WHERE
     AND p.estado = 'En Curso'
 ORDER BY
     distancia_metros ASC;
+
 -- ==================================================
--- 4) Detección de Zonas en Rápido Crecimiento
+-- 4) Cobertura de Servicios (ENUNCIADO 2)
+-- ==================================================
+-- Calcula qué porcentaje del área de una zona urbana está cubierta por el 
+-- radio de servicio (buffer de 1km) de los hospitales existentes.
+-- Utiliza ST_Buffer para crear el área de influencia y ST_Intersection
+-- para calcular el área cubierta.
+-- 
+-- Devuelve: zona, tipo de zona, área total (km²), área cubierta (km²),
+-- y porcentaje de cobertura, ordenado de mayor a menor cobertura.
+
+WITH buffers_hospitales AS (
+    -- Crear buffer de 1km alrededor de cada hospital y unirlos
+    SELECT ST_Union(
+        ST_Buffer(pi.coordenadas_punto::geography, 1000)::geometry
+    ) AS buffer_unificado
+    FROM puntos_interes pi
+    WHERE pi.tipo = 'Hospital'
+      AND pi.activo = TRUE
+)
+SELECT
+    zu.zona_urbana_id,
+    zu.nombre AS zona,
+    zu.tipo_zona,
+    -- Área total de la zona en km²
+    ROUND(
+        (ST_Area(zu.geometria_poligono::geography) / 1000000)::NUMERIC,
+        4
+    ) AS area_total_km2,
+    -- Área cubierta por hospitales en km²
+    ROUND(
+        COALESCE(
+            ST_Area(
+                ST_Intersection(
+                    zu.geometria_poligono::geography::geometry,
+                    bh.buffer_unificado
+                )::geography
+            ) / 1000000,
+            0
+        )::NUMERIC,
+        4
+    ) AS area_cubierta_km2,
+    -- Porcentaje de cobertura
+    ROUND(
+        COALESCE(
+            (ST_Area(
+                ST_Intersection(
+                    zu.geometria_poligono::geography::geometry,
+                    bh.buffer_unificado
+                )::geography
+            ) / NULLIF(ST_Area(zu.geometria_poligono::geography), 0)) * 100,
+            0
+        )::NUMERIC,
+        2
+    ) AS porcentaje_cobertura
+FROM zonas_urbanas zu
+CROSS JOIN buffers_hospitales bh
+WHERE zu.geometria_poligono IS NOT NULL
+  AND ST_Area(zu.geometria_poligono::geography) > 0
+ORDER BY porcentaje_cobertura DESC;
+
+
+-- ==================================================
+-- 5) Detección de Zonas en Rápido Crecimiento
 -- ==================================================
 -- Identifica las 3 zonas cuya población creció más del 10% en los últimos 5 años.
 -- Muestra nombre de zona y porcentaje de crecimiento.
