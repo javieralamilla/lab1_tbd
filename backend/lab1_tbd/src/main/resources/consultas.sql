@@ -87,13 +87,10 @@ ORDER BY
     distancia_metros ASC;
 
 -- ==================================================
--- 4) Cobertura de Servicios (ENUNCIADO 2)
+-- 4) Cobertura de Servicios
 -- ==================================================
 -- Calcula qué porcentaje del área de una zona urbana está cubierta por el 
 -- radio de servicio (buffer de 1km) de los hospitales existentes.
--- Utiliza ST_Buffer para crear el área de influencia y ST_Intersection
--- para calcular el área cubierta.
--- 
 -- Devuelve: zona, tipo de zona, área total (km²), área cubierta (km²),
 -- y porcentaje de cobertura, ordenado de mayor a menor cobertura.
 
